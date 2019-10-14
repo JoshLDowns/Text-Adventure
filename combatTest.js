@@ -9,7 +9,7 @@ function ask(questionText) {
 
 let player = {
     health: 50,
-    inventory: ['Repair Kit', 'Repair Kit'],
+    inventory: ['Repair Kit', 'Room Key', 'Repair Kit'],
     ability: 'Particle Beam',
     damageBase: 5,
     damageModifier: 4,
@@ -17,6 +17,7 @@ let player = {
         for (var i = 0; i < this.inventory.length; i++) {
             if (this.inventory[i] === 'Repair Kit') {
                 this.inventory.splice(i, 1);
+                break;
             }
         }
     }
@@ -44,8 +45,14 @@ async function combat(user, comp) {
                 process.exit();
             }
         } else {
-            if (user.inventory.length !== 0) {
-                let itemChoice = await ask(`You have ${user.inventory.length} Repair Kits to use, would you like to use one?\n`);
+            if (user.inventory.includes('Repair Kit')) {
+                let kitCount = 0;
+                for (let item of user.inventory) {
+                    if (item === 'Repair Kit') {
+                        kitCount = kitCount + 1;
+                    }
+                }
+                let itemChoice = await ask(`You have ${kitCount} Repair Kits to use, would you like to use one?\n`);
                 if (itemChoice === 'y') {
                     user.useRepairKit();
                     user.health = user.health + 10;
@@ -64,7 +71,7 @@ async function combat(user, comp) {
                     }
                 }
             } else {
-                console.log('You do not have any items ... ATTACK!');
+                console.log('You do not have any items you can use... ATTACK!');
                 damageUser = user.damageBase + Math.floor(Math.random() * (user.damageModifier) + 1);
                 console.log(`You fired your ${user.ability}!  It dealt ${damageUser} damage!`);
                 comp.health = comp.health - damageUser;
