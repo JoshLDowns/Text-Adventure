@@ -25,9 +25,9 @@ let player = {
 
 let enemy = {
     name: 'Robot Sentry',
-    health: 50,
+    health: 35,
     ability: 'Plasma Ray',
-    damageBase: 3,
+    damageBase: 6,
     damageModifier: 6,
     reward : 'Metal Scraps'
 }
@@ -61,7 +61,7 @@ async function combat(user, comp) {
                 let itemChoice = await ask(`You have ${kitCount} Repair Kits to use, would you like to use one?\n`);
                 if (itemChoice === 'y') {
                     user.useRepairKit();  //removes a Repair Kit from inventory if you used one
-                    user.health = user.health + 10;
+                    user.health = user.health + 20;
                     if (user.health > userMaxHealth) {
                         user.health = userMaxHealth;
                     }
