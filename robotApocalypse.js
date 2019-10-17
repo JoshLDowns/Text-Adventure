@@ -8,12 +8,12 @@ function ask(questionText) {
 }
 
 let player = {
-    maxHealth : 20,
-    health: 20,
-    inventory: [],
+    maxHealth : 50,
+    health: 50,
+    inventory: ['Office Keycard West', 'Office Keycard East'],
     ability: 'Particle Beam',
-    damageBase: 2,
-    damageModifier: 3,
+    damageBase: 5,
+    damageModifier: 4,
     useRepairKit: function () { //removes repair kit from inventory on use
         for (var i = 0; i < this.inventory.length; i++) {
             if (this.inventory[i] === 'Repair Kit') {
@@ -30,7 +30,8 @@ let enemyW = {
     ability: 'Plasma Ray',
     damageBase: 6,
     damageModifier: 6,
-    reward : 'Killswitch Code 1'
+    reward : 'Killswitch Code 1',
+    postRoomInfo : 'Sample Info E'
 }
 
 let enemyE = {
@@ -39,7 +40,8 @@ let enemyE = {
     ability: 'Pneumatic Fist',
     damageBase: 3,
     damageModifier: 3,
-    reward: 'Killswitch Code 2'
+    reward: 'Killswitch Code 2',
+    postRoomInfo : 'Sample Info W'
 }
 
 let enemyN1 = {
@@ -48,7 +50,8 @@ let enemyN1 = {
     ability: 'Fission Laser',
     damageBase: 8,
     damageModifier: 6,
-    reward: 'Office Keycard North'
+    reward: 'Office Keycard North',
+    postRoomInfo : 'Sample Info N,S,E,W'
 }
 
 let enemyF = {
@@ -57,9 +60,90 @@ let enemyF = {
     ability: 'Collider Beam',
     damageBase: 10,
     damageModifier: 10,
-    reward: 'Killswitch Code 3'
+    reward: 'Killswitch Code 3',
+    postRoomInfo : 'Sample Info S'
 }
 
+//Input validation class
+class ValidInput {
+    constructor (string) {
+        this.firstWord = string.slice(0, string.indexOf(' ')).toUpperCase();
+        this.lastWord = string.slice((string.lastIndexOf(' '))+1).toUpperCase();
+        this.return = undefined;
+        this.affirmative = ['YES', 'Y', 'YEAH', 'YUP', 'YUPPER', 'MHM', 'MMHMM', 'AFFIRMATIVE', '\r'];
+        this.negatory = ['NO', 'N', 'NOPE', 'NADA', 'NEGATORY'];
+        this.direction = ['GO', 'TRAVEL', 'LEAVE', 'EXIT', 'NORTH', 'SOUTH', 'EAST', 'WEST'];
+        this.inventory = ['B', 'INVENTORY', 'BAG', 'BACKPACK'];
+        this.status = ['STATUS', 'INFO'];
+        this.inspect = ['INSPECT'];
+        this.instructions = ['D', 'DIRECTIONS', 'INSTRUCTIONS', 'INST', 'HOW'];
+        this.pickUpItem = ['PICK UP', 'PICK', 'GRAB', 'AQUIRE', 'METAL', 'BATTERY', 'COATING', 'BOX1', 'BOX2'];
+        this.validInputs = [this.affirmative, this.negatory, this.direction, this.inventory, this.inspect, this.instructions, this.pickUpItem];
+    }
+
+    firstInputTrue () {
+        for (let arr of this.validInputs) {
+            for (let item of arr) {
+                if (this.firstWord === item.toString()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    lastWordTrue () {
+        for (let arr of this.validInputs) {
+            for (let item of arr) {
+                if (this.lastWord === item.toString()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    returnInput (obj) {
+        if (this.affirmative.includes(obj.firstWord) || this.affirmative.includes(obj.lastWord)){
+            this.return = 'y';
+        } else if (this.negatory.includes(obj.firstWord) || this.negatory.includes(obj.lastWord)){
+            this.return = 'n';
+        } else if (this.inventory.includes(obj.firstWord) || this.inventory.includes(obj.lastWord)){
+            this.return = 'i';
+        } else if (this.status.includes(obj.firstWord) || this.status.includes(obj.lastWord)){
+            this.return = 's';
+        } else if (this.inspect.includes(obj.firstWord) || this.inspect.includes(obj.lastWord)){
+            this.return = 'insp';
+        } else if (this.direction.includes(obj.firstWord) || this.direction.includes(obj.lastWord)){
+            if (obj.firstWord === 'NORTH' || obj.lastWord === 'NORTH'){
+                this.return = 'dn';
+            } else if (obj.firstWord === 'SOUTH' || obj.lastWord === 'SOUTH') {
+                this.return = 'ds';
+            } else if (obj.firstWord === 'EAST' || obj.lastWord === 'EAST') {
+                this.return = 'de';
+            } else {
+                this.return = 'dw';
+            }
+        } else if (this.pickUpItem.includes(obj.firstWord) || this.pickUpItem.includes(obj.lastWord)){
+            if (obj.firstWord === 'METAL' || obj.lastWord === 'METAL') {
+                this.return = 'pu_scrapmetal';
+            } else if (obj.firstWord === 'BATTERY' || obj.lastWord === 'BATTERY'){
+                this.return = 'pu_particlebattery';
+            } else if (obj.firstWord === 'COATING' || obj.lastWord === 'COATING'){
+                this.return = 'pu_carboncoating';
+            } else if (obj.firstWord === 'BOX1' || obj.lastWord === 'BOX1'){
+                this.return = 'pu_rboxw'
+            } else {
+                this.return  = 'pu_rboxe';
+            }
+        }
+        else {
+            return 'd';
+        }
+    }
+}
+
+//Room class to build each room
 class Room {
     constructor(name, info, inventory, enemy, north, south, east, west, keycard) {
         this.name = name;
@@ -80,11 +164,11 @@ class Room {
             }
         }
     }
-
+    //room transfer machine
     enterRoom (direction) {
         let newRoom = '';
-        if ((direction === 'n' && this.north) || (direction === 's' && this.south) || (direction === 'e' && this.east) || (direction === 'w' && this.west)) {
-            if (direction === 'n') {
+        if ((direction === 'dn' && this.north) || (direction === 'ds' && this.south) || (direction === 'de' && this.east) || (direction === 'dw' && this.west)) {
+            if (direction === 'dn') {
                 newRoom = this.north;
                 newRoom = roomLookUp[newRoom];
                 if (newRoom.keycard && player.inventory.includes(newRoom.keycard)) {
@@ -95,7 +179,7 @@ class Room {
                 } else {
                     return newRoom;
                 }
-            } else if (direction === 's') {
+            } else if (direction === 'ds') {
                 newRoom = this.south;
                 newRoom = roomLookUp[newRoom];
                 if (newRoom.keycard && player.inventory.includes(newRoom.keycard)) {
@@ -106,7 +190,7 @@ class Room {
                 } else {
                     return newRoom;
                 }
-            } else if (direction === 'e') {
+            } else if (direction === 'de') {
                 newRoom = this.east;
                 newRoom = roomLookUp[newRoom];
                 if (newRoom.keycard && player.inventory.includes(newRoom.keycard)) {
@@ -136,13 +220,14 @@ class Room {
     }
 }
 
+
 //Rooms
 //Home Base (You can trade in Scrap Metal here to restore health);
 let falloutBunker = new Room('Fallout Bunker', 'Sample Info N,E,W', [], undefined, 'RUN_Entrance', false, 'RUE_Entrance', 'RUW_Entrance', false);
 //Robotics United Towers
 //R.U. West
 let RUW_Entrance = new Room('R.U.West Entrance', 'Sample Info E,W', [], undefined, false, false, 'falloutBunker', 'RUW_WelcomeDesk', false);
-let RUW_WelcomeDesk = new Room('Welcome Desk', 'Sample Info N,S', ['Scrap Metal', 'Scrap Metal'], undefined, 'RUW_BreakRoom', 'RUW_Cubicle1', false, false, false);
+let RUW_WelcomeDesk = new Room('Welcome Desk', 'Sample Info N,S,E', ['Scrap Metal', 'Scrap Metal'], undefined, 'RUW_BreakRoom', 'RUW_Cubicle1', 'RUW_Entrance', false, false);
 let RUW_BreakRoom = new Room('Break Room', 'Sample Info S,W', ['Repair Kit'], undefined, false, 'RUW_WelcomeDesk', false, 'RUW_Hallway1N', false);
 let RUW_Hallway1N = new Room('Hallway 1N - W', 'Sample Info S,E,W', ['Scrap Metal'], undefined, false, 'RUW_FabUnit', 'RUW_BreakRoom', 'RUW_ExpLabs', false);
 let RUW_ExpLabs = new Room('Experimental Arms Lab', 'Sample Info E', ['Particle Battery', 'Scrap Metal'], undefined, false, false, 'RUW_Hallway1N', false, false);
@@ -176,6 +261,7 @@ let RUN_Hallway3N = new Room('Hallway 3N - N', 'Sample Info N,S,E,W', ['Scrap Me
 let RUN_MainServer = new Room('Main Server Room', 'Sample Info N', [], enemyF, 'RUN_PresOffice', 'RUN_Hallway3N', false, false, 'Office Keycard North');
 let RUN_PresOffice = new Room('R.U. Presidents Office', 'Sample Info S', [], undefined, false, false, false, false, false);
 
+//Room Lookup Table
 let roomLookUp = {
     'falloutBunker' : falloutBunker,
     'RUW_Entrance' : RUW_Entrance, 
@@ -228,7 +314,7 @@ async function combat(user, comp) {
                 console.log(`You received ${comp.reward} for winning!`);
                 user.inventory.push(comp.reward);
                 console.log(user.inventory);
-                process.exit();
+                return true;
             }
         } else {
             if (user.inventory.includes('Repair Kit')) {
@@ -256,7 +342,7 @@ async function combat(user, comp) {
                         console.log(`You received ${comp.reward} for winning!`);
                         user.inventory.push(comp.reward);
                         console.log(user.inventory);
-                        process.exit();
+                        return true;
                     }
                 }
             } else {
@@ -269,7 +355,7 @@ async function combat(user, comp) {
                     console.log(`You received ${comp.reward} for winning!`);
                     user.inventory.push(comp.reward);
                     console.log(user.inventory);
-                    process.exit();
+                    return true;
                 }
             }
         }
@@ -290,15 +376,25 @@ async function play(room) {
     console.log(room.name);
     console.log(room.info);
     if (room.enemy) {
-        await combat(player, room.enemy);
+        let victory = await combat(player, room.enemy);
+        if (victory === true) {
+            room.info = room.enemy.postRoomInfo;
+            room.enemy = undefined;
+            return play(room);
+        }
     }
     let input = await ask('What would you like to do?\n');
-    while (room.enterRoom(input) === false) {
+    input = new ValidInput(input);
+    while (input.firstInputTrue() === false && input.lastWordTrue() === false) {
+        console.log('Please enter a valid input...\n');
         input = await ask('What would you like to do?\n');
-    }    
+        input = new ValidInput(input);
+    }
+    input.returnInput(input);
+    input = input.return.toString(); 
     let newRoom = room.enterRoom(input);
     //newRoom = roomLookUp[newRoom];
-    play(newRoom);
+    return play(newRoom);
 }
 
 play(falloutBunker);
