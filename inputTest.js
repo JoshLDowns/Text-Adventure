@@ -20,7 +20,7 @@ class ValidInput {
         this.inspect = ['INSPECT'];
         this.instructions = ['D', 'DIRECTIONS', 'INSTRUCTIONS', 'INST', 'HOW'];
         this.pickUpItem = ['PICK UP', 'PICK', 'GRAB', 'AQUIRE', 'METAL', 'BATTERY', 'COATING', 'BOX1', 'BOX2'];
-        this.validInputs = [this.affirmative, this.negatory, this.direction, this.inventory, this.inspect, this.instructions, this.pickUpItem];
+        this.validInputs = [this.affirmative, this.negatory, this.direction, this.inventory, this.status, this.inspect, this.instructions, this.pickUpItem];
     }
 
     firstInputTrue () {
@@ -88,6 +88,7 @@ class ValidInput {
 async function whatToDo () {
     let input = await ask('What would you like to do?\n');
     input = new ValidInput(input);
+    console.log(input);
     while (input.firstInputTrue() === false && input.lastWordTrue() === false) {
         console.log('Please enter a valid input...\n');
         input = await ask('What would you like to do?\n');

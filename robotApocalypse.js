@@ -21,6 +21,25 @@ let player = {
                 break;
             }
         }
+    },
+    status: function () {
+        console.log(`You currently have ${this.health} HP.`);
+        if ((this.health / this.maxHealth) > .75){
+            console.log('HP is above 75%, you are feeling great');
+        } else if ((this.health / this.maxHealth) < .25) {
+            console.log('HP is below 25%, repair as soon as you can!');
+        } else {
+            console.log('You are a little beat up but doing alright!')
+        }
+    },
+
+    inspectBag () {
+        if (this.inventory.length !== 0) {
+            console.log(`You currently have the following items in your bag:`);
+            console.log(this.inventory.join(', ') + `\n`);
+        } else {
+            console.log('You currently are not carrying any items in your bag.\n');
+        }
     }
 }
 
@@ -70,15 +89,15 @@ class ValidInput {
         this.firstWord = string.slice(0, string.indexOf(' ')).toUpperCase();
         this.lastWord = string.slice((string.lastIndexOf(' '))+1).toUpperCase();
         this.return = undefined;
-        this.affirmative = ['YES', 'Y', 'YEAH', 'YUP', 'YUPPER', 'MHM', 'MMHMM', 'AFFIRMATIVE', '\r'];
-        this.negatory = ['NO', 'N', 'NOPE', 'NADA', 'NEGATORY'];
-        this.direction = ['GO', 'TRAVEL', 'LEAVE', 'EXIT', 'NORTH', 'SOUTH', 'EAST', 'WEST'];
+        this.affirmative = ['YES', 'YEAH', 'YUP', 'YUPPER', 'MHM', 'MMHMM', 'AFFIRMATIVE', '\r'];
+        this.negatory = ['NO', 'NOPE', 'NADA', 'NEGATORY'];
+        this.direction = ['GO', 'TRAVEL', 'LEAVE', 'EXIT', 'N', 'NORTH', 'S', 'SOUTH', 'E', 'EAST', 'W', 'WEST'];
         this.inventory = ['B', 'INVENTORY', 'BAG', 'BACKPACK'];
-        this.status = ['STATUS', 'INFO'];
+        this.status = ['STATUS', 'INFO', 'HP', 'HEALTH'];
         this.inspect = ['INSPECT'];
-        this.instructions = ['D', 'DIRECTIONS', 'INSTRUCTIONS', 'INST', 'HOW'];
+        this.instructions = ['D', 'DIRECTIONS', 'INSTRUCTIONS', 'INST', 'HOW', 'PLAY'];
         this.pickUpItem = ['PICK UP', 'PICK', 'GRAB', 'AQUIRE', 'METAL', 'BATTERY', 'COATING', 'BOX1', 'BOX2'];
-        this.validInputs = [this.affirmative, this.negatory, this.direction, this.inventory, this.inspect, this.instructions, this.pickUpItem];
+        this.validInputs = [this.affirmative, this.negatory, this.direction, this.inventory, this.status, this.inspect, this.instructions, this.pickUpItem];
     }
 
     firstInputTrue () {
@@ -164,7 +183,7 @@ class Room {
             }
         }
     }
-    //room transfer machine
+    //room state machine
     enterRoom (direction) {
         let newRoom = '';
         if ((direction === 'dn' && this.north) || (direction === 'ds' && this.south) || (direction === 'de' && this.east) || (direction === 'dw' && this.west)) {
@@ -218,8 +237,16 @@ class Room {
             return false;
         }
     }
-}
 
+    inspectRoom () {
+        if (this.inventory.length !== 0) {
+            console.log(`Upon looking around, you notice that the following items are in ${this.name}:`);
+            console.log(this.inventory.join(', ') + `\n`);
+        } else {
+            console.log('There is nothing of interest in this area\n');
+        }
+    }
+}
 
 //Rooms
 //Home Base (You can trade in Scrap Metal here to restore health);
@@ -233,7 +260,7 @@ let RUW_Hallway1N = new Room('Hallway 1N - W', 'Sample Info S,E,W', ['Scrap Meta
 let RUW_ExpLabs = new Room('Experimental Arms Lab', 'Sample Info E', ['Particle Battery', 'Scrap Metal'], undefined, false, false, 'RUW_Hallway1N', false, false);
 let RUW_Cubicle1 = new Room('Cubicle Block 1', 'Sample Info N,W', ['Repair Kit'], undefined, 'RUW_WelcomeDesk', false, false, 'RUW_Hallway1S', false);
 let RUW_Hallway1S = new Room('Hallway 1S - W', 'Sample Info N,E,W', [], undefined, 'RUW_FabUnit', false, 'RUW_Cubicle1', 'RUW_Office', false);
-let RUW_Office = new Room('R.U.West Office', 'Sample Info E', ['Riddle Box West'], undefined, false, false, 'RUW_Hallway1S', false, false);
+let RUW_Office = new Room('R.U.West Office', 'Sample Info E', ['Riddle Box1'], undefined, false, false, 'RUW_Hallway1S', false, false);
 let RUW_FabUnit = new Room('Fabrication Unit West', 'Sample Info N,S,W', ['Thick Carbon Coating', 'Scrap Metal', 'Scrap Metal'], undefined, 'RUW_Hallway1N', 'RUW_Hallway1S', false, 'RUW_ServerW', false);
 let RUW_ServerW = new Room('Server Room West', 'Sample Info E', [], enemyW, false, false, 'RUW_FabUnit', false, 'Office Keycard West');
 //R.U. East
@@ -241,7 +268,7 @@ let RUE_Entrance = new Room('R.U.East Entrance', 'Sample Info E,W', [], undefine
 let RUE_WelcomeDesk = new Room('Welcome Desk', 'Sample Info N,S,W', ['Scrap Metal', 'Scrap Metal'], undefined, 'RUE_Cubicle2', 'RUE_Charging', false, 'RUE_Entrance', false);
 let RUE_Cubicle2 = new Room('Cubicle Block 2', 'Sample Info S,E', ['Repair Kit'], undefined, false, 'RUE_WelcomeDesk', 'RUE_Hallway1N', false, false);
 let RUE_Hallway1N = new Room('Hallway 1N - E', 'Sample Info S,E,W', ['Scrap Metal'], undefined, false, 'RUE_FabUnit', 'RUE_QA', 'RUE_Cubicle2', false);
-let RUE_QA = new Room('Quality Assurance', 'Sample Info W', ['Riddle Box East'], undefined, false, false, false, 'RUE_Hallway1N', false);
+let RUE_QA = new Room('Quality Assurance', 'Sample Info W', ['Riddle Box2'], undefined, false, false, false, 'RUE_Hallway1N', false);
 let RUE_Charging = new Room('Charging Station', 'Sample Info N,E', ['Repair Kit'], undefined, 'RUE_WelcomeDesk', false, 'RUE_Hallway1S', false, false);
 let RUE_Hallway1S = new Room('Hallway 1S - E', 'Sample Info N,E,W', ['Scrap Metal', 'Scrap Metal'], undefined, 'RUE_FabUnit', false, 'RUE_AdvWeapons', 'RUE_Charging', false);
 let RUE_AdvWeapons = new Room('Advanced Weapons Lab', 'Sample Info W', ['Particle Battery'], undefined, false, false, false, 'RUE_Hallway1S', false);
@@ -298,6 +325,19 @@ let roomLookUp = {
     'RUN_PresOffice' : RUN_PresOffice 
 }
 
+//possible item array
+let possibleItems = ['pu_scrapmetal', 'pu_particlebattery', 'pu_carboncoating', 'pu_rboxw', 'pu_rboxe'];
+
+//item lookup object
+let itemLookUp = {
+    pu_scrapmetal : 'Scrap Metal',
+    pu_particlebattery : 'Particle Battery',
+    pu_carboncoating : 'Thick Carbon Coating',
+    pu_rboxw : 'Riddle Box1',
+    pu_rboxe : 'Riddle Box2'
+}
+
+//combat function
 async function combat(user, comp) {
     let damageUser = 0;
     let damageComp = 0;
@@ -372,15 +412,19 @@ async function combat(user, comp) {
     }
 }
 
-async function play(room) {
+async function initializeRoom(room) {
     console.log(room.name);
     console.log(room.info);
+    return play(room);
+}
+
+async function play(room) {
     if (room.enemy) {
         let victory = await combat(player, room.enemy);
         if (victory === true) {
             room.info = room.enemy.postRoomInfo;
             room.enemy = undefined;
-            return play(room);
+            return initializeRoom(room);
         }
     }
     let input = await ask('What would you like to do?\n');
@@ -392,10 +436,40 @@ async function play(room) {
     }
     input.returnInput(input);
     input = input.return.toString(); 
-    let newRoom = room.enterRoom(input);
-    //newRoom = roomLookUp[newRoom];
-    return play(newRoom);
+    //enter other gameplay options below
+    if (input === 's') {
+        player.status();
+        return play(room);
+    } else if (input === 'insp') {
+        room.inspectRoom();
+        return play(room);
+    } else if (input === 'i') {
+        player.inspectBag();
+        return play(room);
+    } else if (possibleItems.includes(input)){
+        input = input.toString();
+        let currentItem = itemLookUp[input];
+        let currentInventory = room.inventory;
+        if (currentInventory.includes(currentItem)) {
+            room.pickUpItem(currentItem);
+            player.inventory.push(currentItem);
+            console.log(`You put ${currentItem} in your bag...`);
+            return play(room);
+        } else if (currentInventory.length !== 0 && !currentInventory.includes(currentItem)) {
+            console.log(`There is no ${currentItem} in this room!`);
+            return play(room);
+        } else {
+            console.log('There are no items in this room');
+            return play(room);
+        }
+    } else {
+        let newRoom = room.enterRoom(input);
+        while (newRoom === false){
+            return play(room);
+        }
+        return initializeRoom(newRoom);
+    }
 }
 
-play(falloutBunker);
+initializeRoom(falloutBunker);
 
