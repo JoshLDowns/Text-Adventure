@@ -10,13 +10,13 @@ function ask(questionText) {
 let player = {
     maxHealth : 50,
     health: 50,
-    inventory: ['Office Keycard West', 'Office Keycard East'],
+    inventory: ['Office Keycard West', 'Office Keycard East', 'Repair Kit', 'Particle Battery', 'Thick Carbon Coating'],
     ability: 'Particle Beam',
     damageBase: 5,
     damageModifier: 4,
-    useRepairKit: function () { //removes repair kit from inventory on use
+    useItem: function (item) { //removes repair kit from inventory on use
         for (var i = 0; i < this.inventory.length; i++) {
-            if (this.inventory[i] === 'Repair Kit') {
+            if (this.inventory[i] === item) {
                 this.inventory.splice(i, 1);
                 break;
             }
@@ -31,6 +31,7 @@ let player = {
         } else {
             console.log('You are a little beat up but doing alright!')
         }
+        console.log(`Your Particle Beam has a base damage value of ${this.damageBase}.\n`);
     },
 
     inspectBag () {
@@ -96,8 +97,9 @@ class ValidInput {
         this.status = ['STATUS', 'INFO', 'HP', 'HEALTH'];
         this.inspect = ['INSPECT'];
         this.instructions = ['D', 'DIRECTIONS', 'INSTRUCTIONS', 'INST', 'HOW', 'PLAY'];
-        this.pickUpItem = ['PICK UP', 'PICK', 'GRAB', 'AQUIRE', 'METAL', 'BATTERY', 'COATING', 'BOX1', 'BOX2'];
-        this.validInputs = [this.affirmative, this.negatory, this.direction, this.inventory, this.status, this.inspect, this.instructions, this.pickUpItem];
+        this.pickUpItem = ['PICK UP', 'PICK', 'GRAB', 'GET', 'AQUIRE', 'KIT', 'METAL', 'BATTERY', 'COATING', 'BOX1', 'BOX2'];
+        this.useItem = ['USE', 'KIT', 'BATTERY', 'COATING', 'BOX1', 'BOX2'];
+        this.validInputs = [this.affirmative, this.negatory, this.direction, this.inventory, this.status, this.inspect, this.instructions, this.useItem, this.pickUpItem];
     }
 
     firstInputTrue () {
@@ -143,6 +145,18 @@ class ValidInput {
             } else {
                 this.return = 'dw';
             }
+        } else if (obj.firstWord === 'USE' && this.useItem.includes(obj.lastWord)) {
+            if (obj.lastWord === 'BATTERY') {
+                this.return = 'use_particlebattery';
+            } else if (obj.lastWord === 'COATING') {
+                this.return = 'use_carboncoating';
+            } else if (obj.lastWord === 'KIT') {
+                this.return = 'use_repairkit';
+            } else if (obj.lastWord === 'BOX1') {
+                this.return = 'use_rboxw';
+            } else {
+                this.return = 'use_rboxe';
+            }
         } else if (this.pickUpItem.includes(obj.firstWord) || this.pickUpItem.includes(obj.lastWord)){
             if (obj.firstWord === 'METAL' || obj.lastWord === 'METAL') {
                 this.return = 'pu_scrapmetal';
@@ -150,13 +164,14 @@ class ValidInput {
                 this.return = 'pu_particlebattery';
             } else if (obj.firstWord === 'COATING' || obj.lastWord === 'COATING'){
                 this.return = 'pu_carboncoating';
+            } else if (obj.firstWord === 'KIT' || obj.lastWord === 'KIT') {
+                this.return = 'pu_repairkit';
             } else if (obj.firstWord === 'BOX1' || obj.lastWord === 'BOX1'){
-                this.return = 'pu_rboxw'
+                this.return = 'pu_rboxw';
             } else {
                 this.return  = 'pu_rboxe';
             }
-        }
-        else {
+        } else {
             return 'd';
         }
     }
@@ -183,7 +198,7 @@ class Room {
             }
         }
     }
-    //room state machine
+    //room "state machine" (I know it's not a state machine lol)
     enterRoom (direction) {
         let newRoom = '';
         if ((direction === 'dn' && this.north) || (direction === 'ds' && this.south) || (direction === 'de' && this.east) || (direction === 'dw' && this.west)) {
@@ -326,15 +341,47 @@ let roomLookUp = {
 }
 
 //possible item array
-let possibleItems = ['pu_scrapmetal', 'pu_particlebattery', 'pu_carboncoating', 'pu_rboxw', 'pu_rboxe'];
+let possibleItems = ['pu_scrapmetal', 'pu_particlebattery', 'pu_carboncoating', 'pu_repairkit', 'pu_rboxw', 'pu_rboxe'];
 
-//item lookup object
+//useable item array
+let useableItems = ['use_particlebattery', 'use_carboncoating', 'use_rboxw', 'use_rboxe', 'use_repairkit'];
+
+// pick up item lookup object
 let itemLookUp = {
     pu_scrapmetal : 'Scrap Metal',
     pu_particlebattery : 'Particle Battery',
     pu_carboncoating : 'Thick Carbon Coating',
+    pu_repairkit: 'Repair Kit',
     pu_rboxw : 'Riddle Box1',
     pu_rboxe : 'Riddle Box2'
+}
+
+//useable item lookup object
+let useableItemLookUp = {
+    use_repairkit : 'Repair Kit',
+    use_particlebattery : 'Particle Battery',
+    use_carboncoating : 'Thick Carbon Coating',
+    use_rboxw : 'Riddle Box1',
+    use_rboxe : 'Riddle Box2'
+}
+
+function itemEffect (item) {
+    if (item === 'use_repairkit') {
+        player.useItem(useableItemLookUp[item]);  
+        player.health = player.health + 25;
+        if (player.health > player.maxHealth) {
+            player.health = player.maxHealth;
+        }
+        return console.log(`Your health has been restored!  You currently have ${player.health} HP!\n`);
+    } else if (item === 'use_particlebattery') {
+        player.useItem(useableItemLookUp[item]);
+        player.damageBase = player.damageBase + 2;
+        return console.log(`You have upgraded your Particle Beam!  It now hits harder than ever!`);
+    } else if (item === 'use_carboncoating') {
+        player.useItem(useableItemLookUp[item]);
+        player.maxHealth = player.maxHealth + 10;
+        return console.log(`You have increased your maximum HP by 10 points!`);
+    }
 }
 
 //combat function
@@ -366,7 +413,7 @@ async function combat(user, comp) {
                 }
                 let itemChoice = await ask(`You have ${kitCount} Repair Kits to use, would you like to use one?\n`);
                 if (itemChoice === 'y') {
-                    user.useRepairKit();  //removes a Repair Kit from inventory if you used one
+                    user.useItem('Repair Kit');  //removes a Repair Kit from inventory if you used one
                     user.health = user.health + 20;
                     if (user.health > userMaxHealth) {
                         user.health = userMaxHealth;
@@ -412,13 +459,13 @@ async function combat(user, comp) {
     }
 }
 
-async function initializeRoom(room) {
+async function initializeRoom(room) {  //initializes the current room with it's despcription and name
     console.log(room.name);
     console.log(room.info);
     return play(room);
 }
 
-async function play(room) {
+async function play(room) {  //allows player to make decisions within each room
     if (room.enemy) {
         let victory = await combat(player, room.enemy);
         if (victory === true) {
@@ -436,17 +483,16 @@ async function play(room) {
     }
     input.returnInput(input);
     input = input.return.toString(); 
-    //enter other gameplay options below
-    if (input === 's') {
+    if (input === 's') {  //displays players status
         player.status();
         return play(room);
-    } else if (input === 'insp') {
+    } else if (input === 'insp') {  //inspects the room
         room.inspectRoom();
         return play(room);
-    } else if (input === 'i') {
+    } else if (input === 'i') {  //shows inventory
         player.inspectBag();
         return play(room);
-    } else if (possibleItems.includes(input)){
+    } else if (possibleItems.includes(input)){  //picks up items in room
         input = input.toString();
         let currentItem = itemLookUp[input];
         let currentInventory = room.inventory;
@@ -462,11 +508,24 @@ async function play(room) {
             console.log('There are no items in this room');
             return play(room);
         }
-    } else {
+    } else if (useableItems.includes(input)){  //uses items in inventory
+        input = input.toString();
+        let itemToUse = useableItemLookUp[input];
+        let userInventory = player.inventory;
+        if (userInventory.includes(itemToUse)){
+            itemEffect(input);
+            return play(room);
+        } else {
+            console.log(`You don't have that item in your bag! Better go find one if you want to use it!`);
+            return play(room);
+        }
+    }
+    else {  //travels to new room
         let newRoom = room.enterRoom(input);
         while (newRoom === false){
             return play(room);
         }
+        console.log('\n');
         return initializeRoom(newRoom);
     }
 }
