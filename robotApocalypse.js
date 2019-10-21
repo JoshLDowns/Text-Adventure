@@ -10,11 +10,13 @@ function ask(questionText) {
 let player = {
     maxHealth : 50,
     health: 50,
-    inventory: ['Office Keycard West', 'Office Keycard East', 'Repair Kit', 'Particle Battery', 'Thick Carbon Coating'],
-    ability: 'Particle Beam',
+    inventory: ['North Tower Keycard', 'Plasma Grenade', 'Portable Shield', 'Smoke Bomb'],
+    attack: 'Particle Beam',
     damageBase: 5,
     damageModifier: 4,
-    useItem: function (item) { //removes repair kit from inventory on use
+    status: undefined,
+    status2: undefined,
+    useItem: function (item) { //removes item from inventory on use
         for (var i = 0; i < this.inventory.length; i++) {
             if (this.inventory[i] === item) {
                 this.inventory.splice(i, 1);
@@ -22,7 +24,7 @@ let player = {
             }
         }
     },
-    status: function () {
+    getStatus: function () {
         console.log(`You currently have ${this.health} HP.`);
         if ((this.health / this.maxHealth) > .75){
             console.log('HP is above 75%, you are feeling great');
@@ -37,52 +39,46 @@ let player = {
     inspectBag () {
         if (this.inventory.length !== 0) {
             console.log(`You currently have the following items in your bag:`);
-            console.log(this.inventory.join(', ') + `\n`);
+            let newInv = this.inventory.sort();
+            let itemCount = 1;
+            for (let i = 0; i < newInv.length; i++){
+                if (newInv[i] !== newInv[i+1]) {
+                    console.log(`  ${itemCount} ${newInv[i]}`)
+                    itemCount = 1
+                } else {
+                    itemCount += 1;
+                }
+            }
+        console.log('\n');
         } else {
             console.log('You currently are not carrying any items in your bag.\n');
         }
     }
 }
 
-let enemyW = {
-    name: 'Robot Sentry',
-    health: 30,
-    ability: 'Plasma Ray',
-    damageBase: 6,
-    damageModifier: 6,
-    reward : 'Killswitch Code 1',
-    postRoomInfo : 'Sample Info E'
+//Enemy Class
+class Enemy {
+    constructor (name, health, attack, ability, damageBase, damageModifier, abilityType, abilityBase, abilityModifier, reward, postRoomInfo) {
+        this.name = name;
+        this.health = health;
+        this.attack = attack;
+        this.ability = ability;
+        this.damageBase = damageBase;
+        this.damageModifier = damageModifier;
+        this.abilityType = abilityType;
+        this.abilityBase = abilityBase;
+        this.abilityModifier = abilityModifier;
+        this.reward = reward;
+        this.postRoomInfo = postRoomInfo;
+        this.status = undefined;
+    }
 }
 
-let enemyE = {
-    name: 'Robot Bruiser',
-    health: 75,
-    ability: 'Pneumatic Fist',
-    damageBase: 3,
-    damageModifier: 3,
-    reward: 'Killswitch Code 2',
-    postRoomInfo : 'Sample Info W'
-}
-
-let enemyN1 = {
-    name: 'Mechanical Surveillance Unit',
-    health: 100,
-    ability: 'Fission Laser',
-    damageBase: 8,
-    damageModifier: 6,
-    reward: 'Office Keycard North',
-    postRoomInfo : 'Sample Info N,S,E,W'
-}
-
-let enemyF = {
-    name: 'Enforcer Captain',
-    health: 150,
-    ability: 'Collider Beam',
-    damageBase: 10,
-    damageModifier: 10,
-    reward: 'Killswitch Code 3',
-    postRoomInfo : 'Sample Info S'
-}
+//Enemy Objects
+let enemyW = new Enemy ('Robot Sentry', 30, 'Plasma Ray', 'Static Discharge', 6, 6, 'status_stun', undefined, undefined, 'Killswitch Code 1', 'Sample Info E');
+let enemyE = new Enemy('Robot Bruiser', 75, 'Pneumatic Fist', 'Missle Barrage', 3, 3, 'offensive', 6, 12, 'Killswitch Code 2', 'Sample Info W');
+let enemyN1 = new Enemy('Mechanical Surveillance Unit', 100, 'Fission Laser', 'Remote Laser', 8, 6, 'status_dot', 3, 3, 'Office Keycard North', 'Sample Info N,S,E,W');
+let enemyF = new Enemy('Enforcer Captain', 150, 'Collider Beam', 'Combat Repair', 10, 10, 'defensive', 19, 6, 'Killswitch Code 3', 'Sample Info S');
 
 //Input validation class
 class ValidInput {
@@ -97,9 +93,12 @@ class ValidInput {
         this.status = ['STATUS', 'INFO', 'HP', 'HEALTH'];
         this.inspect = ['INSPECT'];
         this.instructions = ['D', 'DIRECTIONS', 'INSTRUCTIONS', 'INST', 'HOW', 'PLAY'];
-        this.pickUpItem = ['PICK UP', 'PICK', 'GRAB', 'GET', 'AQUIRE', 'KIT', 'METAL', 'BATTERY', 'COATING', 'BOX1', 'BOX2'];
-        this.useItem = ['USE', 'KIT', 'BATTERY', 'COATING', 'BOX1', 'BOX2'];
-        this.validInputs = [this.affirmative, this.negatory, this.direction, this.inventory, this.status, this.inspect, this.instructions, this.useItem, this.pickUpItem];
+        this.pickUpItem = ['PICK UP', 'PICK', 'GRAB', 'GET', 'AQUIRE'];
+        this.useItem = ['USE'];
+        this.combat = ['ATTACK', 'FIGHT', 'THROW', 'SHOOT', 'FIRE'];
+        this.items = ['KIT', 'METAL', 'BATTERY', 'COATING', 'BOX1', 'BOX2', 'PLASMA GRENADE', 'PORTABLE SHIELD', 'SMOKE BOMB'];
+        this.otherActions = ['DROP', 'THROW', 'FART', 'LAUGH', 'LOL', 'HUG', 'READ'];
+        this.validInputs = [this.affirmative, this.negatory, this.direction, this.inventory, this.status, this.inspect, this.instructions, this.useItem, this.pickUpItem, this.combat, this.items, this.otherActions];
     }
 
     firstInputTrue () {
@@ -135,17 +134,27 @@ class ValidInput {
             this.return = 's';
         } else if (this.inspect.includes(obj.firstWord) || this.inspect.includes(obj.lastWord)){
             this.return = 'insp';
-        } else if (this.direction.includes(obj.firstWord) || this.direction.includes(obj.lastWord)){
-            if (obj.firstWord === 'NORTH' || obj.lastWord === 'NORTH'){
-                this.return = 'dn';
-            } else if (obj.firstWord === 'SOUTH' || obj.lastWord === 'SOUTH') {
-                this.return = 'ds';
-            } else if (obj.firstWord === 'EAST' || obj.lastWord === 'EAST') {
-                this.return = 'de';
+        } else if (obj.firstWord === 'READ' || obj.lastWord === 'READ') {
+            if (obj.lastWord === 'BOX1') {
+                this.return = 'read_rboxw';
+            } else if (obj.lastWord === 'BOX2') {
+                this.return = 'read_rboxe';
             } else {
-                this.return = 'dw';
+                this.return = 'read_null';
             }
-        } else if (obj.firstWord === 'USE' && this.useItem.includes(obj.lastWord)) {
+        } else if (this.direction.includes(obj.firstWord) || this.direction.includes(obj.lastWord)){
+            if (obj.firstWord === 'NORTH' || obj.lastWord === 'NORTH' || obj.firstWord === 'N' || obj.lastWord === 'N'){
+                this.return = 'dn';
+            } else if (obj.firstWord === 'SOUTH' || obj.lastWord === 'SOUTH' || obj.firstWord === 'S' || obj.lastWord === 'S') {
+                this.return = 'ds';
+            } else if (obj.firstWord === 'EAST' || obj.lastWord === 'EAST' || obj.firstWord === 'E' || obj.lastWord === 'E') {
+                this.return = 'de';
+            } else if (obj.firstWord === 'WEST'|| obj.lastWord === 'WEST' || obj.firstWord === 'W' || obj.lastWord === 'W') {
+                this.return = 'dw';
+            } else {
+                this.return ='dnull';
+            }
+        } else if (obj.firstWord === 'USE') {
             if (obj.lastWord === 'BATTERY') {
                 this.return = 'use_particlebattery';
             } else if (obj.lastWord === 'COATING') {
@@ -154,10 +163,20 @@ class ValidInput {
                 this.return = 'use_repairkit';
             } else if (obj.lastWord === 'BOX1') {
                 this.return = 'use_rboxw';
-            } else {
+            } else if (obj.lastWord === 'BOX2') {
                 this.return = 'use_rboxe';
+            } else if (obj.lastWord === 'GRENADE') {
+                this.return = 'use_grenade';
+            } else if (obj.lastWord === 'SHIELD'){
+                this.return = 'use_shield';
+            } else if (obj.lastWord === 'BOMB'){
+                this.return = 'use_bomb';
+            } else if (obj.lastWord === 'METAL') {
+                this.return = 'no_use'
+            } else {
+                this.return = 'use_null';
             }
-        } else if (this.pickUpItem.includes(obj.firstWord) || this.pickUpItem.includes(obj.lastWord)){
+        } else if ((this.pickUpItem.includes(obj.firstWord) || this.items.includes(obj.firstWord) || this.items.includes(obj.lastWord)) && !this.otherActions.includes(obj.firstWord)){
             if (obj.firstWord === 'METAL' || obj.lastWord === 'METAL') {
                 this.return = 'pu_scrapmetal';
             } else if (obj.firstWord === 'BATTERY' || obj.lastWord === 'BATTERY'){
@@ -168,11 +187,36 @@ class ValidInput {
                 this.return = 'pu_repairkit';
             } else if (obj.firstWord === 'BOX1' || obj.lastWord === 'BOX1'){
                 this.return = 'pu_rboxw';
-            } else {
+            } else if (obj.firstword === 'BOX2' || obj.lastWord === 'BOX2') {
                 this.return  = 'pu_rboxe';
+            } else if (obj.firstWord === 'GRENADE' || obj.lastWord === 'GRENADE') {
+                this.return = 'pu_grenade';
+            } else if (obj.firstWord === 'SHIELD' || obj.lastWord === 'SHIELD') {
+                this.return = 'pu_shield';
+            } else if (obj.firstWord === 'BOMB' || obj.lastWord === 'BOMB') {
+                this.return = 'pu_bomb';
+            } else {
+                this.return = 'pu_null';
             }
-        } else {
-            return 'd';
+        } else if (this.combat.includes(obj.firstWord) || this.combat.includes(obj.lastWord)){
+            if (obj.firstWord === 'THROW') {
+                if (obj.lastWord === 'GRENADE') {
+                    this.return = 'use_grenade';
+                } else if (obj.lastWord === 'BOMB'){
+                    this.return = 'use_bomb';
+                }
+            } else {
+                this.return = 'combat';
+            }
+        } else if (this.riddle.includes(obj.lastWord)) {
+            if (obj.lastWord === 'WET') {
+                this.return = 'rboxw_solved';
+            } else if (obj.lastWord === 'SILENCE') {
+                this.return = 'rboxe_solved';
+            }
+        }
+        else {
+            return 'not_sure';
         }
     }
 }
@@ -206,9 +250,10 @@ class Room {
                 newRoom = this.north;
                 newRoom = roomLookUp[newRoom];
                 if (newRoom.keycard && player.inventory.includes(newRoom.keycard)) {
+                    console.log('You scan your keycard, the door unlocks!\n');
                     return newRoom;
                 } else if (newRoom.keycard && !player.inventory.includes(newRoom.keycard)) {
-                    console.log('You do not have the required keycard to enter this area');
+                    console.log('You do not have the required keycard to enter this area\n');
                     return false;
                 } else {
                     return newRoom;
@@ -217,9 +262,10 @@ class Room {
                 newRoom = this.south;
                 newRoom = roomLookUp[newRoom];
                 if (newRoom.keycard && player.inventory.includes(newRoom.keycard)) {
+                    console.log('You scan your keycard, the door unlocks!\n');
                     return newRoom;
                 } else if (newRoom.keycard && !player.inventory.includes(newRoom.keycard)) {
-                    console.log('You do not have the required keycard to enter this area');
+                    console.log('You do not have the required keycard to enter this area\n');
                     return false;
                 } else {
                     return newRoom;
@@ -228,9 +274,10 @@ class Room {
                 newRoom = this.east;
                 newRoom = roomLookUp[newRoom];
                 if (newRoom.keycard && player.inventory.includes(newRoom.keycard)) {
+                    console.log('You scan your keycard, the door unlocks!\n');
                     return newRoom;
                 } else if (newRoom.keycard && !player.inventory.includes(newRoom.keycard)) {
-                    console.log('You do not have the required keycard to enter this area');
+                    console.log('You do not have the required keycard to enter this area\n');
                     return false;
                 } else {
                     return newRoom;
@@ -239,9 +286,10 @@ class Room {
                 newRoom = this.west;
                 newRoom = roomLookUp[newRoom];
                 if (newRoom.keycard && player.inventory.includes(newRoom.keycard)) {
+                    console.log('You scan your keycard, the door unlocks!\n');
                     return newRoom;
                 } else if (newRoom.keycard && !player.inventory.includes(newRoom.keycard)) {
-                    console.log('You do not have the required keycard to enter this area');
+                    console.log('You do not have the required keycard to enter this area\n');
                     return false;
                 } else {
                     return newRoom;
@@ -341,10 +389,10 @@ let roomLookUp = {
 }
 
 //possible item array
-let possibleItems = ['pu_scrapmetal', 'pu_particlebattery', 'pu_carboncoating', 'pu_repairkit', 'pu_rboxw', 'pu_rboxe'];
+let possibleItems = ['pu_scrapmetal', 'pu_particlebattery', 'pu_carboncoating', 'pu_repairkit', 'pu_rboxw', 'pu_rboxe', 'pu_grenade', 'pu_shield', 'pu_bomb'];
 
 //useable item array
-let useableItems = ['use_particlebattery', 'use_carboncoating', 'use_rboxw', 'use_rboxe', 'use_repairkit'];
+let useableItems = ['use_particlebattery', 'use_carboncoating', 'use_rboxw', 'use_rboxe', 'use_repairkit', 'use_grenade', 'use_shield', 'use_bomb'];
 
 // pick up item lookup object
 let itemLookUp = {
@@ -352,6 +400,9 @@ let itemLookUp = {
     pu_particlebattery : 'Particle Battery',
     pu_carboncoating : 'Thick Carbon Coating',
     pu_repairkit: 'Repair Kit',
+    pu_grenade: 'Plasma Grenade',
+    pu_shield: 'Portable Shield',
+    pu_bomb: 'Smoke Bomb',
     pu_rboxw : 'Riddle Box1',
     pu_rboxe : 'Riddle Box2'
 }
@@ -361,17 +412,21 @@ let useableItemLookUp = {
     use_repairkit : 'Repair Kit',
     use_particlebattery : 'Particle Battery',
     use_carboncoating : 'Thick Carbon Coating',
+    use_grenade : 'Plasma Grenade',
+    use_shield : 'Portable Shield',
+    use_bomb : 'Smoke Bomb',
     use_rboxw : 'Riddle Box1',
     use_rboxe : 'Riddle Box2'
 }
 
-function itemEffect (item) {
+function itemEffect (item, comp, answer) {
     if (item === 'use_repairkit') {
         player.useItem(useableItemLookUp[item]);  
         player.health = player.health + 25;
         if (player.health > player.maxHealth) {
             player.health = player.maxHealth;
         }
+        player.status2 = undefined;
         return console.log(`Your health has been restored!  You currently have ${player.health} HP!\n`);
     } else if (item === 'use_particlebattery') {
         player.useItem(useableItemLookUp[item]);
@@ -381,82 +436,282 @@ function itemEffect (item) {
         player.useItem(useableItemLookUp[item]);
         player.maxHealth = player.maxHealth + 10;
         return console.log(`You have increased your maximum HP by 10 points!`);
+    } else if (item === 'use_grenade') {
+        player.useItem(useableItemLookUp[item]);
+        if (comp !== undefined) {
+            comp.health = comp.health - 20;
+            return console.log(`You threw a Plasma Grenade! It dealt 20 damage to ${comp.name}!`)
+        } else {
+            return console.log(`You throw a Plasma Grenade!\nThe blast was impressive, but would have been more useful in a fight...`)
+        }
+    } else if (item === 'use_shield') {
+        player.useItem(useableItemLookUp[item]);
+        if (comp !== undefined) {
+            player.status2 = 'shield';
+            return console.log(`You generate a temporary shield that can absorb damage!`);
+        } else {
+            return console.log(`You generate a temporary shield! Too bad you aren't being attacked...`)
+        }
+    } else if (item === 'use_bomb') {
+        player.useItem(useableItemLookUp[item]);
+        if (comp !== undefined) {
+            comp.status = 'smoke';
+            return console.log(`You throw a Smoke Bomb! It will be harder for ${comp.name} to hit you!`)
+        } else {
+            return console.log(`You throw a Smoke Bomb! Gee golly that was exciting!`);
+        }
+    } else if (item === 'use_rboxw') {
+        if (answer === 'WET') {
+            player.useItem(useableItemLookUp[item]);
+            player.inventory.push('Office Keycard West');
+            return console.log('You solved the riddle!  There was a Keycard to the West tower inside!')
+        } else {
+            return console.log(`That's a tough riddle, gonna have to think about that one...`)
+        }
+    } else if (item === 'use_rboxe') {
+        if (answer === 'SILENCE') {
+            player.useItem(useableItemLookUp[item]);
+            player.inventory.push('Office Keycard East');
+            return console.log('You solved the riddle!  There was a Keycard to the East tower inside!')
+        } else {
+            return console.log(`That's a tough riddle, gonna have to think about that one...`)
+        }
+    }
+}
+
+function random(max) { //random number generator
+    return Math.floor(Math.random() * max) + 1;
+}
+
+//status checking function for combat
+function statusCheck(comp) {
+    if (player.status === 'status_stun') {
+        console.log(`You are still stunned!`)
+        return player.status = undefined;
+    } else if (player.status === 'status_dot') {
+        let dotDamage = comp.abilityBase + random(comp.abilityModifier);
+        console.log(`The ${comp.ability} is still active! It dealt ${dotDamage} damage!`);
+        player.health = player.health - dotDamage;
+        if (player.health <= 0) {
+            console.log('You have been defeated! Better luck next time!');
+            process.exit();
+            } else {
+            return console.log(`Your currently have ${player.health} HP!\n`);
+            }
+    }
+}
+
+function useCompAbility (comp) {
+    if (comp.abilityType === 'status_stun') {
+        let stunChance = random(4);
+        if (stunChance !== 1) {
+            console.log(`${comp.name} used ${comp.ability}!  You are stunned from the attack!\n`)
+            return player.status = 'status_stun';
+        } else {
+            console.log(`${comp.name} used ${comp.ability} ... it failed!\n`);
+            return player.status = undefined;
+        }
+    } else if (comp.abilityType === 'offensive') {
+        let miss = random(5);
+        if (miss !== 5) {
+            let abilityDamage = comp.abilityBase + random(comp.abilityModifier);
+            console.log(`${comp.name} used ${comp.ability}, it dealt ${abilityDamage} damage!\n`);
+            player.health = player.health - abilityDamage;
+            if (player.health <= 0) {
+                console.log('You have been defeated! Better luck next time!');
+                process.exit();
+                } else {
+                return console.log(`Your currently have ${player.health} HP!\n`);
+                }
+        } else {
+            return console.log(`${comp.name} used ${comp.ability} ... it missed!\n`);
+        }
+    } else if (comp.abilityType === 'status_dot') {
+        let dotChance = random(5);
+        if (dotChance !== 5 && player.status !== 'status_dot') {
+            player.status = 'status_dot';
+            return console.log(`${comp.name} used ${comp.ability} ... it plants a remote laser on the ground!\n`)
+        } else {
+            console.log(`${comp.name} used ${comp.ability} ... it failed!\n`);
+            return player.status = undefined;
+        }
+    } else if (comp.abilityType === 'defensive') {
+        let totalHeal = comp.abilityBase + random(comp.abilityModifier);
+        comp.health = comp.health + totalHeal;
+        return console.log(`${comp.name} used ${comp.ability} ... it restored ${totalHeal} HP!\n`)
     }
 }
 
 //combat function
-async function combat(user, comp) {
+async function combat(comp) {
     let damageUser = 0;
     let damageComp = 0;
-    let userMaxHealth = user.maxHealth;
+    let criticalHit;
+    let miss;
+    let compAbility;
+    let statusCount;
+    let shieldHP = 0;
+    player.status = undefined;
 
-    while (user.health > 0 || comp.health > 0) {  //Loop that breaks when either user or computer hits 0 or less HP
-        let choice = await ask('Would you like to (1) Attack, (2) Use item?\n');
-        if (choice === '1') {
-            damageUser = user.damageBase + Math.floor(Math.random() * (user.damageModifier) + 1);  //damage + modifier (like dice roll)
-            console.log(`You fired your ${user.ability}!  It dealt ${damageUser} damage!\n`);  //lines 40 - 42 are reused, will try to rewrite into function
-            comp.health = comp.health - damageUser;
-            if (comp.health <= 0) {
-                console.log(`You have defeated ${comp.name}, congratulations!`);
-                console.log(`You received ${comp.reward} for winning!`);
-                user.inventory.push(comp.reward);
-                console.log(user.inventory);
-                return true;
-            }
+    while (player.health > 0 || comp.health > 0) {  //Loop that breaks when either user or computer hits 0 or less HP
+        //Player Turn
+        player.status2 = undefined;
+        if (player.status === 'status_stun'){
+            statusCheck(comp);
         } else {
-            if (user.inventory.includes('Repair Kit')) {
-                let kitCount = 0;
-                for (let item of user.inventory) {  //determines the amount of Repair Kits you have available
-                    if (item === 'Repair Kit') {
-                        kitCount = kitCount + 1;
+            if (player.status === 'status_dot'){
+                statusCheck(comp);
+                if (statusCount !== 0) {
+                    statusCount = statusCount - 1
+                    if (statusCount === 0) {
+                        player.status = undefined;
+                        console.log(`${comp.name}'s ${comp.ability} is no longer active!`);
                     }
                 }
-                let itemChoice = await ask(`You have ${kitCount} Repair Kits to use, would you like to use one?\n`);
-                if (itemChoice === 'y') {
-                    user.useItem('Repair Kit');  //removes a Repair Kit from inventory if you used one
-                    user.health = user.health + 20;
-                    if (user.health > userMaxHealth) {
-                        user.health = userMaxHealth;
-                    }
-                    console.log(`Your health has been restored!  You currently have ${user.health} HP!\n`);
-                } else {
-                    console.log('You have chosen not to use an item ... ATTACK!');
-                    damageUser = user.damageBase + Math.floor(Math.random() * (user.damageModifier) + 1);
-                    console.log(`You fired your ${user.ability}!  It dealt ${damageUser} damage!\n`);
+            }
+            let input = await ask(`What would you like to do? (Try things like 'attack' or use and item!)\n`);
+            input = new ValidInput(input);
+            while (input.firstInputTrue() === false && input.lastWordTrue() === false) {
+                console.log('Please enter a valid input...\n');
+                input = await ask('What would you like to do?\n');
+                input = new ValidInput(input);
+            }
+            input.returnInput(input);
+            input = input.return.toString();
+            if (input === 'combat') {
+                criticalHit = random(5);
+                miss = random(5);
+                damageUser = player.damageBase + random(player.damageModifier);  //damage + modifier (like dice roll)
+                if (miss === 5) {
+                    console.log(`Your ${player.attack} missed!`)
+                } else if (criticalHit === 5) {
+                    damageUser = damageUser + (Math.ceil(player.damageBase * .75));
+                    console.log(`You fired your ${player.attack}!  It was a Critical Hit!!\nIt dealt ${damageUser} damage!\n`); 
                     comp.health = comp.health - damageUser;
                     if (comp.health <= 0) {
                         console.log(`You have defeated ${comp.name}, congratulations!`);
-                        console.log(`You received ${comp.reward} for winning!`);
-                        user.inventory.push(comp.reward);
-                        console.log(user.inventory);
+                        console.log(`You received ${comp.reward} for winning!\n`);
+                        player.inventory.push(comp.reward);
                         return true;
                     }
-                }
-            } else {
-                console.log('You do not have any items you can use... ATTACK!');
-                damageUser = user.damageBase + Math.floor(Math.random() * (user.damageModifier) + 1);
-                console.log(`You fired your ${user.ability}!  It dealt ${damageUser} damage!\n`);
+                } else {
+                console.log(`You fired your ${player.attack}!  It dealt ${damageUser} damage!\n`); 
                 comp.health = comp.health - damageUser;
                 if (comp.health <= 0) {
                     console.log(`You have defeated ${comp.name}, congratulations!`);
                     console.log(`You received ${comp.reward} for winning!`);
-                    user.inventory.push(comp.reward);
-                    console.log(user.inventory);
+                    player.inventory.push(comp.reward);
                     return true;
+                    }
+                }
+            } else if (input === 'use_null') {
+                console.log(`I'm not sure what item you are trying to use...\n`);
+            } else if (input === 'no_use') {
+                console.log(`You cannot use that item right now...\n`);
+            } else if (useableItems.includes(input)){  //uses items in inventory
+                input = input.toString();
+                let itemToUse = useableItemLookUp[input];
+                let userInventory = player.inventory;
+                if (userInventory.includes(itemToUse) && input !== 'use_rboxe' && input !== 'use_rboxw'){
+                    itemEffect(input, comp);
+                    if (player.status2 === 'shield'){
+                        shieldHP = 30;
+                        player.status2 = undefined;
+                    }
+                } else {
+                    console.log(`You don't have that item in your bag! Better go find one if you want to use it!\n`);
+                }
+                if (comp.health <= 0) {
+                    console.log(`You have defeated ${comp.name}, congratulations!`);
+                    console.log(`You received ${comp.reward} for winning!\n`);
+                    player.inventory.push(comp.reward);
+                    return true;
+                }
+            } else {
+                console.log('Now is not the time or place for that! ... ATTACK!');
+                criticalHit = random(5);
+                miss = random(5);
+                damageUser = player.damageBase + random(player.damageModifier);  //damage + modifier (like dice roll)
+                if (miss === 5) {
+                    console.log(`Your ${player.attack} missed!`)
+                } else if (criticalHit === 5) {
+                    damageUser = damageUser + (Math.ceil(player.damageBase * .75));
+                    console.log(`You fired your ${player.attack}!  It was a Critical Hit!!\nIt dealt ${damageUser} damage!\n`); 
+                    comp.health = comp.health - damageUser;
+                    if (comp.health <= 0) {
+                        console.log(`You have defeated ${comp.name}, congratulations!`);
+                        console.log(`You received ${comp.reward} for winning!\n`);
+                        player.inventory.push(comp.reward);
+                        return true;
+                    }
+                } else {
+                console.log(`You fired your ${player.attack}!  It dealt ${damageUser} damage!\n`); 
+                comp.health = comp.health - damageUser;
+                if (comp.health <= 0) {
+                    console.log(`You have defeated ${comp.name}, congratulations!`);
+                    console.log(`You received ${comp.reward} for winning!\n`);
+                    player.inventory.push(comp.reward);
+                    return true;
+                    }
                 }
             }
         }
-
-        damageComp = comp.damageBase + Math.floor(Math.random() * (comp.damageModifier) + 1);
-        user.health = user.health - damageComp;
-        console.log(`${comp.name} fired a ${comp.ability}, it dealt ${damageComp} damage!`);
-        if (user.health <= 0) {
-            console.log('You have been defeated! Better luck next time!');
-            process.exit();
+        //Computer Enemy turn
+        compAbility = random(4);
+        if (compAbility !== 4) {
+            criticalHit = random(5);
+            miss = random(5);
+            if (comp.status === 'smoke') {
+                miss = random(3);
+            }
+            damageComp = comp.damageBase + random(comp.damageModifier) + 1;
+            if (miss === 1) {
+                console.log(`${comp.name} fired a ${comp.attack} ... it missed!\n`);
+            } else if (criticalHit === 5) {
+                damageComp = damageComp + (Math.ceil(comp.damageBase * .75));
+                console.log(`${comp.name} fired a ${comp.attack} ... it was a critical hit!\nIt dealt ${damageComp} damage!\n`);
+                if (shieldHP > 0) {
+                    shieldHP = shieldHP - damageComp;
+                    if (shieldHP <= 0){
+                        console.log (`Your shield absorbed the damage... but was destroyed in the process\n`);
+                    } else {
+                        console.log (`Your shield absorbed the damage!\n`);
+                    }
+                } else {
+                    player.health = player.health - damageComp;
+                    if (player.health <= 0) {
+                    console.log('You have been defeated! Better luck next time!');
+                    process.exit();
+                    } else {
+                    console.log(`Your currently have ${player.health} HP!\n`);
+                    }
+                }
+            } else {
+                console.log(`${comp.name} fired a ${comp.attack}, it dealt ${damageComp} damage!\n`);
+                if (shieldHP > 0) {
+                    shieldHP = shieldHP - damageComp;
+                    if (shieldHP <= 0){
+                        console.log (`Your shield absorbed the damage... but was destroyed in the process\n`);
+                    } else {
+                        console.log (`Your shield absorbed the damage!\n`);
+                    }
+                } else {
+                    player.health = player.health - damageComp;
+                    if (player.health <= 0) {
+                        console.log('You have been defeated! Better luck next time!');
+                        process.exit();
+                        } else {
+                        console.log(`Your currently have ${player.health} HP!\n`);
+                    }
+                }
+            }
         } else {
-            console.log(`Your currently have ${user.health} HP!\n`);
+            useCompAbility(comp);
+            if (statusCount !== 0 && player.status === 'status_dot') {
+                statusCount = random(4);
+            }
         }
-    }
+    }   
 }
 
 async function initializeRoom(room) {  //initializes the current room with it's despcription and name
@@ -467,7 +722,7 @@ async function initializeRoom(room) {  //initializes the current room with it's 
 
 async function play(room) {  //allows player to make decisions within each room
     if (room.enemy) {
-        let victory = await combat(player, room.enemy);
+        let victory = await combat(room.enemy);
         if (victory === true) {
             room.info = room.enemy.postRoomInfo;
             room.enemy = undefined;
@@ -482,9 +737,12 @@ async function play(room) {  //allows player to make decisions within each room
         input = new ValidInput(input);
     }
     input.returnInput(input);
-    input = input.return.toString(); 
+    input = input.return.toString();
     if (input === 's') {  //displays players status
-        player.status();
+        player.getStatus();
+        return play(room);
+    } else if (input === 'combat') {  //default not in combat message
+        console.log(`There is nothing to fight...\n`); 
         return play(room);
     } else if (input === 'insp') {  //inspects the room
         room.inspectRoom();
@@ -492,23 +750,44 @@ async function play(room) {  //allows player to make decisions within each room
     } else if (input === 'i') {  //shows inventory
         player.inspectBag();
         return play(room);
-    } else if (possibleItems.includes(input)){  //picks up items in room
+    } else if (input === 'pu_null') {
+        console.log(`I'm not sure what you are trying to pick up...\n`);
+        return play(room);
+    } 
+    else if (possibleItems.includes(input)){  //picks up items in room
         input = input.toString();
         let currentItem = itemLookUp[input];
         let currentInventory = room.inventory;
         if (currentInventory.includes(currentItem)) {
             room.pickUpItem(currentItem);
             player.inventory.push(currentItem);
-            console.log(`You put ${currentItem} in your bag...`);
+            console.log(`You put ${currentItem} in your bag...\n`);
             return play(room);
         } else if (currentInventory.length !== 0 && !currentInventory.includes(currentItem)) {
-            console.log(`There is no ${currentItem} in this room!`);
+            console.log(`There is no ${currentItem} in this room!\n`);
             return play(room);
         } else {
-            console.log('There are no items in this room');
+            console.log('There are no items in this room\n');
             return play(room);
         }
-    } else if (useableItems.includes(input)){  //uses items in inventory
+    } else if (input === 'use_null') {
+        console.log(`I'm not sure what item you are trying to use...\n`);
+        return play(room);
+    } else if (input === 'no_use') {
+        console.log(`You cannot use that item right now...\n`);
+        return play(room);
+    } else if (input === 'use_rboxw') {
+        let answer = await ask('What is the answer to the riddle inscribed on this box?\n');
+        answer = answer.toString().toUpperCase()
+        itemEffect('use_rboxw', undefined, answer);
+        return play(room);
+    } else if (input === 'use_rboxe') {
+        let answer = await ask('What is the answer to the riddle inscribed on this box?\n');
+        answer = answer.toString().toUpperCase()
+        itemEffect('use_rboxe', undefined, answer);
+        return play(room);
+    }
+    else if (useableItems.includes(input)){  //uses items in inventory
         input = input.toString();
         let itemToUse = useableItemLookUp[input];
         let userInventory = player.inventory;
@@ -516,17 +795,34 @@ async function play(room) {  //allows player to make decisions within each room
             itemEffect(input);
             return play(room);
         } else {
-            console.log(`You don't have that item in your bag! Better go find one if you want to use it!`);
+            console.log(`You don't have that item in your bag! Better go find one if you want to use it!\n`);
             return play(room);
         }
-    }
-    else {  //travels to new room
-        let newRoom = room.enterRoom(input);
-        while (newRoom === false){
+    } else if (input === 'read_rboxw') {
+        console.log('There is a riddle on the box, it reads:\nIf you throw a blue stone into the red sea, what does it become?\n');
+        return play(room);
+    } else if (input === 'read_rboxe') {
+        console.log('There is a riddle on the box, it reads:\nWhat is so delicate that even just saying its name can break it?\n');
+        return play(room);
+    } else if (input === 'read_null') {
+        console.log(`There is nothing for me to read...`);
+        return play(room);
+    } 
+    else if (input === 'not_sure') {
+        console.log(`I'm not sure what you are telling me to do...`);
+        return play(room);
+    } else {  //travels to new room
+        if (input === 'dnull') {
+            console.log(`I'm not sure where you are telling me to go...\n`);
             return play(room);
+        } else {
+            let newRoom = room.enterRoom(input);
+            while (newRoom === false){
+                return play(room);
+            }
+            console.log('\n');
+            return initializeRoom(newRoom);
         }
-        console.log('\n');
-        return initializeRoom(newRoom);
     }
 }
 
