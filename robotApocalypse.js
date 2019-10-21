@@ -6,7 +6,7 @@ function ask(questionText) {
         rl.question(questionText, resolve);
     });
 }
-
+//player object
 let player = {
     name : undefined,
     maxHealth: 50,
@@ -17,6 +17,7 @@ let player = {
     damageModifier: 4,
     status: undefined,
     status2: undefined,
+    hasKilled: false,
     useItem: function (item) { //removes item from inventory on use
         for (var i = 0; i < this.inventory.length; i++) {
             if (this.inventory[i] === item) {
@@ -25,6 +26,7 @@ let player = {
             }
         }
     },
+    //displays player status
     getStatus: function () {
         console.log(`You currently have ${this.health} HP.`);
         if ((this.health / this.maxHealth) > .75) {
@@ -36,7 +38,7 @@ let player = {
         }
         console.log(`Your Particle Beam has a base damage value of ${this.damageBase}.\n`);
     },
-
+    //displays inventory in an easy to read manner with item descriptions
     inspectBag() {
         if (this.inventory.length !== 0) {
             console.log(`You currently have the following items in your bag:`);
@@ -59,7 +61,7 @@ let player = {
 
 //Enemy Class
 class Enemy {
-    constructor(name, health, attack, ability, damageBase, damageModifier, abilityType, abilityBase, abilityModifier, reward, postRoomInfo) {
+    constructor(name, health, attack, ability, damageBase, damageModifier, abilityType, abilityBase, abilityModifier, reward, postRoomInfo, postRoomInfo2) {
         this.name = name;
         this.health = health;
         this.attack = attack;
@@ -71,15 +73,16 @@ class Enemy {
         this.abilityModifier = abilityModifier;
         this.reward = reward;
         this.postRoomInfo = postRoomInfo;
+        this.postRoomInfo2 = postRoomInfo2;
         this.status = undefined;
     }
 }
 
 //Enemy Objects
-let enemyW = new Enemy('Robot Sentry', 40, 'Plasma Ray', 'Static Discharge', 6, 9, 'status_stun', undefined, undefined, 'Killswitch Code 1', 'Sample Info E');
-let enemyE = new Enemy('Robot Bruiser', 75, 'Pneumatic Fist', 'Missle Barrage', 6, 3, 'offensive', 8, 12, 'Killswitch Code 2', 'Sample Info W');
-let enemyN1 = new Enemy('Mechanical Surveillance Unit', 100, 'Fission Laser', 'Remote Laser', 10, 6, 'status_dot', 6, 3, 'Office Keycard North', 'Sample Info N,S,E,W');
-let enemyF = new Enemy('Enforcer Captain', 150, 'Collider Beam', 'Combat Repair', 10, 10, 'defensive', 14, 6, 'Killswitch Code 3', 'Sample Info S');
+let enemyW = new Enemy('Robot Sentry', 40, 'Plasma Ray', 'Static Discharge', 6, 9, 'status_stun', undefined, undefined, 'Killswitch Code 1', 'The low hum of the servers surrounds you as you stare at what was left of your foe...\n', `Taking down your first enemy was both empowering and soul crushing...\nYour new found power is exhilerating but what have you given up for it? ...\n The low hum of the servers surround you.\n`);
+let enemyE = new Enemy('Robot Bruiser', 75, 'Pneumatic Fist', 'Missle Barrage', 6, 3, 'offensive', 8, 12, 'Killswitch Code 2', 'The low hum of the servers surrounds you as you stare at what was left of your foe...\n', `Taking down your first enemy was both empowering and soul crushing...\nYour new found power is exhilerating but what have you given up for it? ...\n The low hum of the servers surround you.\n`);
+let enemyN1 = new Enemy('Mechanical Surveillance Unit', 100, 'Fission Laser', 'Remote Laser', 10, 6, 'status_dot', 6, 3, 'Office Keycard North', 'As the dust settles, you notice that you were surrounded by automated\nturrets, thankfully defeating this foe seems to have shut them down...\nThe room is earily quiet.\n');
+let enemyF = new Enemy('Enforcer Captain', 125, 'Collider Beam', 'Combat Repair', 10, 10, 'defensive', 14, 6, 'Killswitch Code 3', `Your final foe has been defeated ...\nYou are so close to your end goal, but you can't help but ask yourself,\nhas destroying your own kind been worth it?\n`);
 
 //Input validation class
 class ValidInput {
@@ -87,7 +90,7 @@ class ValidInput {
         this.firstWord = string.slice(0, string.indexOf(' ')).toUpperCase();
         this.lastWord = string.slice((string.lastIndexOf(' ')) + 1).toUpperCase();
         this.return = undefined;
-        this.affirmative = ['YES', 'YEAH', 'YUP', 'YUPPER', 'MHM', 'MMHMM', 'AFFIRMATIVE', '\r'];
+        this.affirmative = ['YES', 'YEAH', 'YUP', 'YUPPER', 'MHM', 'MMHMM', 'AFFIRMATIVE'];
         this.negatory = ['NO', 'NOPE', 'NADA', 'NEGATORY'];
         this.direction = ['GO', 'TRAVEL', 'LEAVE', 'EXIT', 'N', 'NORTH', 'S', 'SOUTH', 'E', 'EAST', 'W', 'WEST'];
         this.inventory = ['B', 'INVENTORY', 'BAG', 'BACKPACK'];
@@ -98,12 +101,12 @@ class ValidInput {
         this.useItem = ['USE'];
         this.combat = ['ATTACK', 'FIGHT', 'THROW', 'SHOOT', 'FIRE'];
         this.items = ['KIT', 'METAL', 'BATTERY', 'COATING', 'BOX1', 'BOX2', 'PLASMA GRENADE', 'PORTABLE SHIELD', 'SMOKE BOMB'];
-        this.otherActions = ['DROP', 'THROW', 'FART', 'LAUGH', 'LOL', 'HUG', 'READ', 'OPEN'];
+        this.otherActions = ['DROP', 'THROW', 'FART', 'LAUGH', 'LOL', 'HUG', 'READ', 'OPEN', 'RUN'];
         this.intObjects = ['SIGN', 'DESK', 'COMPUTER', 'CABINET', 'FRIDGE', 'REFRIDGERATOR', 'SAFE'];
         this.falloutBunkerEvent = ['REPAIR', 'FIX', 'KEYCARD', 'KEY'];
         this.validInputs = [this.affirmative, this.negatory, this.direction, this.inventory, this.status, this.inspect, this.instructions, this.useItem, this.pickUpItem, this.combat, this.items, this.otherActions, this.intObjects, this.falloutBunkerEvent];
     }
-
+    //checks first word of input
     firstInputTrue() {
         for (let arr of this.validInputs) {
             for (let item of arr) {
@@ -114,7 +117,7 @@ class ValidInput {
         }
         return false;
     }
-
+    //checks last word of input
     lastWordTrue() {
         for (let arr of this.validInputs) {
             for (let item of arr) {
@@ -125,7 +128,7 @@ class ValidInput {
         }
         return false;
     }
-
+    //determines the return output of each valid entry
     returnInput(obj) {
         if (this.affirmative.includes(obj.firstWord) || this.affirmative.includes(obj.lastWord)) {
             this.return = 'y';
@@ -256,17 +259,24 @@ class ValidInput {
                 this.return = 'pu_null';
             }
         } else if (this.combat.includes(obj.firstWord) || this.combat.includes(obj.lastWord)) {
-            if (obj.firstWord === 'THROW') {
+            if (obj.firstWord === 'THROW' || obj.lastWord === 'THROW') {
                 if (obj.lastWord === 'GRENADE') {
                     this.return = 'use_grenade';
                 } else if (obj.lastWord === 'BOMB') {
                     this.return = 'use_bomb';
+                } else if (obj.lastWord === 'METAL') {
+                    this.return = 'throw_metal';
+                } else {
+                    this.return = 'throw_null';
                 }
             } else {
                 this.return = 'combat';
             }
         } else if (this.instructions.includes(obj.firstWord) || this.instructions.includes(obj.lastWord)) {
             this.return = 'd';
+        } else if (this.otherActions.includes(obj.firstWord) || this.otherActions.includes(obj.lastWord)) {
+            this.return = 'no_do';
+            //add other actions here ....
         }
         else {
             return 'not_sure';
@@ -351,11 +361,11 @@ class Room {
                 }
             }
         } else {
-            console.log('There is nothing in that direction')
+            console.log('There is nothing in that direction ...\n')
             return false;
         }
     }
-
+    //displays items in room when
     inspectRoom() {
         if (this.inventory.length !== 0 || this.intObjInv !== undefined) {
             if (this.inventory.length !== 0 && this.intObjInv !== undefined) {
@@ -378,22 +388,22 @@ class Room {
 let falloutBunker = new Room('Fallout Bunker', `Ella, as always, is happy to see you...\n'How's everything going?\nIf you bring me some Scrap Metal I can fix you up a bit.\nI can also get a key to the North Tower,\nI just need the keys from the other towers first.'\n\n'If you ever get stuck you can type 'Help' for a list of commands!'\n`, [], undefined, 'RUN_Entrance', false, 'RUE_Entrance', 'RUW_Entrance', false);
 //Robotics United Towers
 //R.U. West
-let RUW_Entrance = new Room('R.U.West Entrance', 'You stand at the Entrance of the Robotics United West Tower.\nEverything around the tower is destroyed, yet the tower itself is mostly intact.\nThere is a sign on the door', [], undefined, false, false, 'falloutBunker', 'RUW_WelcomeDesk', false);
-let RUW_WelcomeDesk = new Room('Welcome Desk', 'Sample Info N,S,E', ['Scrap Metal', 'Scrap Metal'], undefined, 'RUW_BreakRoom', 'RUW_Cubicle1', 'RUW_Entrance', false, false, 'Desk', ['Plasma Grenade']);
-let RUW_BreakRoom = new Room('Break Room', 'Sample Info S,W', ['Repair Kit'], undefined, false, 'RUW_WelcomeDesk', false, 'RUW_Hallway1N', false, 'Refridgerator', []);
-let RUW_Hallway1N = new Room('Hallway 1N - W', 'Sample Info S,E,W', ['Scrap Metal'], undefined, false, 'RUW_FabUnit', 'RUW_BreakRoom', 'RUW_ExpLabs', false);
-let RUW_ExpLabs = new Room('Experimental Arms Lab', 'Sample Info E', ['Particle Battery', 'Scrap Metal'], undefined, false, false, 'RUW_Hallway1N', false, false);
-let RUW_Cubicle1 = new Room('Cubicle Block 1', 'Sample Info N,W', ['Repair Kit'], undefined, 'RUW_WelcomeDesk', false, false, 'RUW_Hallway1S', false, 'Desk', []);
-let RUW_Hallway1S = new Room('Hallway 1S - W', 'Sample Info N,E,W', [], undefined, 'RUW_FabUnit', false, 'RUW_Cubicle1', 'RUW_Office', false);
-let RUW_Office = new Room('R.U.West Office', 'Sample Info E', ['Riddle Box1'], undefined, false, false, 'RUW_Hallway1S', false, false, 'Filing Cabinet', ['Portable Shield']);
-let RUW_FabUnit = new Room('Fabrication Unit West', 'Sample Info N,S,W', ['Thick Carbon Coating', 'Scrap Metal', 'Scrap Metal'], undefined, 'RUW_Hallway1N', 'RUW_Hallway1S', false, 'RUW_ServerW', false);
-let RUW_ServerW = new Room('Server Room West', 'Sample Info E', [], enemyW, false, false, 'RUW_FabUnit', false, 'Office Keycard West');
+let RUW_Entrance = new Room('R.U.West Entrance', 'You stand at the Entrance of the Robotics United Tower West.\nEverything around the tower is destroyed, yet the tower itself is mostly intact.\nThere is a sign on the door\n', [], undefined, false, false, 'falloutBunker', 'RUW_WelcomeDesk', false);
+let RUW_WelcomeDesk = new Room('Welcome Desk', 'Outside of the Circulation Desk looking to be mostly in tact,\nthe room has been mostly destroyed and left in a state of disarray.\nApparently being welcoming is not something we machines are good at...\n', ['Scrap Metal', 'Scrap Metal'], undefined, 'RUW_BreakRoom', 'RUW_Cubicle1', 'RUW_Entrance', false, false, 'Desk', ['Plasma Grenade']);
+let RUW_BreakRoom = new Room('Break Room', 'As you enter the break room, you are met with a strong musty smell.\nJudging by the thick smell of mold and decay ...\nit must have been lunch time when the machines attacked ...\n', ['Repair Kit'], undefined, false, 'RUW_WelcomeDesk', false, 'RUW_Hallway1N', false, 'Refridgerator', []);
+let RUW_Hallway1N = new Room('Hallway 1N - W', 'This side of the building seems to have gotten the worst of the fight.\nThe north wall is mostly destroyed, and the floor is littered with debris.\n', ['Scrap Metal'], undefined, false, 'RUW_FabUnit', 'RUW_BreakRoom', 'RUW_ExpLabs', false);
+let RUW_ExpLabs = new Room('Experimental Arms Lab', 'It looks like the machines have already cleaned out most\nof the lab. There might still be something of use here though...\n', ['Particle Battery', 'Scrap Metal'], undefined, false, false, 'RUW_Hallway1N', false, false);
+let RUW_Cubicle1 = new Room('Cubicle Block 1', 'The room looks like it was a cubicle block at one point, but most\nof the cubicle walls have been destroyed. There is a mostly in tact\ndesk in the corner.\n', ['Repair Kit'], undefined, 'RUW_WelcomeDesk', false, false, 'RUW_Hallway1S', false, 'Desk', []);
+let RUW_Hallway1S = new Room('Hallway 1S - W', 'The machines must have barracaded the Emergency Exit on the south\nwall before their attack. The pile of bones in the room is proof enough of that.\n', [], undefined, 'RUW_FabUnit', false, 'RUW_Cubicle1', 'RUW_Office', false);
+let RUW_Office = new Room('R.U.West Office', 'The office seems to have mostly survived the attack some how. There\nis a filing cabinet that seems to be unscaythed in the corner.\nYou also notice a strange box underneath a smashed desk\n', ['Riddle Box1'], undefined, false, false, 'RUW_Hallway1S', false, false, 'Filing Cabinet', ['Portable Shield']);
+let RUW_FabUnit = new Room('Fabrication Unit West', 'At one point, specialized parts for various types of medical\nrobots were built here. At this point, the room only builds fear in\nwhat was created here...\n', ['Thick Carbon Coating', 'Scrap Metal', 'Scrap Metal'], undefined, 'RUW_Hallway1N', 'RUW_Hallway1S', false, 'RUW_ServerW', false);
+let RUW_ServerW = new Room('Server Room West', `Immidiately upon entering the Server Room, you are geated by a\nnimble but heavily armed Combat Class Robot. 'INTRUDER DETECTED!!!\nIt fires a shot that narrowly misses, you spring into action...\n`, [], enemyW, false, false, 'RUW_FabUnit', false, 'Office Keycard West');
 //R.U. East
-let RUE_Entrance = new Room('R.U.East Entrance', 'Sample Info E,W', [], undefined, false, false, 'RUE_WelcomeDesk', 'falloutBunker', false);
-let RUE_WelcomeDesk = new Room('Welcome Desk', 'Sample Info N,S,W', ['Scrap Metal', 'Scrap Metal'], undefined, 'RUE_Cubicle2', 'RUE_Charging', false, 'RUE_Entrance', false, 'Desk', ['Repair Kit']);
-let RUE_Cubicle2 = new Room('Cubicle Block 2', 'Sample Info S,E', ['Repair Kit'], undefined, false, 'RUE_WelcomeDesk', 'RUE_Hallway1N', false, false, 'Desk', ['Plasma Grenade']);
-let RUE_Hallway1N = new Room('Hallway 1N - E', 'Sample Info S,E,W', ['Scrap Metal'], undefined, false, 'RUE_FabUnit', 'RUE_QA', 'RUE_Cubicle2', false);
-let RUE_QA = new Room('Quality Assurance', 'Sample Info W', ['Riddle Box2'], undefined, false, false, false, 'RUE_Hallway1N', false);
+let RUE_Entrance = new Room('R.U.East Entrance', 'Standing at the Entrance of Robotics United Tower East, you can\nsee a giant hole blasted through the building about 10 stories up...\nSomething big hit this place, at least the sign on the door is ledgible...\n', [], undefined, false, false, 'RUE_WelcomeDesk', 'falloutBunker', false);
+let RUE_WelcomeDesk = new Room('Welcome Desk', 'The vaulted ceilings of the once grand welcome lounge has mostly\ncollapsed, leaving a mess of rubble covering most of the room...\nThe cirrculation desk stoicly stands in the middle of the room, almost as\nif it is proud to have survived the attack...\n', ['Scrap Metal', 'Scrap Metal'], undefined, 'RUE_Cubicle2', 'RUE_Charging', false, 'RUE_Entrance', false, 'Desk', ['Repair Kit']);
+let RUE_Cubicle2 = new Room('Cubicle Block 2', 'There must not have been many people in this cubicle block during the\nattack, as it is still in pretty good shape. There is sure to be something\nof use here...\n', ['Repair Kit'], undefined, false, 'RUE_WelcomeDesk', 'RUE_Hallway1N', false, false, 'Desk', ['Plasma Grenade']);
+let RUE_Hallway1N = new Room('Hallway 1N - E', 'Upon entering the hallway, you see an Employee of the Month picture\nthat somehow survived the attack undamaged hanging on the wall...\nThe man looked so happy...\n', ['Scrap Metal'], undefined, false, 'RUE_FabUnit', 'RUE_QA', 'RUE_Cubicle2', false);
+let RUE_QA = new Room('Quality Assurance', 'The QA room is large but mostly empty. Anything of use must have already\nbeen salvaged by the machines...\nYou notice a strange box on one of the tables...\n', ['Riddle Box2'], undefined, false, false, false, 'RUE_Hallway1N', false);
 let RUE_Charging = new Room('Charging Station', 'Sample Info N,E', ['Repair Kit'], undefined, 'RUE_WelcomeDesk', false, 'RUE_Hallway1S', false, false);
 let RUE_Hallway1S = new Room('Hallway 1S - E', 'Sample Info N,E,W', ['Scrap Metal', 'Scrap Metal'], undefined, 'RUE_FabUnit', false, 'RUE_AdvWeapons', 'RUE_Charging', false);
 let RUE_AdvWeapons = new Room('Advanced Weapons Lab', 'Sample Info W', ['Particle Battery'], undefined, false, false, false, 'RUE_Hallway1S', false);
@@ -464,7 +474,10 @@ let descLookUp = {
     'Office Keycard West' : 'Opens doors in R.U. West Tower',
     'Office Keycard East' : 'Opens doors in R.U. East Tower',
     'Office Keycard North' : 'Opens doors in R.U. North Tower',
-    'North Tower Keycard' : 'Opens gate to R.U. North Tower'
+    'North Tower Keycard' : 'Opens gate to R.U. North Tower',
+    'Killswitch Code 1' : 'One of Three codes needed',
+    'Killswitch Code 2' : 'One of Three codes needed',
+    'Killswitch Code 3' : 'One of Three codes needed'
 }
 
 //interactable open objects arrays
@@ -538,51 +551,51 @@ function itemEffect(item, comp, answer) {
     } else if (item === 'use_particlebattery') {
         player.useItem(useableItemLookUp[item]);
         player.damageBase = player.damageBase + 2;
-        return console.log(`You have upgraded your Particle Beam!  It now hits harder than ever!`);
+        return console.log(`You have upgraded your Particle Beam!  It now hits harder than ever!\n`);
     } else if (item === 'use_carboncoating') {
         player.useItem(useableItemLookUp[item]);
         player.maxHealth = player.maxHealth + 10;
         player.health = player.health + 10;
-        return console.log(`You have increased your maximum HP by 10 points!`);
+        return console.log(`You have increased your maximum HP by 10 points!\n`);
     } else if (item === 'use_grenade') {
         player.useItem(useableItemLookUp[item]);
         if (comp !== undefined) {
             comp.health = comp.health - 20;
-            return console.log(`You threw a Plasma Grenade! It dealt 20 damage to ${comp.name}!`)
+            return console.log(`You threw a Plasma Grenade! It dealt 20 damage to ${comp.name}!\n`)
         } else {
-            return console.log(`You throw a Plasma Grenade!\nThe blast was impressive, but would have been more useful in a fight...`)
+            return console.log(`You throw a Plasma Grenade!\nThe blast was impressive, but would have been more useful in a fight...\n`)
         }
     } else if (item === 'use_shield') {
         player.useItem(useableItemLookUp[item]);
         if (comp !== undefined) {
             player.status2 = 'shield';
-            return console.log(`You generate a temporary shield that can absorb damage!`);
+            return console.log(`You generate a temporary shield that can absorb damage!\n`);
         } else {
-            return console.log(`You generate a temporary shield! Too bad you aren't being attacked...`)
+            return console.log(`You generate a temporary shield! Too bad you aren't being attacked...\n`)
         }
     } else if (item === 'use_bomb') {
         player.useItem(useableItemLookUp[item]);
         if (comp !== undefined) {
             comp.status = 'smoke';
-            return console.log(`You throw a Smoke Bomb! It will be harder for ${comp.name} to hit you!`)
+            return console.log(`You throw a Smoke Bomb! It will be harder for ${comp.name} to hit you!\n`)
         } else {
-            return console.log(`You throw a Smoke Bomb! Gee golly that was exciting!`);
+            return console.log(`You throw a Smoke Bomb! Gee golly that was exciting!\n`);
         }
     } else if (item === 'use_rboxw') {
         if (answer === 'WET') {
             player.useItem(useableItemLookUp[item]);
             player.inventory.push('Office Keycard West');
-            return console.log('You solved the riddle!  There was a Keycard to the West tower inside!')
+            return console.log('You solved the riddle!  There was a Keycard to the West tower inside!\n')
         } else {
-            return console.log(`That's a tough riddle, gonna have to think about that one...`)
+            return console.log(`That's a tough riddle, gonna have to think about that one...\n`)
         }
     } else if (item === 'use_rboxe') {
         if (answer === 'SILENCE') {
             player.useItem(useableItemLookUp[item]);
             player.inventory.push('Office Keycard East');
-            return console.log('You solved the riddle!  There was a Keycard to the East tower inside!')
+            return console.log('You solved the riddle!  There was a Keycard to the East tower inside!\n')
         } else {
-            return console.log(`That's a tough riddle, gonna have to think about that one...`)
+            return console.log(`That's a tough riddle, gonna have to think about that one...\n`)
         }
     }
 }
@@ -594,14 +607,14 @@ function random(max) { //random number generator
 //status checking function for combat
 function statusCheck(comp) {
     if (player.status === 'status_stun') {
-        console.log(`You are still stunned!`)
+        console.log(`You are still stunned!\n`)
         return player.status = undefined;
     } else if (player.status === 'status_dot') {
         let dotDamage = comp.abilityBase + random(comp.abilityModifier);
-        console.log(`The ${comp.ability} is still active! It dealt ${dotDamage} damage!`);
+        console.log(`The ${comp.ability} is still active! It dealt ${dotDamage} damage!\n`);
         player.health = player.health - dotDamage;
         if (player.health <= 0) {
-            console.log('You have been defeated! Better luck next time!');
+            console.log('You have been defeated! Better luck next time!\n');
             process.exit();
         } else {
             return console.log(`Your currently have ${player.health} HP!\n`);
@@ -613,8 +626,15 @@ function useCompAbility(comp) {
     if (comp.abilityType === 'status_stun') {
         let stunChance = random(4);
         if (stunChance !== 1) {
-            console.log(`${comp.name} used ${comp.ability}!  You are stunned from the attack!\n`)
-            return player.status = 'status_stun';
+            console.log(`${comp.name} used ${comp.ability}! It dealt 10 damage!\nYou are stunned from the attack!\n`);
+            player.health = player.health - 10;
+            if (player.health <= 0) {
+                console.log('You have been defeated! Better luck next time!');
+                process.exit();
+            } else {
+                console.log(`Your currently have ${player.health} HP!\n`);
+                return player.status = 'status_stun';
+            }
         } else {
             console.log(`${comp.name} used ${comp.ability} ... it failed!\n`);
             return player.status = undefined;
@@ -639,6 +659,8 @@ function useCompAbility(comp) {
         if (dotChance !== 5 && player.status !== 'status_dot') {
             player.status = 'status_dot';
             return console.log(`${comp.name} used ${comp.ability} ... it plants a remote laser on the ground!\n`)
+        } else if (dotChance === 5 && player.status === 'status_dot') {
+            return console.log(`${comp.name} used ${comp.ability} ... it already has an active remote laser!\n`)
         } else {
             console.log(`${comp.name} used ${comp.ability} ... it failed!\n`);
             return player.status = undefined;
@@ -673,11 +695,11 @@ async function combat(comp) {
                     statusCount = statusCount - 1
                     if (statusCount === 0) {
                         player.status = undefined;
-                        console.log(`${comp.name}'s ${comp.ability} is no longer active!`);
+                        console.log(`${comp.name}'s ${comp.ability} is no longer active!\n`);
                     }
                 }
             }
-            let input = await ask(`What would you like to do? (Try things like 'attack' or use and item!)\n`);
+            let input = await ask(`What would you like to do? (Try things like 'attack' or use an item!)\n`);
             input = new ValidInput(input);
             while (input.firstInputTrue() === false && input.lastWordTrue() === false) {
                 console.log('I am not sure what that means...\n');
@@ -691,7 +713,7 @@ async function combat(comp) {
                 miss = random(5);
                 damageUser = player.damageBase + random(player.damageModifier);  //damage + modifier (like dice roll)
                 if (miss === 5) {
-                    console.log(`Your ${player.attack} missed!`)
+                    console.log(`Your ${player.attack} missed!\n`)
                 } else if (criticalHit === 5) {
                     damageUser = damageUser + (Math.ceil(player.damageBase * .75));
                     console.log(`You fired your ${player.attack}!  It was a Critical Hit!!\nIt dealt ${damageUser} damage!\n`);
@@ -707,12 +729,22 @@ async function combat(comp) {
                     comp.health = comp.health - damageUser;
                     if (comp.health <= 0) {
                         console.log(`You have defeated ${comp.name}, congratulations!`);
-                        console.log(`You received ${comp.reward} for winning!`);
+                        console.log(`You received ${comp.reward} for winning!\n`);
                         player.inventory.push(comp.reward);
                         return true;
                     }
                 }
-            } else if (input === 'use_null') {
+            } else if (input === 'throw_metal') {
+                if (player.inventory.includes('Scrap Metal')) {
+                    console.log(`You threw a piece of Scrap Metal at ${comp.name} ... it did nothing ...\n`);
+                    player.useItem('Scrap Metal');
+                } else {
+                    console.log(`You don't have any Scrap Metal to throw!\n`);
+                }
+            } else if (input === 'throw_null') {
+                console.log(`I don't know what you want me to throw\n`);
+            }
+            else if (input === 'use_null') {
                 console.log(`I'm not sure what item you are trying to use...\n`);
             } else if (input === 'no_use') {
                 console.log(`You cannot use that item right now...\n`);
@@ -736,7 +768,7 @@ async function combat(comp) {
                     return true;
                 }
             } else {
-                console.log('Now is not the time or place for that! ... ATTACK!');
+                console.log('Now is not the time or place for that! ... ATTACK!\n');
                 criticalHit = random(5);
                 miss = random(5);
                 damageUser = player.damageBase + random(player.damageModifier);  //damage + modifier (like dice roll)
@@ -821,6 +853,8 @@ async function combat(comp) {
         }
     }
 }
+
+//Into to the game function
 async function prologue() {
     console.log(`Welcome to the year 2361, the year that the human race was given another
 chance ... again. It has been twenty-four years since the machines took
@@ -868,7 +902,7 @@ the time to ask...'\n`);
     while (input2.firstInputTrue() === false && input2.lastWordTrue() === false) {
         console.log('I am not sure what that means...\n');
         input2 = await ask('What would you like to do?\n');
-        input2 = new ValidInput(input);
+        input2 = new ValidInput(input2);
     }
     input2.returnInput(input2);
     input2 = input2.return.toString();
@@ -971,7 +1005,12 @@ it will shut the whole system down.  This means you will be shut down too,
 but this is why you were created, this is your mission ... will you help us?
 
 ... That was a lot to take in, but you cautiously answer yes, this is what
-you were meant for right?\n\n`);
+you were meant for right?
+
+'One last thing' Ella continues, 'My father hid Riddle Boxes in each of the
+towers with backup keys. They are most likely out in the open, as they were
+just his spare keys. You'll need the keycards inside to get around each
+Tower.\n\n`);
     console.log(`----------------------------------------------------------------------\n`);
     initializeRoom(falloutBunker);
 }
@@ -986,9 +1025,16 @@ async function play(room) {  //allows player to make decisions within each room
     if (room.enemy) {
         let victory = await combat(room.enemy);
         if (victory === true) {
-            room.info = room.enemy.postRoomInfo;
-            room.enemy = undefined;
-            return initializeRoom(room);
+            if (player.hasKilled === true) {
+                room.info = room.enemy.postRoomInfo;
+                room.enemy = undefined;
+                return initializeRoom(room);
+            } else {
+                player.hasKilled = true;
+                room.info = room.enemy.postRoomInfo2;
+                room.enemy = undefined;
+                return initializeRoom(room);
+            }
         }
     }
     let input = await ask('What would you like to do?\n');
@@ -1016,7 +1062,7 @@ async function play(room) {  //allows player to make decisions within each room
         console.log(`I'm not sure what you are trying to pick up...\n`);
         return play(room);
     } else if (input === 'no_pickup') {
-        console.log(`Are you crazy?? You can't put that in your bag...`);
+        console.log(`Are you crazy?? You can't put that in your bag...\n`);
         return play(room);
     } else if (possibleItems.includes(input)) {  //picks up items in room
         input = input.toString();
@@ -1051,6 +1097,16 @@ async function play(room) {  //allows player to make decisions within each room
             console.log(`You dropped ${currentItem}...\n`);
             return play(room);
         }
+    } else if (input === 'throw_metal') {
+        if (player.inventory.includes('Scrap Metal')) {
+            console.log(`You threw a piece of Scrap Metal ... not sure why ...\n`);
+            player.useItem('Scrap Metal');
+            room.inventory.push('Scrap Metal');
+        } else {
+            console.log(`You don't have any Scrap Metal to throw!\n`);
+        }
+    } else if (input === 'throw_null') {
+        console.log(`I don't know what you want me to throw ...\n`);
     } else if (input === 'open_null') {
         console.log(`I'm not sure what you are trying to open...\n`);
         return play(room);
@@ -1097,32 +1153,32 @@ async function play(room) {  //allows player to make decisions within each room
             return play(room);
         }
     } else if (input === 'read_sign' && room === RUW_Entrance) {
-        console.log(`Welcome to Robotics United West\nWhere Dreams are Born\n`);
+        console.log(`\nWelcome to Robotics United West\nWhere Dreams are Born\n`);
         return play(room);
     } else if (input === 'read_sign' && room === RUE_Entrance) {
-        console.log(`Welcome to Robotics United East\nWhere Dreams are our Reality`);
+        console.log(`\nWelcome to Robotics United East\nWhere Dreams are our Reality\n`);
         return play(room);
     } else if (input === 'read_sign' && room === RUN_Entrance) {
-        console.log(`Welcome to Robotics United North\nWhere Dreams are our Future\n`);
+        console.log(`\nWelcome to Robotics United North\nWhere Dreams are our Future\n`);
         return play(room);
     } else if (input === 'read_sign' && room !== RUW_Entrance && room !==RUE_Entrance && room !== RUN_Entrance) {
-        console.log(`There is no sign to read...`);
+        console.log(`\nThere is no sign to read...\n`);
         return play(room);
     } else if (input === 'read_rboxw') {
-        console.log('There is a riddle on the box, it reads:\nIf you throw a blue stone into the red sea, what does it become?\n');
+        console.log('\nThere is a riddle on the box, it reads:\nIf you throw a blue stone into the red sea, what does it become?\n');
         return play(room);
     } else if (input === 'read_rboxe') {
-        console.log('There is a riddle on the box, it reads:\nWhat is so delicate that even just saying its name can break it?\n');
+        console.log('\nThere is a riddle on the box, it reads:\nWhat is so delicate that even just saying its name can break it?\n');
         return play(room);
     } else if (input === 'read_null') {
-        console.log(`There is nothing for me to read...`);
+        console.log(`There is nothing for me to read...\n`);
         return play(room);
     }
     else if (input === 'not_sure') {
-        console.log(`I'm not sure what you are telling me to do...`);
+        console.log(`I'm not sure what you are telling me to do...\n`);
         return play(room);
     } else if (input === 'fob_null') {
-        console.log(`I'm not sure what you are telling me to do...`);
+        console.log(`I'm not sure what you are telling me to do...\n`);
         return play(room);
     } else if (input === 'fob_fix') {
         if (room === falloutBunker) {
@@ -1157,7 +1213,7 @@ async function play(room) {  //allows player to make decisions within each room
             if (player.inventory.includes('Office Keycard West') && player.inventory.includes('Office Keycard East')) {
                 console.log(`Ella says she can program a new key to get into the North Tower\nusing the data from the two keycards you have collected\n`);
                 player.inventory.push('North Tower Keycard');
-                console.log(`You put the North Tower Keycard in your bag`);
+                console.log(`You put the North Tower Keycard in your bag\n`);
                 return play(room);
             } else {
                 console.log(`Ella says you need the data from Office Keycard East and West to program a new one\n`);
@@ -1183,13 +1239,17 @@ async function play(room) {  //allows player to make decisions within each room
         return play(room);
     } else if (input === 'use_comp') {
         if (room === RUN_Cubicle3) {
-            console.log(`The computer doesn't seem to be working`);
+            console.log(`The computer doesn't seem to be working\n`);
             return play(room);
         } else if (room === RUN_PresOffice) {
             epilogue();
         } else {
-            console.log(`There isn't a computer in this room...`);
+            console.log(`There isn't a computer in this room...\n`);
+            return play(room);
         }
+    } else if (input === 'no_do') {
+        console.log(`You can't do that right now!\n`);
+        return play(room);
     }
     else {  //travels to new room
         if (input === 'dnull') {
@@ -1201,6 +1261,7 @@ async function play(room) {  //allows player to make decisions within each room
                 return play(room);
             }
             console.log('\n');
+            console.log(`----------------------------------------------------------------------\n`);
             return initializeRoom(newRoom);
         }
     }
@@ -1217,13 +1278,13 @@ thought has been haunting you throughout this journey.  You have been
 cursed with human emotion for so long yet you still don't understand
 it.  So many questions... with no definitive answers... is it worth
 putting the planets survival in the hands of the humans?
-The decision is in your hands now...`)
-    let finalDecision = await ask('Would you like to enter the Killcodes?');
-    finalDecision = new ValidInput(input);
+The decision is in your hands now...\n`)
+    let finalDecision = await ask('Would you like to enter the Killcodes?\n');
+    finalDecision = new ValidInput(finalDecision);
     while (finalDecision.firstInputTrue() === false && finalDecision.lastWordTrue() === false) {
         console.log(`I know it's hard...`);
         finalDecision = await ask('Please answer the question...\n');
-        finalDecision = new ValidInput(input);
+        finalDecision = new ValidInput(finalDecision);
     }
     finalDecision.returnInput(finalDecision);
     finalDecision = finalDecision.return.toString();
