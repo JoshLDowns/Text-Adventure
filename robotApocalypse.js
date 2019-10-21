@@ -8,9 +8,10 @@ function ask(questionText) {
 }
 
 let player = {
+    name : undefined,
     maxHealth: 50,
     health: 50,
-    inventory: ['Office Keycard West', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal'],
+    inventory: [],
     attack: 'Particle Beam',
     damageBase: 5,
     damageModifier: 4,
@@ -43,7 +44,7 @@ let player = {
             let itemCount = 1;
             for (let i = 0; i < newInv.length; i++) {
                 if (newInv[i] !== newInv[i + 1]) {
-                    console.log(`  ${itemCount} ${newInv[i]}`)
+                    console.log(`  ${itemCount} ${newInv[i]}  |  ${descLookUp[newInv[i]]}`);
                     itemCount = 1
                 } else {
                     itemCount += 1;
@@ -75,9 +76,9 @@ class Enemy {
 }
 
 //Enemy Objects
-let enemyW = new Enemy('Robot Sentry', 30, 'Plasma Ray', 'Static Discharge', 6, 6, 'status_stun', undefined, undefined, 'Killswitch Code 1', 'Sample Info E');
-let enemyE = new Enemy('Robot Bruiser', 75, 'Pneumatic Fist', 'Missle Barrage', 3, 3, 'offensive', 6, 12, 'Killswitch Code 2', 'Sample Info W');
-let enemyN1 = new Enemy('Mechanical Surveillance Unit', 100, 'Fission Laser', 'Remote Laser', 8, 6, 'status_dot', 3, 3, 'Office Keycard North', 'Sample Info N,S,E,W');
+let enemyW = new Enemy('Robot Sentry', 40, 'Plasma Ray', 'Static Discharge', 6, 9, 'status_stun', undefined, undefined, 'Killswitch Code 1', 'Sample Info E');
+let enemyE = new Enemy('Robot Bruiser', 75, 'Pneumatic Fist', 'Missle Barrage', 6, 3, 'offensive', 8, 12, 'Killswitch Code 2', 'Sample Info W');
+let enemyN1 = new Enemy('Mechanical Surveillance Unit', 100, 'Fission Laser', 'Remote Laser', 10, 6, 'status_dot', 6, 3, 'Office Keycard North', 'Sample Info N,S,E,W');
 let enemyF = new Enemy('Enforcer Captain', 150, 'Collider Beam', 'Combat Repair', 10, 10, 'defensive', 14, 6, 'Killswitch Code 3', 'Sample Info S');
 
 //Input validation class
@@ -92,7 +93,7 @@ class ValidInput {
         this.inventory = ['B', 'INVENTORY', 'BAG', 'BACKPACK'];
         this.status = ['STATUS', 'INFO', 'HP', 'HEALTH'];
         this.inspect = ['INSPECT'];
-        this.instructions = ['D', 'DIRECTIONS', 'INSTRUCTIONS', 'INST', 'HOW', 'PLAY'];
+        this.instructions = ['D', 'DIRECTIONS', 'INSTRUCTIONS', 'INST', 'HOW', 'PLAY', 'HELP'];
         this.pickUpItem = ['PICK UP', 'PICK', 'GRAB', 'GET', 'AQUIRE'];
         this.useItem = ['USE'];
         this.combat = ['ATTACK', 'FIGHT', 'THROW', 'SHOOT', 'FIRE'];
@@ -153,6 +154,10 @@ class ValidInput {
                 this.return = 'open_fridge';
             } else if (obj.lastWord === 'SAFE') {
                 this.return = 'open_safe'
+            } else if (obj.lastWord === 'BOX1') {
+                this.return = 'use_rboxw';
+            } else if (obj.lastWord === 'BOX2') {
+                this.return = 'use_rboxe';
             } else {
                 this.return = 'open_null';
             }
@@ -223,6 +228,8 @@ class ValidInput {
                 this.return = 'use_bomb';
             } else if (obj.lastWord === 'METAL') {
                 this.return = 'no_use'
+            } else if (obj.lastWord === 'COMPUTER') {
+                this.return = 'use_comp';
             } else {
                 this.return = 'use_null';
             }
@@ -258,12 +265,8 @@ class ValidInput {
             } else {
                 this.return = 'combat';
             }
-        } else if (this.riddle.includes(obj.lastWord)) {
-            if (obj.lastWord === 'WET') {
-                this.return = 'rboxw_solved';
-            } else if (obj.lastWord === 'SILENCE') {
-                this.return = 'rboxe_solved';
-            }
+        } else if (this.instructions.includes(obj.firstWord) || this.instructions.includes(obj.lastWord)) {
+            this.return = 'd';
         }
         else {
             return 'not_sure';
@@ -302,10 +305,10 @@ class Room {
                 newRoom = this.north;
                 newRoom = roomLookUp[newRoom];
                 if (newRoom.keycard && player.inventory.includes(newRoom.keycard)) {
-                    console.log('You scan your keycard, the door unlocks!\n');
+                    console.log('You scan your keycard, the door unlocks!');
                     return newRoom;
                 } else if (newRoom.keycard && !player.inventory.includes(newRoom.keycard)) {
-                    console.log('You do not have the required keycard to enter this area\n');
+                    console.log(`You need ${newRoom.keycard} to enter this room ... \n`);
                     return false;
                 } else {
                     return newRoom;
@@ -314,10 +317,10 @@ class Room {
                 newRoom = this.south;
                 newRoom = roomLookUp[newRoom];
                 if (newRoom.keycard && player.inventory.includes(newRoom.keycard)) {
-                    console.log('You scan your keycard, the door unlocks!\n');
+                    console.log('You scan your keycard, the door unlocks!');
                     return newRoom;
                 } else if (newRoom.keycard && !player.inventory.includes(newRoom.keycard)) {
-                    console.log('You do not have the required keycard to enter this area\n');
+                    console.log(`You need ${newRoom.keycard} to enter this room ... \n`);
                     return false;
                 } else {
                     return newRoom;
@@ -326,10 +329,10 @@ class Room {
                 newRoom = this.east;
                 newRoom = roomLookUp[newRoom];
                 if (newRoom.keycard && player.inventory.includes(newRoom.keycard)) {
-                    console.log('You scan your keycard, the door unlocks!\n');
+                    console.log('You scan your keycard, the door unlocks!');
                     return newRoom;
                 } else if (newRoom.keycard && !player.inventory.includes(newRoom.keycard)) {
-                    console.log('You do not have the required keycard to enter this area\n');
+                    console.log(`You need ${newRoom.keycard} to enter this room ... \n`);
                     return false;
                 } else {
                     return newRoom;
@@ -338,10 +341,10 @@ class Room {
                 newRoom = this.west;
                 newRoom = roomLookUp[newRoom];
                 if (newRoom.keycard && player.inventory.includes(newRoom.keycard)) {
-                    console.log('You scan your keycard, the door unlocks!\n');
+                    console.log('You scan your keycard, the door unlocks!');
                     return newRoom;
                 } else if (newRoom.keycard && !player.inventory.includes(newRoom.keycard)) {
-                    console.log('You do not have the required keycard to enter this area\n');
+                    console.log(`You need ${newRoom.keycard} to enter this room ... \n`);
                     return false;
                 } else {
                     return newRoom;
@@ -372,10 +375,10 @@ class Room {
 
 //Rooms
 //Home Base (You can trade in Scrap Metal here to restore health);
-let falloutBunker = new Room('Fallout Bunker', 'Sample Info N,E,W', [], undefined, 'RUN_Entrance', false, 'RUE_Entrance', 'RUW_Entrance', false);
+let falloutBunker = new Room('Fallout Bunker', `Ella, as always, is happy to see you...\n'How's everything going?\nIf you bring me some Scrap Metal I can fix you up a bit.\nI can also get a key to the North Tower,\nI just need the keys from the other towers first.'\n\n'If you ever get stuck you can type 'Help' for a list of commands!'\n`, [], undefined, 'RUN_Entrance', false, 'RUE_Entrance', 'RUW_Entrance', false);
 //Robotics United Towers
 //R.U. West
-let RUW_Entrance = new Room('R.U.West Entrance', 'Sample Info E,W', [], undefined, false, false, 'falloutBunker', 'RUW_WelcomeDesk', false);
+let RUW_Entrance = new Room('R.U.West Entrance', 'You stand at the Entrance of the Robotics United West Tower.\nEverything around the tower is destroyed, yet the tower itself is mostly intact.\nThere is a sign on the door', [], undefined, false, false, 'falloutBunker', 'RUW_WelcomeDesk', false);
 let RUW_WelcomeDesk = new Room('Welcome Desk', 'Sample Info N,S,E', ['Scrap Metal', 'Scrap Metal'], undefined, 'RUW_BreakRoom', 'RUW_Cubicle1', 'RUW_Entrance', false, false, 'Desk', ['Plasma Grenade']);
 let RUW_BreakRoom = new Room('Break Room', 'Sample Info S,W', ['Repair Kit'], undefined, false, 'RUW_WelcomeDesk', false, 'RUW_Hallway1N', false, 'Refridgerator', []);
 let RUW_Hallway1N = new Room('Hallway 1N - W', 'Sample Info S,E,W', ['Scrap Metal'], undefined, false, 'RUW_FabUnit', 'RUW_BreakRoom', 'RUW_ExpLabs', false);
@@ -447,16 +450,24 @@ let roomLookUp = {
     'RUN_PresOffice': RUN_PresOffice
 }
 
-//possible item array
-let possibleItems = ['pu_scrapmetal', 'pu_particlebattery', 'pu_carboncoating', 'pu_repairkit', 'pu_rboxw', 'pu_rboxe', 'pu_grenade', 'pu_shield', 'pu_bomb'];
+//item description lookup table
+let descLookUp = {
+    'Scrap Metal' : 'Can be traded in at Fallout Bunker',
+    'Repair Kit' : 'Restores 30 HP',
+    'Thick Carbon Coating' : 'Increases Max HP by 10',
+    'Particle Battery' : 'Increases Base Damage by 2',
+    'Plasma Grenade' : 'Deals 20 damage',
+    'Portable Shield' : 'Generates a temporary shield',
+    'Smoke Bomb' : 'Covers area in smoke, making you harder to hit',
+    'Riddle Box1' : 'There is something inscribed on the box...',
+    'Riddle Box2' : 'There is something inscribed on the box...',
+    'Office Keycard West' : 'Opens doors in R.U. West Tower',
+    'Office Keycard East' : 'Opens doors in R.U. East Tower',
+    'Office Keycard North' : 'Opens doors in R.U. North Tower',
+    'North Tower Keycard' : 'Opens gate to R.U. North Tower'
+}
 
-//dropable item arary
-let dropableItems = ['drop_scrapmetal', 'drop_particlebattery', 'drop_carboncoating', 'drop_repairkit', 'drop_rboxw', 'drop_rboxe', 'drop_grenade', 'drop_shield', 'drop_bomb']
-
-//useable item array
-let useableItems = ['use_particlebattery', 'use_carboncoating', 'use_rboxw', 'use_rboxe', 'use_repairkit', 'use_grenade', 'use_shield', 'use_bomb'];
-
-//interactable open objects array 
+//interactable open objects arrays
 let intObjectOpen = ['open_desk', 'open_cabinet', 'open_fridge', 'open_safe'];
 
 //open objects lookup object
@@ -465,7 +476,11 @@ let intObjectOpenLookUp = {
     open_cabinet: 'Filing Cabinet',
     open_fridge: 'Refridgerator',
     open_safe: 'Broken Safe'
+
 }
+
+//possible item array
+let possibleItems = ['pu_scrapmetal', 'pu_particlebattery', 'pu_carboncoating', 'pu_repairkit', 'pu_rboxw', 'pu_rboxe', 'pu_grenade', 'pu_shield', 'pu_bomb'];
 
 // pick up item lookup object
 let itemLookUp = {
@@ -480,6 +495,9 @@ let itemLookUp = {
     pu_rboxe: 'Riddle Box2'
 }
 
+//dropable item arary
+let dropableItems = ['drop_scrapmetal', 'drop_particlebattery', 'drop_carboncoating', 'drop_repairkit', 'drop_rboxw', 'drop_rboxe', 'drop_grenade', 'drop_shield', 'drop_bomb']
+
 //drop item lookup object
 let dropItemLookUp = {
     drop_scrapmetal: 'Scrap Metal',
@@ -492,6 +510,9 @@ let dropItemLookUp = {
     drop_rboxw: 'Riddle Box1',
     drop_rboxe: 'Riddle Box2'
 }
+
+//useable item array
+let useableItems = ['use_particlebattery', 'use_carboncoating', 'use_rboxw', 'use_rboxe', 'use_repairkit', 'use_grenade', 'use_shield', 'use_bomb'];
 
 //useable item lookup object
 let useableItemLookUp = {
@@ -508,7 +529,7 @@ let useableItemLookUp = {
 function itemEffect(item, comp, answer) {
     if (item === 'use_repairkit') {
         player.useItem(useableItemLookUp[item]);
-        player.health = player.health + 25;
+        player.health = player.health + 30;
         if (player.health > player.maxHealth) {
             player.health = player.maxHealth;
         }
@@ -521,6 +542,7 @@ function itemEffect(item, comp, answer) {
     } else if (item === 'use_carboncoating') {
         player.useItem(useableItemLookUp[item]);
         player.maxHealth = player.maxHealth + 10;
+        player.health = player.health + 10;
         return console.log(`You have increased your maximum HP by 10 points!`);
     } else if (item === 'use_grenade') {
         player.useItem(useableItemLookUp[item]);
@@ -799,6 +821,160 @@ async function combat(comp) {
         }
     }
 }
+async function prologue() {
+    console.log(`Welcome to the year 2361, the year that the human race was given another
+chance ... again. It has been twenty-four years since the machines took
+over. The human's AI algorithms were both their triumph and their
+downfall. The machine were cold and ruthless, and their "justice" was
+brutal and swift.  Eighty percent of all biological life on Earth was
+wiped out in less than a week. What was left of humanity went into
+hiding, and it has been your mission for the past twenty years to find
+them.  You don't know why, but you feel compassion for the humans and
+want to help them.  Something set you apart from the rest of the machines,
+something that you didn't understand ... something that made you special
+... something that made you a target ...\n`);
+    console.log(`\nWhile searching he ruins of what used to be Seattle for any signs of life,
+you find yourself at the end of a mostly collapsed alleyway mostly
+surrounded by rubble. The only choice is to head back the way you came.
+You hear the faint whirring of gears to the north ...\n`);
+    let input = await ask('What would you like to do?\n');
+    input = new ValidInput(input);
+    while (input.firstInputTrue() === false && input.lastWordTrue() === false) {
+        console.log('I am not sure what that means...\n');
+        input = await ask('What would you like to do?\n');
+        input = new ValidInput(input);
+    }
+    input.returnInput(input);
+    input = input.return.toString();
+    if (input !== 'dn') {
+        console.log(`With all this rubble, you can't do that ... you head north\n`);
+    } else {
+        console.log(`You head north ... the whirring gets louder\n`);
+    }
+    console.log(`----------------------------------------------------------------------\n`);
+    console.log(`As you approach a clearing in the rubble, you are cut off by a large,
+combat class robot! A booming robotic voice yells, "you have been deemed
+a threat to the machine race, justice will be administered!"
+
+Up until now you have done a good job of laying low and avoiding any
+interaction with the machines.  You were obviously not built for combat,
+but it doesn't look like there is a way out of this fight...
+
+You don't know why you are being hunted by the machines, after all you
+are one of them ... Unfortunately this big guy isn't going to give you
+the time to ask...'\n`);
+    let input2 = await ask('What would you like to do?\n');
+    input2 = new ValidInput(input2);
+    while (input2.firstInputTrue() === false && input2.lastWordTrue() === false) {
+        console.log('I am not sure what that means...\n');
+        input2 = await ask('What would you like to do?\n');
+        input2 = new ValidInput(input);
+    }
+    input2.returnInput(input2);
+    input2 = input2.return.toString();
+    if (input2 !== 'combat') {
+        console.log(`The machine has you pinned, you must fight ...\n`);
+    } else {
+        console.log(`You know you stand little chance, but you bravely charge into battle...\n`);
+    }
+    console.log(`----------------------------------------------------------------------\n`);
+    console.log(`You fought hard, but were quickly destroyed by a Missle Barrage...
+
+...
+
+...
+
+...
+
+'Surely that blast must have erased me from existence' you thought to
+yourself... Yet somehow ... you were still thinking.  You couldn't see or
+hear anything, but yet here you were, pondering your own existence...
+
+...
+
+...
+
+...
+
+You had no idea how much time had passed. The impenetrable darkness that
+you had accepted as your existence made it difficult to perceive time.
+Suddenly though, something changed.  You began to hear voices ... human
+voices! Slowly the light hum of your solar energy core, and the light
+clicking of circuits firing joined the sounds filling your noise sensors.
+Your vision software snapped back online, and you could see the world
+around you...
+
+You were in a dimly lit room, with a woman standing over you...
+'You are actually WORKING!!!' she exclaimed... You tried to respond but
+realize you are not fully repaired yet, and have now way to communicate.
+In her excitement, it seems like the human almost forgot that fact
+as well ... 'OH! Right ... I need to get your communication modules in
+order before you can talk to me ... HA!' Her genuine excitement seemed so
+pure, and you had never experienced anything like it before...
+
+'Alright, everything should be working now ... what's your name?' she
+asked.'`);
+    let name = await ask('Please enter your name ...\n');
+    player.name = name;
+    console.log(`----------------------------------------------------------------------\n`);
+    console.log(`You think, and finally respond "My name is ${player.name}."
+    'I KNEW IT,' she yelled, 'you ARE my father's robot!!!'
+You weren't sure what that meant, but before you could ask, the human
+jumped right into an explanation for you...
+    'First off, my name is Ella Lloyd, the daughter of James Lloyd, the
+father of all machines ... and you my friend, YOU were his last hope
+for humanity.  After the machines AI went awol and it became clear what
+their motive was, my father holed himself up and built you in hopes that
+instilling human emotion in the machines would put an end to their
+tyranny. He hoped that human compassion would be enough to fight the urge
+to purify the planet.  Unfortunately his secret lab was attacked and he
+was killed before he could transfer your code to the rest of the machines.
+Unaware of what you were at the time, the machines left you there. It seems
+though, they have figured out just what it is you are unfortunately.
+I'm hoping you can help us, all of us ... what's left of humanity itself
+to overcome the machine race, and give us a chance at a new life.  I used
+what supplies I could muster up to give you some upgrades, so you should be
+a little more fit for battle now.'
+
+...As Ella spoke, you struggled to comprehend what she was telling you...
+You are humanities last hope? You were created to save the human race?
+All these things you have been 'feeling' are human emotions? Knowing that
+didn't help you understand what that meant yet ... hopefully that will come
+in time...`);
+    let input3 = await ask('Continue listening?...(yes) or (no)\n');
+    input3 = new ValidInput(input3);
+    while (input3.firstInputTrue() === false && input3.lastWordTrue() === false) {
+        console.log('I am not sure what that means...\n');
+        input3 = await ask('Continue listening?...(yes) or (no)\n');
+        input3 = new ValidInput(input3);
+    }
+    input3.returnInput(input3);
+    input3 = input3.return.toString();
+    if (input3 !== 'y') {
+        console.log(`Doesn't look like Ella is going to give you a choice ...\n`);
+    } else {
+        console.log(`You hold back your questions and continue listening...\n`);
+    }
+    console.log(`----------------------------------------------------------------------\n`);
+    console.log(`Ella, in all of her excitement took no notice to your confusion, 'We
+are currently in an old Fallout Bunker deep underground in the center of the
+Robotics United Towers ... where the machines were invented.  I stationed us
+here in hopes that being close to enemy would help us figure out a way to
+fight them. In my father's office in the North Tower, his computer has
+to still be functioning.  It has to be in order for the machines to all
+be operational.  The computer is connected to many back up servers around
+the world though so simply shutting it off won't shut down the machines.
+There are three Killcodes though, one in each of the towers.  You can get them
+in the server room of each tower, but they are most likely gaurded. If you
+enter all the Killcodes into the shutdown program on my father's computer,
+it will shut the whole system down.  This means you will be shut down too,
+but this is why you were created, this is your mission ... will you help us?
+
+... That was a lot to take in, but you cautiously answer yes, this is what
+you were meant for right?\n\n`);
+    console.log(`----------------------------------------------------------------------\n`);
+    initializeRoom(falloutBunker);
+}
 
 async function initializeRoom(room) {  //initializes the current room with it's despcription and name
     console.log(room.name);
@@ -920,6 +1096,18 @@ async function play(room) {  //allows player to make decisions within each room
             console.log(`You don't have that item in your bag! Better go find one if you want to use it!\n`);
             return play(room);
         }
+    } else if (input === 'read_sign' && room === RUW_Entrance) {
+        console.log(`Welcome to Robotics United West\nWhere Dreams are Born\n`);
+        return play(room);
+    } else if (input === 'read_sign' && room === RUE_Entrance) {
+        console.log(`Welcome to Robotics United East\nWhere Dreams are our Reality`);
+        return play(room);
+    } else if (input === 'read_sign' && room === RUN_Entrance) {
+        console.log(`Welcome to Robotics United North\nWhere Dreams are our Future\n`);
+        return play(room);
+    } else if (input === 'read_sign' && room !== RUW_Entrance && room !==RUE_Entrance && room !== RUN_Entrance) {
+        console.log(`There is no sign to read...`);
+        return play(room);
     } else if (input === 'read_rboxw') {
         console.log('There is a riddle on the box, it reads:\nIf you throw a blue stone into the red sea, what does it become?\n');
         return play(room);
@@ -979,7 +1167,31 @@ async function play(room) {  //allows player to make decisions within each room
             console.log(`You gotta be at the bunker if you want Ella to make you a new keycard\n`);
             return play(room);
         }
-    } else {  //travels to new room
+    } else if (input === 'd') {
+        console.log(`If you are unsure what to do, you can try some of the following commands:\n
+    'go' followed by a direction (N, S, E, W) will attempt to go in that direction
+    'inspect' will tell you what's in the room
+    'get' or 'pick up' followed by an item will put an item in your bag
+    'read' followed by an object will try to read that object
+    'use' followed by an item will try to use that item
+    'drop' followed by an item will drop that item
+    'status' will display your current status
+    'bag' or 'b' will show what's in your bag
+    'attack' will attack an enemy in combat
+    'fix' or 'keycard' at the Fallout Bunker will interact with Ella
+    Other commands work too, try some out!\n`);
+        return play(room);
+    } else if (input === 'use_comp') {
+        if (room === RUN_Cubicle3) {
+            console.log(`The computer doesn't seem to be working`);
+            return play(room);
+        } else if (room === RUN_PresOffice) {
+            epilogue();
+        } else {
+            console.log(`There isn't a computer in this room...`);
+        }
+    }
+    else {  //travels to new room
         if (input === 'dnull') {
             console.log(`I'm not sure where you are telling me to go...\n`);
             return play(room);
@@ -994,5 +1206,48 @@ async function play(room) {  //allows player to make decisions within each room
     }
 }
 
-initializeRoom(falloutBunker);
+async function epilogue () {
+    console.log(`After everything you have been through, this could be your final moment...
+Entering the Killswitch Codes will give humanity another chance, but
+will also shut you down in the process.  Will the humans treat this
+new chance at life with respect and integrity?  Or will they squander
+it away and fall down the same path they have over and over again?
+Was destroying your own kind to help the humans the right choice? The
+thought has been haunting you throughout this journey.  You have been
+cursed with human emotion for so long yet you still don't understand
+it.  So many questions... with no definitive answers... is it worth
+putting the planets survival in the hands of the humans?
+The decision is in your hands now...`)
+    let finalDecision = await ask('Would you like to enter the Killcodes?');
+    finalDecision = new ValidInput(input);
+    while (finalDecision.firstInputTrue() === false && finalDecision.lastWordTrue() === false) {
+        console.log(`I know it's hard...`);
+        finalDecision = await ask('Please answer the question...\n');
+        finalDecision = new ValidInput(input);
+    }
+    finalDecision.returnInput(finalDecision);
+    finalDecision = finalDecision.return.toString();
+    if (finalDecision === 'y') {
+        console.log(`The codes worked much quicker than you could have imagined...
+The power went out all around you, apparently shutting down the
+machines meant shutting down the entire grid. Suddenly, every electronic
+device around you starts to emit an overwhelming sound.  The world feels
+like it is shaking apart.  The grid didn't shut down ... that would not
+have been enough to stop the machines.  The grid was being overloaded and
+the force of all of this electricity was tearing your circuitry apart. As
+you shut down, you can't help but wonder ... was it worth it?`);
+        process.exit();
+    } else {
+        console.log(`At the end of it all, human emotion was the downfall of humanity...
+You just can't bring yourself to end your own life, not with so many
+looming questions.  The human's have survived this long, maybe they can
+continue surviving.  You decide to give the Killcodes to the humans, if
+Ella can rebuild and make it to her fathers computer, then you can accept 
+your fate and be shut down with the rest of the machine race ...
+The decision was just too much for you to make ...`)
+        process.exit();
+    }
+}
+
+prologue();
 
