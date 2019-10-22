@@ -1407,6 +1407,7 @@ async function play(room) {  //allows player to make decisions within each room
     'get' or 'pick up' followed by an item will put an item in your bag
     'read' followed by an object will try to read that object
     'use' followed by an item will try to use that item
+    'check' or 'open' to interact with objects in room
     'drop' followed by an item will drop that item
     'status' will display your current status
     'bag' or 'b' will show what's in your bag
