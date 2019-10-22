@@ -307,7 +307,7 @@ class ValidInput {
             this.return = 'd';
         } else if (this.otherActions.includes(obj.firstWord) || this.otherActions.includes(obj.lastWord)) {
             this.return = 'no_do';
-            //add other actions here ....
+            //add other actions here .... this is where some easter eggs would go, and some silly inputs if I have time
         }
         else {
             return 'not_sure';
@@ -589,6 +589,7 @@ let useableItemLookUp = {
     use_rboxe: 'Riddle Box2'
 }
 
+//when called with an item (and enemy or answer if necessary) it determines what action to take
 function itemEffect(item, comp, answer) {
     if (item === 'use_repairkit') {
         player.useItem(useableItemLookUp[item]);
@@ -680,6 +681,7 @@ function statusCheck(comp) {
     }
 }
 
+//called in combat when conditions are met, determines the enemy ability and its effect
 function useCompAbility(comp) {
     if (comp.abilityType === 'status_stun') {
         let stunChance = random(5);
@@ -743,7 +745,7 @@ async function combat(comp) {
 
     while (player.health > 0 || comp.health > 0) {  //Loop that breaks when either user or computer hits 0 or less HP
         //Player Turn
-        player.status2 = undefined;
+        player.status2 = undefined; //emergency reset to status in case it gets skipped (happened once, can't figure out why still...)
         if (player.status === 'status_stun') {
             statusCheck(comp);
         } else {
@@ -1237,11 +1239,14 @@ async function play(room) {  //allows player to make decisions within each room
             console.log(`You threw a piece of Scrap Metal ... not sure why ...\n`);
             player.useItem('Scrap Metal');
             room.inventory.push('Scrap Metal');
+            return play(room);
         } else {
             console.log(`You don't have any Scrap Metal to throw!\n`);
+            return play(room);
         }
     } else if (input === 'throw_null') {
         console.log(`I don't know what you want me to throw ...\n`);
+        return play(room);
     } else if (input === 'open_null') {
         console.log(`I'm not sure what you are trying to open...\n`);
         return play(room);
@@ -1335,7 +1340,7 @@ async function play(room) {  //allows player to make decisions within each room
                 }
                 return play(room);
             } else {
-                console.log(`Ella says you don't have enough Scrap Metal to fix you up...\n`);
+                console.log(`Ella says you need 5 Scrap Metal to get fixed up...\n`);
                 return play(room);
             }
         } else {
