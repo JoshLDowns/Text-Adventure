@@ -8,7 +8,7 @@ function ask(questionText) {
 }
 //player object
 let player = {
-    name : undefined,
+    name: undefined,
     maxHealth: 50,
     health: 50,
     inventory: [],
@@ -93,7 +93,7 @@ class ValidInput {
         this.return = undefined;
         this.affirmative = ['YES', 'YEAH', 'YUP', 'YUPPER', 'MHM', 'MMHMM', 'AFFIRMATIVE',];
         this.negatory = ['NO', 'NOPE', 'NADA', 'NEGATORY'];
-        this.direction = ['GO', 'TRAVEL', 'LEAVE', 'EXIT', 'N', 'NORTH', 'S', 'SOUTH', 'E', 'EAST', 'W', 'WEST'];
+        this.direction = ['GO', 'TRAVEL', 'LEAVE', 'EXIT', 'N', 'NORTH', 'S', 'SOUTH', 'E', 'EAST', 'W', 'WEST', 'INSIDE'];
         this.inventory = ['B', 'INVENTORY', 'BAG', 'BACKPACK'];
         this.status = ['STATUS', 'INFO', 'HP', 'HEALTH'];
         this.inspect = ['INSPECT'];
@@ -141,7 +141,7 @@ class ValidInput {
             this.return = 's';
         } else if (this.inspect.includes(obj.firstWord) || this.inspect.includes(obj.lastWord)) {
             this.return = 'insp';
-        } else if (this.falloutBunkerEvent.includes(obj.firstWord) || this.falloutBunkerEvent.includes(obj.lastWord)){
+        } else if (this.falloutBunkerEvent.includes(obj.firstWord) || this.falloutBunkerEvent.includes(obj.lastWord)) {
             if (obj.firstWord === 'REPAIR' || obj.lastWord === 'REPAIR' || obj.firstWord === 'FIX' || obj.lastWord === 'FIX') {
                 this.return = 'fob_fix';
             } else if (obj.firstWord === 'KEY' || obj.lastWord === 'KEY' || obj.firstWord === 'KEYCARD' || obj.lastWord === 'KEYCARD') {
@@ -192,7 +192,7 @@ class ValidInput {
             } else if (obj.lastWord === 'REFRIDGERATOR') {
                 this.return = 'no_pu_fridge';
             } else {
-            this.return = 'no_pickup';
+                this.return = 'no_pickup';
             }
         } else if (obj.firstWord === 'DROP' || obj.lastWord === 'DROP') {
             if (obj.lastWord === 'BATTERY') {
@@ -230,6 +230,8 @@ class ValidInput {
                 this.return = 'de';
             } else if (obj.firstWord === 'WEST' || obj.lastWord === 'WEST' || obj.firstWord === 'W' || obj.lastWord === 'W') {
                 this.return = 'dw';
+            } else if (obj.firstWord === 'INSIDE' || obj.lastWord === 'INSIDE') {
+                this.return = 'di';
             } else {
                 this.return = 'dnull';
             }
@@ -485,7 +487,7 @@ let roomLookUp = {
     'RUE_QA': RUE_QA,
     'RUE_Charging': RUE_Charging,
     'RUE_Hallway1S': RUE_Hallway1S,
-    'RUE_SupplyCloset' : RUE_SupplyCloset,
+    'RUE_SupplyCloset': RUE_SupplyCloset,
     'RUE_AdvWeapons': RUE_AdvWeapons,
     'RUE_FabUnit': RUE_FabUnit,
     'RUE_ServerE': RUE_ServerE,
@@ -505,24 +507,24 @@ let roomLookUp = {
 
 //item description lookup table
 let descLookUp = {
-    'Scrap Metal' : 'Can be traded in at Fallout Bunker',
-    'Nuclear Fuel Cell' : 'Maybe Ella can do something with this...',
-    'Repair Kit' : 'Restores 30 HP',
-    'Thick Carbon Coating' : 'Increases Max HP by 10',
-    'Particle Battery' : 'Increases Base Damage by 2',
-    'Plasma Grenade' : 'Deals 20 damage',
-    'Portable Shield' : 'Generates a temporary shield',
-    'Nuclear Heat Ray' : 'A very powerful weapon, it only has one shot...',
-    'Smoke Bomb' : 'Covers area in smoke, making you harder to hit',
-    'Riddle Box1' : 'There is something inscribed on the box...',
-    'Riddle Box2' : 'There is something inscribed on the box...',
-    'Office Keycard West' : 'Opens doors in R.U. West Tower',
-    'Office Keycard East' : 'Opens doors in R.U. East Tower',
-    'Office Keycard North' : 'Opens doors in R.U. North Tower',
-    'North Tower Keycard' : 'Opens gate to R.U. North Tower',
-    'Killswitch Code 1' : 'One of Three codes needed',
-    'Killswitch Code 2' : 'One of Three codes needed',
-    'Killswitch Code 3' : 'One of Three codes needed'
+    'Scrap Metal': 'Can be traded in at Fallout Bunker',
+    'Nuclear Fuel Cell': 'Maybe Ella can do something with this...',
+    'Repair Kit': 'Restores 30 HP',
+    'Thick Carbon Coating': 'Increases Max HP by 10',
+    'Particle Battery': 'Increases Base Damage by 2',
+    'Plasma Grenade': 'Deals 20 damage',
+    'Portable Shield': 'Generates a temporary shield',
+    'Nuclear Heat Ray': 'A very powerful weapon, it only has one shot...',
+    'Smoke Bomb': 'Covers area in smoke, making you harder to hit',
+    'Riddle Box1': 'There is something inscribed on the box...',
+    'Riddle Box2': 'There is something inscribed on the box...',
+    'Office Keycard West': 'Opens doors in R.U. West Tower',
+    'Office Keycard East': 'Opens doors in R.U. East Tower',
+    'Office Keycard North': 'Opens doors in R.U. North Tower',
+    'North Tower Keycard': 'Opens gate to R.U. North Tower',
+    'Killswitch Code 1': 'One of Three codes needed',
+    'Killswitch Code 2': 'One of Three codes needed',
+    'Killswitch Code 3': 'One of Three codes needed'
 }
 
 //interactable open objects arrays
@@ -674,7 +676,7 @@ function statusCheck(comp) {
         player.health = player.health - dotDamage;
         if (player.health <= 0) {
             console.log('You have been defeated! Better luck next time!\n');
-            process.exit();
+            playAgain();
         } else {
             return console.log(`Your currently have ${player.health} HP!\n`);
         }
@@ -690,7 +692,7 @@ function useCompAbility(comp) {
             player.health = player.health - 10;
             if (player.health <= 0) {
                 console.log('You have been defeated! Better luck next time!');
-                process.exit();
+                playAgain();
             } else {
                 console.log(`Your currently have ${player.health} HP!\n`);
                 return player.status = 'status_stun';
@@ -707,7 +709,7 @@ function useCompAbility(comp) {
             player.health = player.health - abilityDamage;
             if (player.health <= 0) {
                 console.log('You have been defeated! Better luck next time!');
-                process.exit();
+                playAgain();
             } else {
                 return console.log(`Your currently have ${player.health} HP!\n`);
             }
@@ -882,7 +884,7 @@ async function combat(comp) {
                     player.health = player.health - damageComp;
                     if (player.health <= 0) {
                         console.log('You have been defeated! Better luck next time!');
-                        process.exit();
+                        playAgain();
                     } else {
                         console.log(`Your currently have ${player.health} HP!\n`);
                     }
@@ -900,7 +902,7 @@ async function combat(comp) {
                     player.health = player.health - damageComp;
                     if (player.health <= 0) {
                         console.log('You have been defeated! Better luck next time!');
-                        process.exit();
+                        playAgain();
                     } else {
                         console.log(`Your currently have ${player.health} HP!\n`);
                     }
@@ -1110,23 +1112,23 @@ async function play(room) {  //allows player to make decisions within each room
     }
     if (room === falloutBunker && player.inventory.includes('Nuclear Fuel Cell')) {
         metalCount = 0;
-            for (let i = 0; i < player.inventory.length; i++) {
-                if (player.inventory[i] === 'Scrap Metal') {
-                    metalCount = metalCount + 1;
-                }
+        for (let i = 0; i < player.inventory.length; i++) {
+            if (player.inventory[i] === 'Scrap Metal') {
+                metalCount = metalCount + 1;
             }
-            if (metalCount >= 5) {
-                console.log(`You show Ella the Nuclear Fuel Cell...\n'WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter.\nGive me 5 Scrap Metal and the Fuel Cell and I can make a Heat Ray that will\nreally pack a punch! It only has one shot, so use it wisely...\n`);
-                console.log('You put the Nuclear Heat Ray in your bag.\n');
-                player.useItem('Nuclear Fuel Cell');
-                player.inventory.push('Nuclear Heat Ray');
-                for (let i = 1; i <= 5; i++) {
-                    player.useItem('Scrap Metal');
-                }
-                return play(room);
-            } else {
-                console.log(`You show Ella the Nuclear Fuel Cell...\n'WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter.\nCome back when you have 5 Scrap Metal and I can make you a sweet weapon!\n`);
+        }
+        if (metalCount >= 5) {
+            console.log(`You show Ella the Nuclear Fuel Cell...\n'WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter.\nGive me 5 Scrap Metal and the Fuel Cell and I can make a Heat Ray that will\nreally pack a punch! It only has one shot, so use it wisely...\n`);
+            console.log('You put the Nuclear Heat Ray in your bag.\n');
+            player.useItem('Nuclear Fuel Cell');
+            player.inventory.push('Nuclear Heat Ray');
+            for (let i = 1; i <= 5; i++) {
+                player.useItem('Scrap Metal');
             }
+            return play(room);
+        } else {
+            console.log(`You show Ella the Nuclear Fuel Cell...\n'WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter.\nCome back when you have 5 Scrap Metal and I can make you a sweet weapon!\n`);
+        }
     }
     let input = await ask('What would you like to do?\n');
     if ((input.slice(0, input.indexOf(' ')).toUpperCase()) === 'XYZZY' && (cheatCode.includes((input.slice((input.lastIndexOf(' ')) + 1))))) {
@@ -1138,6 +1140,10 @@ async function play(room) {  //allows player to make decisions within each room
     while ((input.firstInputTrue() === false && input.lastWordTrue() === false) || input.return === undefined) {
         console.log('I am not sure what that means...\n');
         input = await ask('What would you like to do?\n');
+        if ((input.slice(0, input.indexOf(' ')).toUpperCase()) === 'XYZZY' && (cheatCode.includes((input.slice((input.lastIndexOf(' ')) + 1))))) {
+            console.log(`----------------------------------------------------------------------\n`);
+            return initializeRoom(roomLookUp[(input.slice((input.lastIndexOf(' ')) + 1))]);
+        }
         input = new ValidInput(input);
         input.returnInput(input);
     }
@@ -1154,7 +1160,7 @@ async function play(room) {  //allows player to make decisions within each room
     } else if (input === 'i') {  //shows inventory
         player.inspectBag();
         return play(room);
-    } else if (input === 'pu_null') {
+    } else if (input === 'pu_null') { //pu_null and no_pu statements catch items you can't add to inventory
         console.log(`I'm not sure what you are trying to pick up...\n`);
         return play(room);
     } else if (input === 'no_pu_desk') {
@@ -1190,7 +1196,7 @@ async function play(room) {  //allows player to make decisions within each room
             return play(room);
         }
     } else if (input === 'no_pu_sign') {
-        if(room.intObject === 'Sign') {
+        if (room.intObject === 'Sign') {
             console.log(`What do you even need the sign for? Huh? ... that's what I thought.\n`);
             return play(room);
         } else {
@@ -1218,9 +1224,9 @@ async function play(room) {  //allows player to make decisions within each room
             return play(room);
         }
     } else if (input === 'drop_null') {
-        console.log(`I'm not sure what you are trying to drop...\n`);
+        console.log(`I'm not sure what you are trying to drop...\n`);  //catches invalid items to drop
         return play(room);
-    } else if (dropableItems.includes(input)) {
+    } else if (dropableItems.includes(input)) {  //drops item of choice if you have it
         let currentItem = dropItemLookUp[input];
         if (player.inventory.length === 0) {
             console.log(`You don't have any items to drop!\n`);
@@ -1234,7 +1240,7 @@ async function play(room) {  //allows player to make decisions within each room
             console.log(`You dropped ${currentItem}...\n`);
             return play(room);
         }
-    } else if (input === 'throw_metal') {
+    } else if (input === 'throw_metal') {  //throws scrap metal... because... why not?
         if (player.inventory.includes('Scrap Metal')) {
             console.log(`You threw a piece of Scrap Metal ... not sure why ...\n`);
             player.useItem('Scrap Metal');
@@ -1244,13 +1250,13 @@ async function play(room) {  //allows player to make decisions within each room
             console.log(`You don't have any Scrap Metal to throw!\n`);
             return play(room);
         }
-    } else if (input === 'throw_null') {
+    } else if (input === 'throw_null') {  //when you don't know what to throw
         console.log(`I don't know what you want me to throw ...\n`);
         return play(room);
-    } else if (input === 'open_null') {
+    } else if (input === 'open_null') { //when you don't now what to open
         console.log(`I'm not sure what you are trying to open...\n`);
         return play(room);
-    } else if (intObjectOpen.includes(input)) {
+    } else if (intObjectOpen.includes(input)) { //interacts with interactable objects
         let currentIntObj = intObjectOpenLookUp[input];
         if (room.intObject === currentIntObj && room.intObjInv.length !== 0) {
             console.log(`You opened the ${currentIntObj}, inside you found ${room.intObjInv[0]}!\nYou put it in your bag...\n`);
@@ -1264,22 +1270,32 @@ async function play(room) {  //allows player to make decisions within each room
             console.log(`There is no ${currentIntObj} to open in this room...\n`);
             return play(room);
         }
-    } else if (input === 'use_null') {
+    } else if (input === 'use_null') { //when you don't know what to use
         console.log(`I'm not sure what item you are trying to use...\n`);
         return play(room);
-    } else if (input === 'no_use') {
+    } else if (input === 'no_use') { //catches items you can't use
         console.log(`You cannot use that item right now...\n`);
         return play(room);
-    } else if (input === 'use_rboxw') {
-        let answer = await ask('What is the answer to the riddle inscribed on this box?\n');
-        answer = answer.toString().toUpperCase()
-        itemEffect('use_rboxw', undefined, answer);
-        return play(room);
-    } else if (input === 'use_rboxe') {
-        let answer = await ask('What is the answer to the riddle inscribed on this box?\n');
-        answer = answer.toString().toUpperCase()
-        itemEffect('use_rboxe', undefined, answer);
-        return play(room);
+    } else if (input === 'use_rboxw') { //checks for riddle box1 and uses it
+        if (player.inventory.includes('Riddle Box1')) {
+            let answer = await ask('What is the answer to the riddle inscribed on this box?\n');
+            answer = answer.toString().toUpperCase()
+            itemEffect('use_rboxw', undefined, answer);
+            return play(room);
+        } else {
+            console.log(`I'm not sure what you are trying to use...\n`);
+            return play(room);
+        }
+    } else if (input === 'use_rboxe') { //checks for riddle box2 and uses it
+        if (player.inventory.includes('Riddle Box2')) {
+            let answer = await ask('What is the answer to the riddle inscribed on this box?\n');
+            answer = answer.toString().toUpperCase()
+            itemEffect('use_rboxe', undefined, answer);
+            return play(room);
+        } else {
+            console.log(`I'm not sure what you are trying to use...\n`);
+            return play(room);
+        }
     }
     else if (useableItems.includes(input)) {  //uses items in inventory
         input = input.toString();
@@ -1292,7 +1308,7 @@ async function play(room) {  //allows player to make decisions within each room
             console.log(`You don't have that item in your bag! Better go find one if you want to use it!\n`);
             return play(room);
         }
-    } else if (input === 'read_sign' && room === RUW_Entrance) {
+    } else if (input === 'read_sign' && room === RUW_Entrance) { //various read inputs to read things
         console.log(`\nWelcome to Robotics United West\nWhere Dreams are Born\n`);
         return play(room);
     } else if (input === 'read_sign' && room === RUE_Entrance) {
@@ -1301,26 +1317,36 @@ async function play(room) {  //allows player to make decisions within each room
     } else if (input === 'read_sign' && room === RUN_Entrance) {
         console.log(`\nWelcome to Robotics United North\nWhere Dreams are our Future\n`);
         return play(room);
-    } else if (input === 'read_sign' && room !== RUW_Entrance && room !==RUE_Entrance && room !== RUN_Entrance) {
+    } else if (input === 'read_sign' && room !== RUW_Entrance && room !== RUE_Entrance && room !== RUN_Entrance) {
         console.log(`\nThere is no sign to read...\n`);
         return play(room);
     } else if (input === 'read_rboxw') {
-        console.log('\nThere is a riddle on the box, it reads:\nIf you throw a blue stone into the red sea, what does it become?\n');
-        return play(room);
+        if (player.inventory.includes('Riddle Box1')) {
+            console.log('\nThere is a riddle on the box, it reads:\nIf you throw a blue stone into the red sea, what does it become?\n');
+            return play(room);
+        } else {
+            console.log(`I don't know what you want me to read...`);
+            return play(room);
+        }
     } else if (input === 'read_rboxe') {
-        console.log('\nThere is a riddle on the box, it reads:\nWhat is so delicate that even just saying its name can break it?\n');
-        return play(room);
+        if (player.inventory.includes('Riddle Box2')) {
+            console.log('\nThere is a riddle on the box, it reads:\nWhat is so delicate that even just saying its name can break it?\n');
+            return play(room);
+        } else {
+            console.log(`I don't know what you want me to read...`);
+            return play(room);
+        }
     } else if (input === 'read_null') {
         console.log(`I don't know what you want me to read...\n`);
         return play(room);
     }
-    else if (input === 'not_sure') {
+    else if (input === 'not_sure') { //generic catch all
         console.log(`I'm not sure what you are telling me to do...\n`);
         return play(room);
-    } else if (input === 'fob_null') {
+    } else if (input === 'fob_null') { //fix catch
         console.log(`I'm not sure what you are telling me to do...\n`);
         return play(room);
-    } else if (input === 'fob_fix') {
+    } else if (input === 'fob_fix') { //restores hp from scrap metal
         if (room === falloutBunker) {
             metalCount = 0;
             for (let i = 0; i < player.inventory.length; i++) {
@@ -1347,7 +1373,7 @@ async function play(room) {  //allows player to make decisions within each room
             console.log(`You gotta be at the bunker if you want Ella to fix you up\n`);
             return play(room);
         }
-    } else if (input === 'fob_key') {
+    } else if (input === 'fob_key') { //makes the key to north tower if you have keys from east and west towers
         if (room === falloutBunker) {
             if (player.inventory.includes('Office Keycard West') && player.inventory.includes('Office Keycard East')) {
                 console.log(`Ella says she can program a new key to get into the North Tower\nusing the data from the two keycards you have collected\n`);
@@ -1362,7 +1388,7 @@ async function play(room) {  //allows player to make decisions within each room
             console.log(`You gotta be at the bunker if you want Ella to make you a new keycard\n`);
             return play(room);
         }
-    } else if (input === 'd') {
+    } else if (input === 'd') { //displays basic commands for players
         console.log(`If you are unsure what to do, you can try some of the following commands:\n
     'go' followed by a direction (N, S, E, W) will attempt to go in that direction
     'inspect' will tell you what's in the room
@@ -1389,6 +1415,20 @@ async function play(room) {  //allows player to make decisions within each room
     } else if (input === 'no_do') {
         console.log(`You can't do that right now!\n`);
         return play(room);
+    } else if (input === 'di') { //my wife asked why she couldn't go inside... it was a valid question...
+        if (room === RUE_Entrance) {
+            console.log(`----------------------------------------------------------------------\n`);
+            return initializeRoom(RUE_WelcomeDesk);
+        } else if (room === RUW_Entrance) {
+            console.log(`----------------------------------------------------------------------\n`);
+            return initializeRoom(RUW_WelcomeDesk);
+        } else if (room === RUN_Entrance) {
+            console.log(`----------------------------------------------------------------------\n`);
+            return initializeRoom(RUN_WelcomeDesk);
+        } else {
+            console.log(`You are already inside a building...\n`);
+            return play(room);
+        }
     }
     else {  //travels to new room
         if (input === 'dnull') {
@@ -1404,8 +1444,8 @@ async function play(room) {  //allows player to make decisions within each room
         }
     }
 }
-
-async function epilogue () {
+//function that ends the game
+async function epilogue() {
     console.log(`After everything you have been through, this could be your final moment...
 Entering the Killswitch Codes will give humanity another chance, but
 will also shut you down in the process.  Will the humans treat this
@@ -1423,7 +1463,7 @@ The decision is in your hands now...\n`)
     } else if (finalDecision.toUpperCase() === 'NO') {
         finalDecision = 'N';
     }
-    while(finalDecision.toUpperCase() !== 'Y' && finalDecision.toUpperCase() !== 'N') {
+    while (finalDecision.toUpperCase() !== 'Y' && finalDecision.toUpperCase() !== 'N') {
         console.log(`I know its a hard choice...`);
         finalDecision = await ask('Please answer the question...\n');
         if (finalDecision.toUpperCase() === 'YES') {
@@ -1432,7 +1472,7 @@ The decision is in your hands now...\n`)
             finalDecision = 'N';
         }
     }
-    if (finalDecision === 'Y') {
+    if (finalDecision.toUpperCase() === 'Y') {
         console.log(`The codes worked much quicker than you could have imagined...
 The power went out all around you, apparently shutting down the
 machines meant shutting down the entire grid. Suddenly, every electronic
@@ -1441,7 +1481,7 @@ like it is shaking apart.  The grid didn't shut down ... that would not
 have been enough to stop the machines.  The grid was being overloaded and
 the force of all of this electricity was tearing your circuitry apart. As
 you shut down, you can't help but wonder ... was it worth it?`);
-        process.exit();
+        playAgain();
     } else {
         console.log(`At the end of it all, human emotion was the downfall of humanity...
 You just can't bring yourself to end your own life, not with so many
@@ -1450,6 +1490,28 @@ continue surviving.  You decide to give the Killcodes to the humans, if
 Ella can rebuild and make it to her fathers computer, then you can accept 
 your fate and be shut down with the rest of the machine race ...
 The decision was just too much for you to make ...`)
+        playAgain();
+    }
+}
+
+async function playAgain() {  //Allows user to play again
+    let again = await ask("\n\nWould you like to play again? (Yes or No)?\n");
+    if (again.toUpperCase() === 'YES') {
+        again = 'Y';
+    } else if (again.toUpperCase() === 'NO') {
+        again = 'N';
+    }
+    while (again.toUpperCase() !== 'Y' && again.toUpperCase() !== 'N') {
+        again = await ask('Please answer Yes or No...\n');
+        if (again.toUpperCase() === 'YES') {
+            again = 'Y';
+        } else if (again.toUpperCase() === 'NO') {
+            again = 'N';
+        }
+    }
+    if (again.toUpperCase() === 'Y') {
+        await prologue();
+    } else {
         process.exit();
     }
 }
