@@ -102,7 +102,7 @@ class ValidInput {
         this.useItem = ['USE'];
         this.combat = ['ATTACK', 'FIGHT', 'THROW', 'SHOOT', 'FIRE'];
         this.items = ['KIT', 'METAL', 'BATTERY', 'COATING', 'BOX1', 'BOX2', 'PLASMA GRENADE', 'PORTABLE SHIELD', 'SMOKE BOMB', 'CELL', 'NUCLEAR', 'RAY'];
-        this.otherActions = ['DROP', 'THROW', 'FART', 'LAUGH', 'LOL', 'HUG', 'READ', 'OPEN', 'RUN'];
+        this.otherActions = ['DROP', 'THROW', 'FART', 'LAUGH', 'LOL', 'HUG', 'READ', 'OPEN', 'RUN', 'CHECK'];
         this.intObjects = ['SIGN', 'DESK', 'COMPUTER', 'CABINET', 'FRIDGE', 'REFRIDGERATOR', 'SAFE'];
         this.falloutBunkerEvent = ['REPAIR', 'FIX', 'KEYCARD', 'KEY'];
         this.validInputs = [this.affirmative, this.negatory, this.direction, this.inventory, this.status, this.inspect, this.instructions, this.useItem, this.pickUpItem, this.combat, this.items, this.otherActions, this.intObjects, this.falloutBunkerEvent];
@@ -260,6 +260,18 @@ class ValidInput {
                 this.return = 'use_heatray';
             } else {
                 this.return = 'use_null';
+            }
+        } else if (obj.firstWord === 'CHECK' || obj.lastWord === 'CHECK') {
+            if (obj.lastWord === 'DESK') {
+                this.return = 'open_desk';
+            } else if (obj.lastWord === 'CABINET') {
+                this.return = 'open_cabinet';
+            } else if (obj.lastWord === 'FRIDGE' || obj.lastWord === 'REFRIDGERATOR') {
+                this.return = 'open_fridge';
+            } else if (obj.lastWord === 'SAFE') {
+                this.return = 'open_safe';
+            } else {
+                this.return = 'check_null';
             }
         } else if ((this.pickUpItem.includes(obj.firstWord) || this.items.includes(obj.firstWord) || this.items.includes(obj.lastWord)) && !this.otherActions.includes(obj.firstWord)) {
             if (obj.firstWord === 'METAL' || obj.lastWord === 'METAL') {
@@ -1429,8 +1441,10 @@ async function play(room) {  //allows player to make decisions within each room
             console.log(`You are already inside a building...\n`);
             return play(room);
         }
-    }
-    else {  //travels to new room
+    } else if (input === 'check_null') {  //it's a check ... check?
+        console.log(`I'm not sure what you are checking on...\n`);
+        return play(room);
+    } else {  //travels to new room
         if (input === 'dnull') {
             console.log(`I'm not sure where you are telling me to go...\n`);
             return play(room);
