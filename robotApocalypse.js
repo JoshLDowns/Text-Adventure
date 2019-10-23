@@ -96,14 +96,14 @@ class ValidInput {
         this.direction = ['GO', 'TRAVEL', 'LEAVE', 'EXIT', 'N', 'NORTH', 'S', 'SOUTH', 'E', 'EAST', 'W', 'WEST', 'INSIDE'];
         this.inventory = ['B', 'INVENTORY', 'BAG', 'BACKPACK'];
         this.status = ['STATUS', 'INFO', 'HP', 'HEALTH'];
-        this.inspect = ['INSPECT'];
+        this.inspect = ['INSPECT', 'EXAMINE'];
         this.instructions = ['D', 'DIRECTIONS', 'INSTRUCTIONS', 'INST', 'HOW', 'PLAY', 'HELP'];
         this.pickUpItem = ['PICK UP', 'PICK', 'GRAB', 'GET', 'TAKE', 'AQUIRE'];
         this.useItem = ['USE'];
         this.combat = ['ATTACK', 'FIGHT', 'THROW', 'SHOOT', 'FIRE'];
         this.items = ['KIT', 'METAL', 'BATTERY', 'COATING', 'BOX1', 'BOX2', 'PLASMA GRENADE', 'PORTABLE SHIELD', 'SMOKE BOMB', 'CELL', 'NUCLEAR', 'RAY'];
         this.otherActions = ['DROP', 'THROW', 'FART', 'LAUGH', 'LOL', 'HUG', 'READ', 'OPEN', 'RUN', 'CHECK'];
-        this.intObjects = ['SIGN', 'DESK', 'COMPUTER', 'CABINET', 'FRIDGE', 'REFRIDGERATOR', 'SAFE'];
+        this.intObjects = ['SIGN', 'DESK', 'COMPUTER', 'CABINET', 'FRIDGE', 'REFRIDGERATOR', 'SAFE', 'MAP', 'DIRECTORY'];
         this.falloutBunkerEvent = ['REPAIR', 'FIX', 'KEYCARD', 'KEY'];
         this.validInputs = [this.affirmative, this.negatory, this.direction, this.inventory, this.status, this.inspect, this.instructions, this.useItem, this.pickUpItem, this.combat, this.items, this.otherActions, this.intObjects, this.falloutBunkerEvent];
     }
@@ -173,6 +173,8 @@ class ValidInput {
                 this.return = 'read_rboxe';
             } else if (obj.lastWord === 'SIGN') {
                 this.return = 'read_sign';
+            } else if (obj.lastWord === 'MAP' || obj.lastWord === 'DIRECTORY') {
+                this.return = 'read_map';
             } else {
                 this.return = 'read_null';
             }
@@ -270,6 +272,8 @@ class ValidInput {
                 this.return = 'open_fridge';
             } else if (obj.lastWord === 'SAFE') {
                 this.return = 'open_safe';
+            } else if (obj.lastWord === 'MAP' || obj.lastWord === 'DIRECTORY') {
+                this.return = 'read_map';
             } else {
                 this.return = 'check_null';
             }
@@ -444,7 +448,7 @@ let falloutBunker = new Room('Fallout Bunker', `Ella, as always, is happy to see
 //Robotics United Towers
 //R.U. West
 let RUW_Entrance = new Room('R.U.West Entrance', 'You stand at the Entrance of the Robotics United Tower West.\nEverything around the tower is destroyed, yet the tower itself is mostly intact.\nThere is a sign on the door...\n', [], undefined, false, false, 'falloutBunker', 'RUW_WelcomeDesk', false, 'Sign');
-let RUW_WelcomeDesk = new Room('Welcome Desk', 'Outside of the Circulation Desk looking to be mostly intact,\nthe room has been mostly destroyed and left in a state of disarray.\nApparently being welcoming is not something we machines are good at...\n', ['Scrap Metal', 'Scrap Metal'], undefined, 'RUW_BreakRoom', 'RUW_Cubicle1', 'RUW_Entrance', false, false, 'Desk', ['Plasma Grenade']);
+let RUW_WelcomeDesk = new Room('Welcome Desk', 'Outside of the Circulation Desk looking to be mostly intact,\nthe room has been mostly destroyed and left in a state of disarray.\nApparently being welcoming is not something we machines are good at...\nAt least the directory with a nice map of the tower is still mostly legible...\n', ['Scrap Metal', 'Scrap Metal'], undefined, 'RUW_BreakRoom', 'RUW_Cubicle1', 'RUW_Entrance', false, false, 'Desk', ['Plasma Grenade']);
 let RUW_BreakRoom = new Room('Break Room', 'As you enter the break room, you are met with a strong musty smell.\nJudging by the thick smell of mold and decay ...\nit must have been lunch time when the machines attacked ...\n', ['Repair Kit'], undefined, false, 'RUW_WelcomeDesk', false, 'RUW_Hallway1N', false, 'Refridgerator', []);
 let RUW_Hallway1N = new Room('Hallway 1N - W', 'This side of the building seems to have gotten the worst of the fight.\nThe north wall is mostly destroyed, and the floor is littered with debris.\n', ['Scrap Metal'], undefined, false, 'RUW_FabUnit', 'RUW_BreakRoom', 'RUW_ExpLabs', false);
 let RUW_ExpLabs = new Room('Experimental Arms Lab', 'It looks like the machines have already cleaned out most\nof the lab. There might still be something of use here though...\n', ['Particle Battery', 'Scrap Metal'], undefined, false, false, 'RUW_Hallway1N', false, false);
@@ -455,7 +459,7 @@ let RUW_FabUnit = new Room('Fabrication Unit West', 'At one point, specialized p
 let RUW_ServerW = new Room('Server Room West', `Immidiately upon entering the Server Room, you are greeted by a\nnimble but heavily armed Combat Class Robot. 'INTRUDER DETECTED!!!\nIt fires a shot that narrowly misses, you spring into action...\n`, [], enemyW, false, false, 'RUW_FabUnit', false, 'Office Keycard West');
 //R.U. East
 let RUE_Entrance = new Room('R.U.East Entrance', 'Standing at the Entrance of Robotics United Tower East, you can\nsee a giant hole blasted through the building about 10 stories up...\nSomething big hit this place, at least the sign on the door is ledgible...\n', [], undefined, false, false, 'RUE_WelcomeDesk', 'falloutBunker', false, 'Sign');
-let RUE_WelcomeDesk = new Room('Welcome Desk', 'The vaulted ceilings of the once grand welcome lounge has mostly\ncollapsed, leaving a mess of rubble covering most of the room...\nThe Cirrculation Desk stoically stands in the middle of the room, almost as\nif it is proud to have survived the attack...\n', ['Scrap Metal', 'Scrap Metal'], undefined, 'RUE_Cubicle2', 'RUE_Charging', false, 'RUE_Entrance', false, 'Desk', ['Repair Kit']);
+let RUE_WelcomeDesk = new Room('Welcome Desk', 'The vaulted ceilings of the once grand welcome lounge has mostly\ncollapsed, leaving a mess of rubble covering most of the room...\nThe Cirrculation Desk stoically stands in the middle of the room, almost as\nif it is proud to have survived the attack...\nAt least the directory with a nice map of the tower is still mostly legible...\n', ['Scrap Metal', 'Scrap Metal'], undefined, 'RUE_Cubicle2', 'RUE_Charging', false, 'RUE_Entrance', false, 'Desk', ['Repair Kit']);
 let RUE_Cubicle2 = new Room('Cubicle Block 2', 'There must not have been many people in this cubicle block during the\nattack, as it is still in pretty good shape. There is sure to be something\nof use here...\n', ['Repair Kit'], undefined, false, 'RUE_WelcomeDesk', 'RUE_Hallway1N', false, false, 'Desk', ['Plasma Grenade']);
 let RUE_Hallway1N = new Room('Hallway 1N - E', 'Upon entering the hallway, you see an Employee of the Month picture\nthat somehow survived the attack undamaged hanging on the wall...\nThe man looked so happy...\n', ['Scrap Metal'], undefined, false, 'RUE_FabUnit', 'RUE_QA', 'RUE_Cubicle2', false);
 let RUE_QA = new Room('Quality Assurance', 'The QA room is large but mostly empty. Anything of use must have already\nbeen salvaged by the machines...\nYou notice a strange box on one of the tables...\n', ['Riddle Box2'], undefined, false, false, false, 'RUE_Hallway1N', false);
@@ -467,7 +471,7 @@ let RUE_FabUnit = new Room('Fabrication Unit East', 'This Fabrication Unit focus
 let RUE_ServerE = new Room('Server Room East', `Before the door finishes opening, a large fist puts a sizeable dent in\nit, barely missing you. A big Combat Class Robot with large missile\nlaunchers mounted on it's shoulders points at you and yells 'TRAITOR! You\nmust be terminated! ... Looks like you have to fight ...\n`, [], enemyE, false, false, false, 'RUE_FabUnit', 'Office Keycard East');
 //R.U. North
 let RUN_Entrance = new Room('R.U.North Entrance', `Unlike the other two towers, the Robotics United Tower North seems\nto be in pretty good shape from the outside. The machines must have\nbeen worried about destroying the main server computer that resides inside Ella's\nDad's office. I wonder how he would have felt about the sign on the door now...\n`, [], undefined, 'RUN_WelcomeDesk', 'falloutBunker', false, false, 'North Tower Keycard', 'Sign');
-let RUN_WelcomeDesk = new Room('Welcome Desk', `The outside might have looked like it had avoided the brunt of the\nmachine onslaught, but the inside sure didn't. The room is littered with\nthe remains of both machine and human alike. The one takeaway from this\ngruesome sight is that the desks at Robotics United were rock solid, as the\none in this welcome area is still standing tall, just like in the other Towers...\n`, ['Scrap Metal', 'Scrap Metal', 'Scrap Metal'], undefined, 'RUN_aiLab', 'RUN_Entrance', 'RUN_Cubicle3', 'RUN_Cubicle4', false, 'Desk', ['Thick Carbon Coating']);
+let RUN_WelcomeDesk = new Room('Welcome Desk', `The outside might have looked like it had avoided the brunt of the\nmachine onslaught, but the inside sure didn't. The room is littered with\nthe remains of both machine and human alike. The one takeaway from this\ngruesome sight is that the desks at Robotics United were rock solid, as the\none in this welcome area is still standing tall, just like in the other Towers...\nAt least the directory with a nice map of the tower is still mostly legible...\n`, ['Scrap Metal', 'Scrap Metal', 'Scrap Metal'], undefined, 'RUN_aiLab', 'RUN_Entrance', 'RUN_Cubicle3', 'RUN_Cubicle4', false, 'Desk', ['Thick Carbon Coating']);
 let RUN_Cubicle3 = new Room('Cubicle Block 3', 'Half of the room is completely leveled, as if a bulldozer drove right\nthrough the room. There must have been a big fight here. The other\nside of the room is in disarray, but some things are still intact...\n', ['Repair Kit'], undefined, 'RUN_Hallway1E', false, false, 'RUN_WelcomeDesk', false, 'Computer', []);
 let RUN_Hallway1E = new Room('Hallway 1E - N', `The walls in this hallway are mostly intact, and are lined with awards\ncelebrating the accomplishments of AI before things went south...\nIf the machines don't have emotion, why save all of this?\n`, ['Thick Carbon Coating'], undefined, 'RUN_AdminOffice', 'RUN_Cubicle3', false, 'RUN_aiLab', false);
 let RUN_AdminOffice = new Room('Administrative Offices', 'The machines must have took out the higher ups first, as this\nroom looks like it was cleared before the panic set in. It looks as\nif most the room has already been ransacked for supplies, but a\nlone Filing Cabinet at the back of the office remains untouched...\n', ['Repair Kit', 'Scrap Metal'], undefined, false, 'RUN_Hallway1E', false, 'RUN_Hallway3N', false, 'Filing Cabinet', ['Smoke Bomb']);
@@ -1348,7 +1352,94 @@ async function play(room) {  //allows player to make decisions within each room
             console.log(`I don't know what you want me to read...`);
             return play(room);
         }
-    } else if (input === 'read_null') {
+    } else if (input === 'read_map' && room === RUW_WelcomeDesk) {
+        console.log(`\n         Robotics United West Tower
+        +----------+----------+----------+
+        |          |          |          |
+        |         ===        ===         |
+        |    1    ===   2    ===    3    |
+        |          |          |          |
+        +----------+--⋮   ⋮---+--⋮   ⋮---+----------+
+        |          |          |          |          |
+        |         ===         |         === 
+        |    4    ===   5     |     6   ===   Ent.
+        |          |          |          |          |
+        +----------+---⋮   ⋮--+---⋮   ⋮--+----------+
+        |          |          |          |
+        |         ===        ===         |
+        |    7    ===   8    ===    9    |
+        |          |          |          |
+        +----------+----------+----------+ 
+       1: Exp. Arms Lab, 2: Hallway N 3: Breakroom
+       4: Server Room, 5: Fab. Unit, 6: You are Here!
+       7: Office, 8: Hallway S, 9: Cubicle Blk. 1\n`);
+       return play(room);
+    } else if (input === 'read_map' && room === RUE_WelcomeDesk) {
+        console.log(`\n                    Robotics United East Tower
+                +----------+----------+----------+
+                |          |          |          |
+                |         ===        ===         |
+                |    1    ===   2    ===    3    |
+                |          |          |          |
+     +----------+--⋮   ⋮---+---⋮   ⋮--+----------+
+     |          |          |          |          |
+               ===         |         ===         |
+         Ent.  ===   4     |     5   ===    6    |
+     |          |          |          |          |
+     +----------+---⋮   ⋮--+--⋮   ⋮---+----------+
+                |          |          |          |
+                |         ===        ===         |
+                |    7    ===   8    ===    9    |
+                |          |          |          |
+                +----------+----------+----------+ 
+     1: Cubicle Blk. 2, 2: Hallway N, 3: Q.A.
+     4: You are Here!, 5: Fab. Unit, 6: Server Room
+     7: Charging Station, 8: Hallway S, 4: Adv. Wpns.\n`);
+        return play(room);
+    } else if (input === 'read_map' && room === RUN_WelcomeDesk) {
+        console.log(`\n         Robotics United North Tower
+                +----------+
+                |          |
+                |          |
+                |    1     |
+                |          |
+                +---⋮   ⋮--+
+                |          |
+                |          |
+                |    2     |
+                |          |
+     +----------+---⋮   ⋮---+---------+
+     |          |          |          |
+     |         ===        ===         |
+     |    3    ===   4    ===    5    |
+     |          |          |          |
+     +----------+---⋮   ⋮--+---⋮   ⋮--+
+     |          |          |          |
+     |         ===        ===         |
+     |    6    ===   7    ===    8    |
+     |          |          |          |
+     +----------+---⋮   ⋮--+---⋮   ⋮--+
+     |          |          |          |
+     |         ===        ===         |
+     |    9    ===   10   ===    11   |
+     |          |          |          |
+     +----------+---⋮   ⋮---+---------+ 
+                |          |
+                |          |
+                |   Ent.   |
+                |          |
+                +---⋮   ⋮--+
+     1: President' Office, 2: Server Room
+     3: Treasury, 4: Hallway N, 5: Admin
+     6: Hallway W, 7: AI Lab, 8: Hallway E
+     9: Cubicle Blk 4, 10: You are here!
+     11: Cubicle Blk 3\n`);
+     return play(room);
+    } else if (input === 'read_map') {
+        console.log('There is not a directory in this room to read...\n');
+        return play(room);
+    }
+     else if (input === 'read_null') {
         console.log(`I don't know what you want me to read...\n`);
         return play(room);
     }
