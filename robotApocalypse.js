@@ -1337,7 +1337,7 @@ async function play(room) {  //allows player to make decisions within each room
         return play(room);
     } else if (input === 'use_rboxw') { //checks for riddle box1 and uses it
         if (player.inventory.includes('Riddle Box1')) {
-            let answer = await ask('What is the answer to the riddle inscribed on this box?\n...you can 'read' or 'check' the box to see what it says!...\n');
+            let answer = await ask(`What is the answer to the riddle inscribed on this box?\n...you can 'read' or 'check' the box to see what it says!...\n`);
             answer = answer.toString().toUpperCase()
             itemEffect('use_rboxw', undefined, answer);
             return play(room);
