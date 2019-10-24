@@ -19,9 +19,9 @@ let player = {
     status2: undefined,
     hasKilled: false,
     useItem: function (item) { //removes item from inventory on use
-        for (var i = 0; i < this.inventory.length; i++) {
-            if (this.inventory[i] === item) {
-                this.inventory.splice(i, 1);
+        for(let element of this.inventory) {
+            if(element === item) {
+                this.inventory.splice(this.inventory.indexOf(item),1);
                 break;
             }
         }
@@ -59,6 +59,7 @@ let player = {
         }
     }
 }
+let playerReset = player;
 
 //Enemy Class
 class Enemy {
@@ -85,6 +86,11 @@ let enemyE = new Enemy('Robot Bruiser', 75, 'Pneumatic Fist', 'Missle Barrage', 
 let enemyN1 = new Enemy('Mechanical Surveillance Unit', 100, 'Fission Laser', 'Remote Laser', 10, 6, 'status_dot', 6, 3, 'Office Keycard North', 'As the dust settles, you notice that you were surrounded by automated\nturrets, thankfully defeating this foe seems to have shut them down...\nThe room is earily quiet.\n');
 let enemyF = new Enemy('Enforcer Captain', 125, 'Collider Beam', 'Combat Repair', 10, 10, 'defensive', 14, 6, 'Killswitch Code 3', `Your final foe has been defeated ...\nYou are so close to your end goal, but you can't help but ask yourself,\nhas destroying your own kind been worth it?\n`);
 
+let enemyWReset = enemyW;
+let enemyEReset = enemyE;
+let enemyN1Reset = enemyN1;
+let enemyFReset = enemyF;
+
 //Input validation class
 class ValidInput {
     constructor(string) {
@@ -93,10 +99,10 @@ class ValidInput {
         this.return = undefined;
         this.affirmative = ['YES', 'YEAH', 'YUP', 'YUPPER', 'MHM', 'MMHMM', 'AFFIRMATIVE',];
         this.negatory = ['NO', 'NOPE', 'NADA', 'NEGATORY'];
-        this.direction = ['GO', 'TRAVEL', 'LEAVE', 'EXIT', 'N', 'NORTH', 'S', 'SOUTH', 'E', 'EAST', 'W', 'WEST', 'INSIDE'];
+        this.direction = ['GO', 'TRAVEL', 'LEAVE', 'EXIT', 'N', 'NORTH', 'S', 'SOUTH', 'E', 'EAST', 'W', 'WEST', 'INSIDE', 'IN'];
         this.inventory = ['B', 'INVENTORY', 'BAG', 'BACKPACK'];
         this.status = ['STATUS', 'INFO', 'HP', 'HEALTH'];
-        this.inspect = ['INSPECT', 'EXAMINE'];
+        this.inspect = ['INSPECT', 'EXAMINE', 'ROOM'];
         this.instructions = ['D', 'DIRECTIONS', 'INSTRUCTIONS', 'INST', 'HOW', 'PLAY', 'HELP'];
         this.pickUpItem = ['PICK UP', 'PICK', 'GRAB', 'GET', 'TAKE', 'AQUIRE'];
         this.useItem = ['USE'];
@@ -140,7 +146,33 @@ class ValidInput {
         } else if (this.status.includes(obj.firstWord) || this.status.includes(obj.lastWord)) {
             this.return = 's';
         } else if (this.inspect.includes(obj.firstWord) || this.inspect.includes(obj.lastWord)) {
+            if (this.inspect.includes(obj.firstWord)) {
+                if (obj.lastWord === 'BOX1') {
+                    this.return = 'read_rboxw';
+                } else if (obj.lastWord === 'BOX2') {
+                    this.return = 'read_rboxe';
+                } else if (obj.lastWord === 'SIGN') {
+                    this.return = 'read_sign';
+                } else if (obj.lastWord === 'MAP' || obj.lastWord === 'DIRECTORY') {
+                    this.return = 'read_map';
+                } else if (obj.lastWord === 'DESK') {
+                    this.return = 'open_desk';
+                } else if (obj.lastWord === 'CABINET') {
+                    this.return = 'open_cabinet';
+                } else if (obj.lastWord === 'FRIDGE' || obj.lastWord === 'REFRIDGERATOR') {
+                    this.return = 'open_fridge';
+                } else if (obj.lastWord === 'SAFE') {
+                    this.return = 'open_safe';
+                } else if (obj.lastWord === 'ROOM') {
+                    this.return = 'insp';
+                }
+            } else if (obj.firstWord === 'CHECK' && obj.lastWord === 'ROOM') {
+                this.return = 'insp';
+            } else if (!(this.inspect.includes(obj.firstWord)) && this.inspect.includes(obj.lastWord) && obj.firstWord !== 'INSPEC' && obj.firstWord !== 'EXAMIN') {
+                this.return = 'not_sure';
+            } else {
             this.return = 'insp';
+            }
         } else if (this.falloutBunkerEvent.includes(obj.firstWord) || this.falloutBunkerEvent.includes(obj.lastWord)) {
             if (obj.firstWord === 'REPAIR' || obj.lastWord === 'REPAIR' || obj.firstWord === 'FIX' || obj.lastWord === 'FIX') {
                 this.return = 'fob_fix';
@@ -232,7 +264,7 @@ class ValidInput {
                 this.return = 'de';
             } else if (obj.firstWord === 'WEST' || obj.lastWord === 'WEST' || obj.firstWord === 'W' || obj.lastWord === 'W') {
                 this.return = 'dw';
-            } else if (obj.firstWord === 'INSIDE' || obj.lastWord === 'INSIDE') {
+            } else if (obj.firstWord === 'INSIDE' || obj.lastWord === 'INSIDE' || obj.firstWord === 'IN' || obj.lastWord === 'IN') {
                 this.return = 'di';
             } else {
                 this.return = 'dnull';
@@ -274,8 +306,32 @@ class ValidInput {
                 this.return = 'open_safe';
             } else if (obj.lastWord === 'MAP' || obj.lastWord === 'DIRECTORY') {
                 this.return = 'read_map';
+            } else if (obj.lastWord === 'BOX1') {
+                this.return = 'read_rboxw';
+            } else if (obj.lastWord === 'BOX2') {
+                this.return = 'read_rboxe';
+            } else if (obj.lastWord === 'SIGN') {
+                this.return = 'read_sign';
             } else {
                 this.return = 'check_null';
+            }
+        } else if (this.combat.includes(obj.firstWord) || this.combat.includes(obj.lastWord)) {
+            if (obj.firstWord === 'THROW' || obj.lastWord === 'THROW') {
+                if (obj.lastWord === 'GRENADE') {
+                    this.return = 'use_grenade';
+                } else if (obj.lastWord === 'BOMB') {
+                    this.return = 'use_bomb';
+                } else if (obj.lastWord === 'METAL') {
+                    this.return = 'throw_metal';
+                } else {
+                    this.return = 'throw_null';
+                }
+            } else if (obj.firstWord === 'SHOOT' && obj.lastWord === 'RAY') {
+                this.return = 'use_heatray';
+            } else if (obj.firstWord === 'FIRE' && obj.lastWord === 'RAY') {
+                this.return = 'use_heatray';
+            } else {
+                this.return = 'combat';
             }
         } else if ((this.pickUpItem.includes(obj.firstWord) || this.items.includes(obj.firstWord) || this.items.includes(obj.lastWord)) && !this.otherActions.includes(obj.firstWord)) {
             if (obj.firstWord === 'METAL' || obj.lastWord === 'METAL') {
@@ -302,24 +358,6 @@ class ValidInput {
                 this.return = 'pu_heatray';
             } else {
                 this.return = 'pu_null';
-            }
-        } else if (this.combat.includes(obj.firstWord) || this.combat.includes(obj.lastWord)) {
-            if (obj.firstWord === 'THROW' || obj.lastWord === 'THROW') {
-                if (obj.lastWord === 'GRENADE') {
-                    this.return = 'use_grenade';
-                } else if (obj.lastWord === 'BOMB') {
-                    this.return = 'use_bomb';
-                } else if (obj.lastWord === 'METAL') {
-                    this.return = 'throw_metal';
-                } else {
-                    this.return = 'throw_null';
-                }
-            } else if (obj.firstWord === 'SHOOT' && obj.lastWord === 'RAY') {
-                this.return = 'use_heatray';
-            } else if (obj.firstWord === 'FIRE' && obj.lastWord === 'RAY') {
-                this.return = 'use_heatray';
-            } else {
-                this.return = 'combat';
             }
         } else if (this.instructions.includes(obj.firstWord) || this.instructions.includes(obj.lastWord)) {
             this.return = 'd';
@@ -350,11 +388,11 @@ class Room {
         this.intObject = intObject;
         this.intObjInv = intObjInv;
         this.pickUpItem = function (item) {  //removes item from room inventory when picked up
-            for (var i = 0; i < this.inventory.length; i++) {
-                if (this.inventory[i] === item) {
-                    this.inventory.splice(i, 1);
+            for(let element of this.inventory) {
+                if(element === item) {
+                    this.inventory.splice(this.inventory.indexOf(item),1);
                     break;
-                };
+                }
             }
         }
     }
@@ -470,7 +508,7 @@ let RUE_AdvWeapons = new Room('Advanced Weapons Lab', 'This lab was used to rese
 let RUE_FabUnit = new Room('Fabrication Unit East', 'This Fabrication Unit focused soley on military grade machines.\nYou can tell by the bullet casings that litter the floor, and the\nlarge amount of extremely disfigured skeletal remains strewn across the room...\n', ['Thick Carbon Coating', 'Scrap Metal', 'Scrap Metal'], undefined, 'RUE_Hallway1N', 'RUE_Hallway1S', 'RUE_ServerE', false, false);
 let RUE_ServerE = new Room('Server Room East', `Before the door finishes opening, a large fist puts a sizeable dent in\nit, barely missing you. A big Combat Class Robot with large missile\nlaunchers mounted on it's shoulders points at you and yells 'TRAITOR! You\nmust be terminated! ... Looks like you have to fight ...\n`, [], enemyE, false, false, false, 'RUE_FabUnit', 'Office Keycard East');
 //R.U. North
-let RUN_Entrance = new Room('R.U.North Entrance', `Unlike the other two towers, the Robotics United Tower North seems\nto be in pretty good shape from the outside. The machines must have\nbeen worried about destroying the main server computer that resides inside Ella's\nDad's office. I wonder how he would have felt about the sign on the door now...\n`, [], undefined, 'RUN_WelcomeDesk', 'falloutBunker', false, false, 'North Tower Keycard', 'Sign');
+let RUN_Entrance = new Room('R.U.North Entrance', `Unlike the other two towers, the Robotics United Tower North seems\nto be in pretty good shape from the outside. The machines must have\nbeen worried about destroying the main server computer that resides\ninside Ella's Dad's office. I wonder how he would have felt about\nthe sign on the door now...\n`, [], undefined, 'RUN_WelcomeDesk', 'falloutBunker', false, false, 'North Tower Keycard', 'Sign');
 let RUN_WelcomeDesk = new Room('Welcome Desk', `The outside might have looked like it had avoided the brunt of the\nmachine onslaught, but the inside sure didn't. The room is littered with\nthe remains of both machine and human alike. The one takeaway from this\ngruesome sight is that the desks at Robotics United were rock solid, as the\none in this welcome area is still standing tall, just like in the other Towers...\nAt least the directory with a nice map of the tower is still mostly legible...\n`, ['Scrap Metal', 'Scrap Metal', 'Scrap Metal'], undefined, 'RUN_aiLab', 'RUN_Entrance', 'RUN_Cubicle3', 'RUN_Cubicle4', false, 'Desk', ['Thick Carbon Coating']);
 let RUN_Cubicle3 = new Room('Cubicle Block 3', 'Half of the room is completely leveled, as if a bulldozer drove right\nthrough the room. There must have been a big fight here. The other\nside of the room is in disarray, but some things are still intact...\n', ['Repair Kit'], undefined, 'RUN_Hallway1E', false, false, 'RUN_WelcomeDesk', false, 'Computer', []);
 let RUN_Hallway1E = new Room('Hallway 1E - N', `The walls in this hallway are mostly intact, and are lined with awards\ncelebrating the accomplishments of AI before things went south...\nIf the machines don't have emotion, why save all of this?\n`, ['Thick Carbon Coating'], undefined, 'RUN_AdminOffice', 'RUN_Cubicle3', false, 'RUN_aiLab', false);
@@ -482,6 +520,11 @@ let RUN_aiLab = new Room('Artificial Intelligence Laboratory', `As you enter the
 let RUN_Hallway3N = new Room('Hallway 3N - N', `There must have been a mad dash to get to James' office just north of\nhere. The hall has so much rubble, decimated machines, and skeletal remains\nthat it is hard to walk through...\n`, ['Scrap Metal', 'Scrap Metal'], undefined, 'RUN_MainServer', 'RUN_aiLab', 'RUN_AdminOffice', 'RUN_Treasury', false);
 let RUN_MainServer = new Room('Main Server Room', `This is the last room before the office, and you are met with one last\nfoe. You immidiately recognize this Robot. It was the same one that almost\nended your time here on what is left of Earth...\nThanks to Ella, you have a shot at revenge!\n`, [], enemyF, 'RUN_PresOffice', 'RUN_Hallway3N', false, false, 'Office Keycard North');
 let RUN_PresOffice = new Room('R.U. Presidents Office', `Well, you made it...are you ready for this?\nYou see James' computer in the middle of the office completely untouched\nby the war. There is one more big choice in your journey...\n`, [], undefined, false, false, false, false, false, 'Computer', []);
+
+let RUW_ServerWReset = RUW_ServerW;
+let RUE_ServerEReset = RUE_ServerE;
+let RUN_aiLabReset = RUN_aiLab;
+let RUN_MainServerReset = RUN_MainServer;
 
 //Room Lookup Table
 let roomLookUp = {
@@ -1054,7 +1097,7 @@ what supplies I could muster up to give you some upgrades, so you should be
 a little more fit for battle now.'
 
 ...As Ella spoke, you struggled to comprehend what she was telling you...
-You are humanities last hope? You were created to save the human race?
+You are humanity's last hope? You were created to save the human race?
 All these things you have been 'feeling' are human emotions? Knowing that
 didn't help you understand what that meant yet ... hopefully that will come
 in time...`);
@@ -1294,7 +1337,7 @@ async function play(room) {  //allows player to make decisions within each room
         return play(room);
     } else if (input === 'use_rboxw') { //checks for riddle box1 and uses it
         if (player.inventory.includes('Riddle Box1')) {
-            let answer = await ask('What is the answer to the riddle inscribed on this box?\n');
+            let answer = await ask('What is the answer to the riddle inscribed on this box?\n...you can 'read' or 'check' the box to see what it says!...\n');
             answer = answer.toString().toUpperCase()
             itemEffect('use_rboxw', undefined, answer);
             return play(room);
@@ -1304,7 +1347,7 @@ async function play(room) {  //allows player to make decisions within each room
         }
     } else if (input === 'use_rboxe') { //checks for riddle box2 and uses it
         if (player.inventory.includes('Riddle Box2')) {
-            let answer = await ask('What is the answer to the riddle inscribed on this box?\n');
+            let answer = await ask(`What is the answer to the riddle inscribed on this box?\n...you can 'read' or 'check' the box to see what it says!...\n`);
             answer = answer.toString().toUpperCase()
             itemEffect('use_rboxe', undefined, answer);
             return play(room);
@@ -1338,7 +1381,7 @@ async function play(room) {  //allows player to make decisions within each room
         return play(room);
     } else if (input === 'read_rboxw') {
         if (player.inventory.includes('Riddle Box1')) {
-            console.log('\nThere is a riddle on the box, it reads:\nIf you throw a blue stone into the red sea, what does it become?\n');
+            console.log('\nThere is a riddle on the box, it reads:\nIf you throw a blue stone into the red sea, what does it become?\n...maybe try opening it?...\n');
             return play(room);
         } else {
             console.log(`I don't know what you want me to read...`);
@@ -1346,7 +1389,7 @@ async function play(room) {  //allows player to make decisions within each room
         }
     } else if (input === 'read_rboxe') {
         if (player.inventory.includes('Riddle Box2')) {
-            console.log('\nThere is a riddle on the box, it reads:\nWhat is so delicate that even just saying its name can break it?\n');
+            console.log('\nThere is a riddle on the box, it reads:\nWhat is so delicate that even just saying its name can break it?\n...maybe try opening it?...\n');
             return play(room);
         } else {
             console.log(`I don't know what you want me to read...`);
@@ -1616,6 +1659,15 @@ async function playAgain() {  //Allows user to play again
         }
     }
     if (again.toUpperCase() === 'Y') {
+        player = playerReset;
+        enemyW = enemyWReset;
+        enemyE = enemyEReset;
+        enemyN1 = enemyN1Reset;
+        enemyF = enemyFReset;
+        RUW_ServerW = RUW_ServerWReset;
+        RUE_ServerE = RUE_ServerEReset;
+        RUN_aiLab = RUN_aiLabReset;
+        RUN_MainServer = RUN_MainServerReset;
         await prologue();
     } else {
         process.exit();
