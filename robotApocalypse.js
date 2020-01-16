@@ -1,5 +1,6 @@
 const readline = require('readline');
 const rl = readline.createInterface(process.stdin, process.stdout);
+let lootNum;
 
 function ask(questionText) {
     return new Promise((resolve, reject) => {
@@ -14,7 +15,7 @@ let player = {
     inventory: [],
     attack: 'Particle Beam',
     damageBase: 5,
-    damageModifier: 4,
+    damageModifier: 6,
     status: undefined,
     status2: undefined,
     hasKilled: false,
@@ -85,11 +86,7 @@ let enemyW = new Enemy('Robot Sentry', 40, 'Plasma Ray', 'Static Discharge', 6, 
 let enemyE = new Enemy('Robot Bruiser', 75, 'Pneumatic Fist', 'Missle Barrage', 6, 3, 'offensive', 8, 12, 'Killswitch Code 2', 'The low hum of the servers surrounds you as you stare at what was left of your foe...\n', `Taking down your first enemy was both empowering and soul crushing...\nYour new found power is exhilerating but what have you given up for it? ...\nThe low hum of the servers surrounds you.\n`);
 let enemyN1 = new Enemy('Mechanical Surveillance Unit', 100, 'Fission Laser', 'Remote Laser', 10, 6, 'status_dot', 6, 3, 'Office Keycard North', 'As the dust settles, you notice that you were surrounded by automated\nturrets, thankfully defeating this foe seems to have shut them down...\nThe room is earily quiet.\n');
 let enemyF = new Enemy('Enforcer Captain', 125, 'Collider Beam', 'Combat Repair', 10, 10, 'defensive', 14, 6, 'Killswitch Code 3', `Your final foe has been defeated ...\nYou are so close to your end goal, but you can't help but ask yourself,\nhas destroying your own kind been worth it?\n`);
-
-let enemyWReset = enemyW;
-let enemyEReset = enemyE;
-let enemyN1Reset = enemyN1;
-let enemyFReset = enemyF;
+let enemyRandom = new Enemy('Surveillance Bot', 35, 'Photon Blaster', 'Combat Repair', 5, 5, 'defensive', 5, 5, `${lootNum<=2?'Repair Kit':'Scrap Metal'}`)
 
 //Input validation class
 class ValidInput {
@@ -102,7 +99,7 @@ class ValidInput {
         this.direction = ['GO', 'TRAVEL', 'LEAVE', 'EXIT', 'N', 'NORTH', 'S', 'SOUTH', 'E', 'EAST', 'W', 'WEST', 'INSIDE', 'IN'];
         this.inventory = ['B', 'INVENTORY', 'BAG', 'BACKPACK'];
         this.status = ['STATUS', 'INFO', 'HP', 'HEALTH'];
-        this.inspect = ['INSPECT', 'EXAMINE', 'ROOM'];
+        this.inspect = ['INSPECT', 'EXAMINE', 'ROOM', 'LOOK', 'AROUND'];
         this.instructions = ['D', 'DIRECTIONS', 'INSTRUCTIONS', 'INST', 'HOW', 'PLAY', 'HELP'];
         this.pickUpItem = ['PICK UP', 'PICK', 'GRAB', 'GET', 'TAKE', 'AQUIRE'];
         this.useItem = ['USE'];
@@ -164,6 +161,8 @@ class ValidInput {
                 } else if (obj.lastWord === 'SAFE') {
                     this.return = 'open_safe';
                 } else if (obj.lastWord === 'ROOM') {
+                    this.return = 'insp';
+                } else if (obj.firstWord === 'LOOK' && obj.lastWord === 'AROUND') {
                     this.return = 'insp';
                 }
             } else if (obj.firstWord === 'CHECK' && obj.lastWord === 'ROOM') {
@@ -475,8 +474,9 @@ class Room {
                 console.log(`There is a ${this.intObject} in the room\n`);
             }
         } else {
-            console.log('There is nothing of interest in this area\n');
+            console.log('After searching the area, you do not see anything of use\n');
         }
+        console.log(`There are exits in the following directions:\n${this.north?`North\n`:''}${this.east?`East\n`:''}${this.south?`South\n`:''}${this.west?`West\n`:''}`);
     }
 }
 
@@ -1154,9 +1154,13 @@ async function initializeRoom(room) {  //initializes the current room with it's 
 
 async function play(room) {  //allows player to make decisions within each room
     let metalCount = 0;
+    let ranEnemyNum;
     if (room.enemy) {
         let victory = await combat(room.enemy);
         if (victory === true) {
+            if (room.enemy === enemyRandom) {
+                enemyRandom.health = 35;
+            }
             if (player.hasKilled === true) {
                 room.info = room.enemy.postRoomInfo;
                 room.enemy = undefined;
@@ -1166,6 +1170,20 @@ async function play(room) {  //allows player to make decisions within each room
                 room.info = room.enemy.postRoomInfo2;
                 room.enemy = undefined;
                 return initializeRoom(room);
+            }
+        }
+    }
+    if (!room.enemy && room.name !== 'Fallout Bunker' && room.name !== 'R.U.West Entrance' && room.name !== 'R.U.East Entrance' && room.name !== 'R.U.North Entrance') {
+        ranEnemyNum = random(10);
+        if (ranEnemyNum === 1) {
+            room.enemy = enemyRandom;
+            console.log('All of the sudden, an alarm sounds... The sound is coming from a small\nrobot covered in flashing lights that was hiding in the corner!\nIt looks like it wants to fight!')
+            enemyRandom.postRoomInfo = room.info;
+            let victory = await combat(room.enemy);
+        if (victory === true) {
+            enemyRandom.health = 35;
+            room.enemy = undefined;
+            return initializeRoom(room);
             }
         }
     }
