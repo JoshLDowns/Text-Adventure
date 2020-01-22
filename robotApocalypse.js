@@ -104,7 +104,7 @@ class ValidInput {
         this.pickUpItem = ['PICK UP', 'PICK', 'GRAB', 'GET', 'TAKE', 'AQUIRE'];
         this.useItem = ['USE'];
         this.combat = ['ATTACK', 'FIGHT', 'THROW', 'SHOOT', 'FIRE'];
-        this.items = ['KIT', 'METAL', 'BATTERY', 'COATING', 'BOX1', 'BOX2', 'PLASMA GRENADE', 'PORTABLE SHIELD', 'SMOKE BOMB', 'CELL', 'NUCLEAR', 'RAY'];
+        this.items = ['KIT', 'METAL', 'BATTERY', 'COATING', 'BOX1', 'BOX2', 'PLASMA GRENADE', 'PORTABLE SHIELD', 'SMOKE BOMB', 'CELL', 'NUCLEAR', 'RAY', 'ALL'];
         this.otherActions = ['DROP', 'THROW', 'FART', 'LAUGH', 'LOL', 'HUG', 'READ', 'OPEN', 'RUN', 'CHECK'];
         this.intObjects = ['SIGN', 'DESK', 'COMPUTER', 'CABINET', 'FRIDGE', 'REFRIDGERATOR', 'SAFE', 'MAP', 'DIRECTORY'];
         this.falloutBunkerEvent = ['REPAIR', 'FIX', 'KEYCARD', 'KEY'];
@@ -355,6 +355,8 @@ class ValidInput {
                 this.return = 'pu_fuelcell';
             } else if (obj.firstWord === 'RAY' || obj.lastWord === 'RAY') {
                 this.return = 'pu_heatray';
+            } else if (obj.firstWord === 'ALL' || obj.lastWord === 'ALL') {
+                this.return = 'pu_all';
             } else {
                 this.return = 'pu_null';
             }
@@ -374,7 +376,7 @@ let cheatCode = ['falloutBunker', 'RUW_Entrance', 'RUW_WelcomeDesk', 'RUW_BreakR
 
 //Room class to build each room
 class Room {
-    constructor(name, info, inventory, enemy, north, south, east, west, keycard, intObject, intObjInv) {
+    constructor(name, info, inventory, enemy, north, south, east, west, keycard, intObject, intObjInv, foughtRando) {
         this.name = name;
         this.info = info;
         this.inventory = inventory;
@@ -386,6 +388,7 @@ class Room {
         this.keycard = keycard;
         this.intObject = intObject;
         this.intObjInv = intObjInv;
+        this.foughtRando = false;
         this.pickUpItem = function (item) {  //removes item from room inventory when picked up
             for(let element of this.inventory) {
                 if(element === item) {
@@ -599,7 +602,7 @@ let intObjectOpenLookUp = {
 }
 
 //possible item array
-let possibleItems = ['pu_scrapmetal', 'pu_particlebattery', 'pu_carboncoating', 'pu_repairkit', 'pu_rboxw', 'pu_rboxe', 'pu_grenade', 'pu_shield', 'pu_bomb', 'pu_fuelcell', 'pu_heatray'];
+let possibleItems = ['pu_scrapmetal', 'pu_particlebattery', 'pu_carboncoating', 'pu_repairkit', 'pu_rboxw', 'pu_rboxe', 'pu_grenade', 'pu_shield', 'pu_bomb', 'pu_fuelcell', 'pu_heatray', 'pu_all'];
 
 // pick up item lookup object
 let itemLookUp = {
@@ -1173,7 +1176,8 @@ async function play(room) {  //allows player to make decisions within each room
             }
         }
     }
-    if (!room.enemy && room.name !== 'Fallout Bunker' && room.name !== 'R.U.West Entrance' && room.name !== 'R.U.East Entrance' && room.name !== 'R.U.North Entrance') {
+    //determines if random enemy spawns in room
+    if (!room.enemy && room.name !== 'Fallout Bunker' && room.name !== 'R.U.West Entrance' && room.name !== 'R.U.East Entrance' && room.name !== 'R.U.North Entrance' && room.foughtRando === false) {
         ranEnemyNum = random(10);
         if (ranEnemyNum === 1) {
             room.enemy = enemyRandom;
@@ -1183,6 +1187,7 @@ async function play(room) {  //allows player to make decisions within each room
         if (victory === true) {
             enemyRandom.health = 35;
             room.enemy = undefined;
+            room.foughtRando = true;
             return initializeRoom(room);
             }
         }
@@ -1288,6 +1293,15 @@ async function play(room) {  //allows player to make decisions within each room
         input = input.toString();
         let currentItem = itemLookUp[input];
         let currentInventory = room.inventory;
+        if (currentInventory.lengh !== 0 && input === 'pu_all') {  //picks up all items in room
+            console.log (`You put the following items in your bag:\n${currentInventory.join(`\n`)}\n-----------------------------------------------------------------`);
+            let n = currentInventory.length;
+            for (let i = 0; i < n; i++) {
+                room.pickUpItem(currentInventory[0]);
+                player.inventory.push(currentInventory[0]);
+            };
+            return play(room);
+        }
         if (currentInventory.includes(currentItem)) {
             room.pickUpItem(currentItem);
             player.inventory.push(currentItem);
