@@ -8,6 +8,7 @@ function ask(questionText) {
 }
 
 async function start() {
+    let width = process.stdout.columns - 5;
     let lootNum;  //number that decides loot on random enemies
     let firstTurn = true;
     let gameOverText = `
@@ -1770,6 +1771,27 @@ async function playAgain() {  //Allows user to play again
     } else {
         process.exit();
     }
+}
+
+//text wrapping function
+function wrap(string, w) {
+    if (string.length <= w) {
+        return string;
+    }
+
+    let count = 1;
+    let tempString='';
+    let sliceNum=0;
+
+    while (string.length > (count * w)) {
+        tempString = string.slice(sliceNum, (count*w)-1);
+        sliceNum = tempString.lastIndexOf(' ')+sliceNum;
+        string = string.slice(0, sliceNum) + `\n` + string.slice(sliceNum+1)
+        sliceNum+=1;
+        count += 1;
+    }
+
+    return string;
 }
 
 start();
