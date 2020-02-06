@@ -9,6 +9,7 @@ function ask(questionText) {
 
 async function start() {
     let lootNum;
+    let difficulty;
 
     //player object
     let player = {
@@ -803,6 +804,16 @@ async function start() {
         let statusCount;
         let shieldHP = 0;
         player.status = undefined;
+        
+        //displays text on player victory (there were 5 victory conditions so I used this to save some code)
+        function victoryText() {
+            lootNum = random(6); //determines lootNum for random enemy loot condition(ternary operator in the random enemy object)
+            console.log(`You have defeated ${comp.name}, congratulations!`);
+            console.log(`You received ${comp.reward} for winning!\n`);
+            console.log(`----------------------------------------------------------------------\n`);
+            player.inventory.push(comp.reward);
+            return true;
+        }
 
         while (player.health > 0 || comp.health > 0) {  //Loop that breaks when either user or computer hits 0 or less HP
             //Player Turn
@@ -841,21 +852,13 @@ async function start() {
                         console.log(`You fired your ${player.attack}!  It was a Critical Hit!!\nIt dealt ${damageUser} damage!\n`);
                         comp.health = comp.health - damageUser;
                         if (comp.health <= 0) {
-                            console.log(`You have defeated ${comp.name}, congratulations!`);
-                            console.log(`You received ${comp.reward} for winning!\n`);
-                            console.log(`----------------------------------------------------------------------\n`);
-                            player.inventory.push(comp.reward);
-                            return true;
+                            return victoryText();
                         }
                     } else {
                         console.log(`You fired your ${player.attack}!  It dealt ${damageUser} damage!\n`);
                         comp.health = comp.health - damageUser;
                         if (comp.health <= 0) {
-                            console.log(`You have defeated ${comp.name}, congratulations!`);
-                            console.log(`You received ${comp.reward} for winning!\n`);
-                            console.log(`----------------------------------------------------------------------\n`);
-                            player.inventory.push(comp.reward);
-                            return true;
+                            return victoryText();
                         }
                     }
                 } else if (input === 'throw_metal') {
@@ -886,11 +889,7 @@ async function start() {
                         console.log(`You don't have that item in your bag! Better go find one if you want to use it!\n`);
                     }
                     if (comp.health <= 0) {
-                        console.log(`You have defeated ${comp.name}, congratulations!`);
-                        console.log(`You received ${comp.reward} for winning!\n`);
-                        console.log(`----------------------------------------------------------------------\n`);
-                        player.inventory.push(comp.reward);
-                        return true;
+                        return victoryText();
                     }
                 } else {
                     console.log('Now is not the time or place for that! ... ATTACK!\n');
@@ -904,20 +903,13 @@ async function start() {
                         console.log(`You fired your ${player.attack}!  It was a Critical Hit!!\nIt dealt ${damageUser} damage!\n`);
                         comp.health = comp.health - damageUser;
                         if (comp.health <= 0) {
-                            console.log(`You have defeated ${comp.name}, congratulations!`);
-                            console.log(`You received ${comp.reward} for winning!\n`);
-                            player.inventory.push(comp.reward);
-                            return true;
+                            return victoryText();
                         }
                     } else {
                         console.log(`You fired your ${player.attack}!  It dealt ${damageUser} damage!\n`);
                         comp.health = comp.health - damageUser;
                         if (comp.health <= 0) {
-                            console.log(`You have defeated ${comp.name}, congratulations!`);
-                            console.log(`You received ${comp.reward} for winning!\n`);
-                            console.log(`----------------------------------------------------------------------\n`);
-                            player.inventory.push(comp.reward);
-                            return true;
+                            return victoryText();
                         }
                     }
                 }
@@ -1294,7 +1286,7 @@ Tower.'\n\n`);
             input = input.toString();
             let currentItem = itemLookUp[input];
             let currentInventory = room.inventory;
-            if (currentInventory.lengh !== 0 && input === 'pu_all') {  //picks up all items in room
+            if (currentInventory.length !== 0 && input === 'pu_all') {  //picks up all items in room
                 console.log(`You put the following items in your bag:\n${currentInventory.join(`\n`)}\n-----------------------------------------------------------------\n`);
                 let n = currentInventory.length;
                 for (let i = 0; i < n; i++) {
@@ -1312,7 +1304,7 @@ Tower.'\n\n`);
                 console.log(`There is no ${currentItem} in this room!\n`);
                 return play(room);
             } else {
-                console.log('There are no items in this room\n');
+                console.log('There are no items in this room...\n');
                 return play(room);
             }
         } else if (input === 'drop_null') {
@@ -1675,6 +1667,30 @@ The decision was just too much for you to make ...`)
             playAgain();
         }
     }
+
+    console.log(`
+      /\\      /\\  __________      ___.           __    /\\     /\\       
+     / /     / /  \\______   \\ ____\\_ |__   _____/  |_  \\ \\    \\ \\      
+    / /     / /    |       _//  _ \\| __ \\ /  _ \\   __\\  \\ \\    \\ \\     
+   / /     / /     |    |   (  <_> ) \\_\\ (  <_> )  |     \\ \\    \\ \\    
+  / /     / /      |____|_  /\\____/|___  /\\____/|__|      \\ \\    \\ \\   
+  \\/      \\/              \\/           \\/                  \\/     \\/   
+   _____                              .__                              
+  /  _  \\ ______   ____   ____ _____  |  | ___.__.______  ______ ____  
+ /  /_\\  \\\\____ \\ /  _ \\_/ ___\\\\__  \\ |  |<   |  |\\____ \\/  ___// __ \\ 
+/    |    \\  |_> >  <_> )  \\___ / __ \\|  |_\\___  ||  |_> >___ \\\\  ___/ 
+\\____|__  /   __/ \\____/ \\___  >____  /____/ ____||   __/____  >\\___  >
+       \\/|__|               \\/     \\/     \\/     |__|       \\/     \\/ \n\n`);
+
+    difficulty = await ask('Please select difficulty... (1) Easy (2) Medium (3) Hard\n');
+    
+    while (difficulty !== '1' && difficulty !== '2' && difficulty !=='3') {
+        console.log(`I know its a hard choice...`);
+        difficulty = await ask('Please answer the question...\n');
+    }
+    
+    console.log(`\n----------------------------------------------------------------------\n`);
+
 
     prologue();
 }
