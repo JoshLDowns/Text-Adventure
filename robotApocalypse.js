@@ -846,6 +846,7 @@ async function combat(comp) {
                     if (comp.health <= 0) {
                         console.log(`You have defeated ${comp.name}, congratulations!`);
                         console.log(`You received ${comp.reward} for winning!\n`);
+                        console.log(`----------------------------------------------------------------------\n`);
                         player.inventory.push(comp.reward);
                         return true;
                     }
@@ -855,6 +856,7 @@ async function combat(comp) {
                     if (comp.health <= 0) {
                         console.log(`You have defeated ${comp.name}, congratulations!`);
                         console.log(`You received ${comp.reward} for winning!\n`);
+                        console.log(`----------------------------------------------------------------------\n`);
                         player.inventory.push(comp.reward);
                         return true;
                     }
@@ -889,6 +891,7 @@ async function combat(comp) {
                 if (comp.health <= 0) {
                     console.log(`You have defeated ${comp.name}, congratulations!`);
                     console.log(`You received ${comp.reward} for winning!\n`);
+                    console.log(`----------------------------------------------------------------------\n`);
                     player.inventory.push(comp.reward);
                     return true;
                 }
@@ -915,6 +918,7 @@ async function combat(comp) {
                     if (comp.health <= 0) {
                         console.log(`You have defeated ${comp.name}, congratulations!`);
                         console.log(`You received ${comp.reward} for winning!\n`);
+                        console.log(`----------------------------------------------------------------------\n`);
                         player.inventory.push(comp.reward);
                         return true;
                     }
@@ -1178,7 +1182,7 @@ async function play(room) {  //allows player to make decisions within each room
     }
     //determines if random enemy spawns in room
     if (!room.enemy && room.name !== 'Fallout Bunker' && room.name !== 'R.U.West Entrance' && room.name !== 'R.U.East Entrance' && room.name !== 'R.U.North Entrance' && room.foughtRando === false) {
-        ranEnemyNum = random(10);
+        ranEnemyNum = random(15);
         if (ranEnemyNum === 1) {
             room.enemy = enemyRandom;
             console.log('All of the sudden, an alarm sounds... The sound is coming from a small\nrobot covered in flashing lights that was hiding in the corner!\nIt looks like it wants to fight!')
@@ -1294,11 +1298,11 @@ async function play(room) {  //allows player to make decisions within each room
         let currentItem = itemLookUp[input];
         let currentInventory = room.inventory;
         if (currentInventory.lengh !== 0 && input === 'pu_all') {  //picks up all items in room
-            console.log (`You put the following items in your bag:\n${currentInventory.join(`\n`)}\n-----------------------------------------------------------------`);
+            console.log (`You put the following items in your bag:\n${currentInventory.join(`\n`)}\n-----------------------------------------------------------------\n`);
             let n = currentInventory.length;
             for (let i = 0; i < n; i++) {
-                room.pickUpItem(currentInventory[0]);
                 player.inventory.push(currentInventory[0]);
+                room.pickUpItem(currentInventory[0]);
             };
             return play(room);
         }
