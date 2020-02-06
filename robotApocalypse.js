@@ -10,6 +10,24 @@ function ask(questionText) {
 async function start() {
     let lootNum;  //number that decides loot on random enemies
     let firstTurn = true;
+    let gameOverText = `
+    ________    _____      _____  ___________
+   /  _____/   /  _  \\    /     \\ \\_   _____/
+  /   \\  ___  /  /_\\  \\  /  \\ /  \\ |    __)_ 
+  \\    \\_\\  \\/    |    \\/    Y    \\|        \\
+   \\______  /\\____|__  /\\____|__  /_______  /
+          \\/         \\/         \\/        \\/ 
+   ____________   _________________________  
+   \\_____  \\   \\ /   /\\_   _____/\\______   \\ 
+    /   |   \\   Y   /  |    __)_  |       _/ 
+   /    |    \\     /   |        \\ |    |   \\ 
+   \\_______  /\\___/   /_______  / |____|_  / 
+           \\/                 \\/         \\/  
+                                             
+                                             
+      ______   ______   ______   ______      
+     /_____/  /_____/  /_____/  /_____/      
+                                             `;
     
     //displays title(looks better in actual console, need to backslash out the backslashes here)
     console.log(`
@@ -761,6 +779,7 @@ async function start() {
             player.health = player.health - dotDamage;
             if (player.health <= 0) {
                 console.log('You have been defeated! Better luck next time!\n');
+                console.log(gameOverText);
                 playAgain();
             } else {
                 return console.log(`Your currently have ${player.health} HP!\n`);
@@ -777,6 +796,7 @@ async function start() {
                 player.health = player.health - 10;
                 if (player.health <= 0) {
                     console.log('You have been defeated! Better luck next time!');
+                    console.log(gameOverText);
                     playAgain();
                 } else {
                     console.log(`Your currently have ${player.health} HP!\n`);
@@ -794,6 +814,7 @@ async function start() {
                 player.health = player.health - abilityDamage;
                 if (player.health <= 0) {
                     console.log('You have been defeated! Better luck next time!');
+                    console.log(gameOverText);
                     playAgain();
                 } else {
                     return console.log(`Your currently have ${player.health} HP!\n`);
@@ -964,6 +985,7 @@ async function start() {
                         player.health = player.health - damageComp;
                         if (player.health <= 0) {
                             console.log('You have been defeated! Better luck next time!');
+                            console.log(gameOverText);
                             playAgain();
                         } else {
                             console.log(`Your currently have ${player.health} HP!\n`);
@@ -982,6 +1004,7 @@ async function start() {
                         player.health = player.health - damageComp;
                         if (player.health <= 0) {
                             console.log('You have been defeated! Better luck next time!');
+                            console.log(gameOverText);
                             playAgain();
                         } else {
                             console.log(`Your currently have ${player.health} HP!\n`);
