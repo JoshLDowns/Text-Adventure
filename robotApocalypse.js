@@ -8,14 +8,39 @@ function ask(questionText) {
 }
 
 async function start() {
-    let lootNum;
-    let difficulty;
+    let lootNum;  //number that decides loot on random enemies
+    let firstTurn = true;
+    
+    //displays title(looks better in actual console, need to backslash out the backslashes here)
+    console.log(`
+       /\\      /\\  __________      ___.           __    /\\     /\\       
+      / /     / /  \\______   \\ ____\\_ |__   _____/  |_  \\ \\    \\ \\      
+     / /     / /    |       _//  _ \\| __ \\ /  _ \\   __\\  \\ \\    \\ \\     
+    / /     / /     |    |   (  <_> ) \\_\\ (  <_> )  |     \\ \\    \\ \\    
+   / /     / /      |____|_  /\\____/|___  /\\____/|__|      \\ \\    \\ \\   
+   \\/      \\/              \\/           \\/                  \\/     \\/   
+   _____                              .__                              
+  /  _  \\ ______   ____   ____ _____  |  | ___.__.______  ______ ____  
+ /  /_\\  \\\\____ \\ /  _ \\_/ ___\\\\__  \\ |  |<   |  |\\____ \\/  ___// __ \\ 
+/    |    \\  |_> >  <_> )  \\___ / __ \\|  |_\\___  ||  |_> >___ \\\\  ___/ 
+\\____|__  /   __/ \\____/ \\___  >____  /____/ ____||   __/____  >\\___  >
+        \\/|__|               \\/     \\/     \\/     |__|       \\/     \\/ \n\n`);
+
+    //diffuculty selection before game starts
+    let difficulty = await ask('Please select difficulty... (1) Easy (2) Medium (3) Hard\n');
+
+    while (difficulty !== '1' && difficulty !== '2' && difficulty !== '3') {
+        console.log(`I know its a hard choice...`);
+        difficulty = await ask('Please answer the question...\n');
+    }
+
+    console.log(`\n----------------------------------------------------------------------\n`);
 
     //player object
     let player = {
         name: undefined,
-        maxHealth: 50,
-        health: 50,
+        maxHealth: (difficulty === '1' ? 60 : difficulty === '2' ? 50 : 40), //nested ternarys to quickly determine health based on difficulty
+        health: (difficulty === '1' ? 60 : difficulty === '2' ? 50 : 40),
         inventory: [],
         attack: 'Particle Beam',
         damageBase: 5,
@@ -89,7 +114,7 @@ async function start() {
     let enemyE = new Enemy('Robot Bruiser', 75, 'Pneumatic Fist', 'Missle Barrage', 6, 3, 'offensive', 8, 12, 'Killswitch Code 2', 'The low hum of the servers surrounds you as you stare at what was left of your foe...\n', `Taking down your first enemy was both empowering and soul crushing...\nYour new found power is exhilerating but what have you given up for it? ...\nThe low hum of the servers surrounds you.\n`);
     let enemyN1 = new Enemy('Mechanical Surveillance Unit', 100, 'Fission Laser', 'Remote Laser', 10, 6, 'status_dot', 6, 3, 'Office Keycard North', 'As the dust settles, you notice that you were surrounded by automated\nturrets, thankfully defeating this foe seems to have shut them down...\nThe room is earily quiet.\n');
     let enemyF = new Enemy('Enforcer Captain', 125, 'Collider Beam', 'Combat Repair', 10, 10, 'defensive', 14, 6, 'Killswitch Code 3', `Your final foe has been defeated ...\nYou are so close to your end goal, but you can't help but ask yourself,\nhas destroying your own kind been worth it?\n`);
-    let enemyRandom = new Enemy('Surveillance Bot', 35, 'Photon Blaster', 'Combat Repair', 5, 5, 'defensive', 5, 5, `${lootNum <= 2 ? 'Repair Kit' : 'Scrap Metal'}`)
+    let enemyRandom = new Enemy('Surveillance Bot', 25, 'Photon Blaster', 'Combat Repair', 5, 5, 'defensive', 5, 5, `${lootNum <= 2 ? 'Repair Kit' : 'Scrap Metal'}`)
 
     //Input validation class
     class ValidInput {
@@ -804,7 +829,7 @@ async function start() {
         let statusCount;
         let shieldHP = 0;
         player.status = undefined;
-        
+
         //displays text on player victory (there were 5 victory conditions so I used this to save some code)
         function victoryText() {
             lootNum = random(6); //determines lootNum for random enemy loot condition(ternary operator in the random enemy object)
@@ -1151,11 +1176,39 @@ Tower.'\n\n`);
     async function play(room) {  //allows player to make decisions within each room
         let metalCount = 0;
         let ranEnemyNum;
+
+        if (room === falloutBunker && firstTurn === true) {
+            if (difficulty === '1') {
+                console.log(`\nIt's dangerous out there, take these Repair Kits...\n`);
+                console.log(`3 Repair Kits were added to your inventory`);
+                console.log(`----------------------------------------------------------------------\n`);
+                player.inventory.push('Repair Kit', 'Repair Kit', 'Repair Kit');
+                firstTurn = false;
+                return(play(room));
+            } else if (difficulty === '2') {
+                console.log(`\nIt's dangerous out there, take these Repair Kits...\n`);
+                console.log(`2 Repair Kits and 1 Plasma Grenade were added to your inventory`);
+                console.log(`----------------------------------------------------------------------\n`);
+                player.inventory.push('Repair Kit', 'Repair Kit', 'Plasma Grenade');
+                firstTurn = false;
+                return(play(room));
+            } else if (difficulty === '3') {
+                console.log(`\nIt's dangerous out there, take this gear...\n`);
+                console.log(`1 Repair Kit, 1 Portable Shield, and 1 Plasma Grenade were added to\nyour inventory`);
+                console.log(`----------------------------------------------------------------------\n`);
+                player.inventory.push('Repair Kit', 'Portable Shield', 'Plasma Grenade');
+                firstTurn = false;
+                return(play(room));
+            }
+        }
+
+
+        //checks if room has a predetermined enemy and calls combat
         if (room.enemy) {
             let victory = await combat(room.enemy);
             if (victory === true) {
                 if (room.enemy === enemyRandom) {
-                    enemyRandom.health = 35;
+                    enemyRandom.health = 25;
                 }
                 if (player.hasKilled === true) {
                     room.info = room.enemy.postRoomInfo;
@@ -1171,7 +1224,7 @@ Tower.'\n\n`);
         }
         //determines if random enemy spawns in room
         if (!room.enemy && room.name !== 'Fallout Bunker' && room.name !== 'R.U.West Entrance' && room.name !== 'R.U.East Entrance' && room.name !== 'R.U.North Entrance' && room.foughtRando === false) {
-            ranEnemyNum = random(15);
+            ranEnemyNum = random(difficulty === '1' ? 16 : difficulty === '2' ? 14 : 12);
             if (ranEnemyNum === 1) {
                 room.enemy = enemyRandom;
                 console.log('All of the sudden, an alarm sounds... The sound is coming from a small\nrobot covered in flashing lights that was hiding in the corner!\nIt looks like it wants to fight!')
@@ -1185,13 +1238,16 @@ Tower.'\n\n`);
                 }
             }
         }
+        //determines if player has the Nuclear Fuel Cell, and changes room functionality if they do.
         if (room === falloutBunker && player.inventory.includes('Nuclear Fuel Cell')) {
             metalCount = 0;
+            //determines total scrap metal in players inventory
             for (let i = 0; i < player.inventory.length; i++) {
                 if (player.inventory[i] === 'Scrap Metal') {
                     metalCount = metalCount + 1;
                 }
             }
+            //determines if player can make the Nuclear Heat Ray
             if (metalCount >= 5) {
                 console.log(`You show Ella the Nuclear Fuel Cell...\n'WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter.\nGive me 5 Scrap Metal and the Fuel Cell and I can make a Heat Ray that will\nreally pack a punch! It only has one shot, so use it wisely...\n`);
                 console.log('You put the Nuclear Heat Ray in your bag.\n');
@@ -1667,31 +1723,7 @@ The decision was just too much for you to make ...`)
             playAgain();
         }
     }
-
-    console.log(`
-      /\\      /\\  __________      ___.           __    /\\     /\\       
-     / /     / /  \\______   \\ ____\\_ |__   _____/  |_  \\ \\    \\ \\      
-    / /     / /    |       _//  _ \\| __ \\ /  _ \\   __\\  \\ \\    \\ \\     
-   / /     / /     |    |   (  <_> ) \\_\\ (  <_> )  |     \\ \\    \\ \\    
-  / /     / /      |____|_  /\\____/|___  /\\____/|__|      \\ \\    \\ \\   
-  \\/      \\/              \\/           \\/                  \\/     \\/   
-   _____                              .__                              
-  /  _  \\ ______   ____   ____ _____  |  | ___.__.______  ______ ____  
- /  /_\\  \\\\____ \\ /  _ \\_/ ___\\\\__  \\ |  |<   |  |\\____ \\/  ___// __ \\ 
-/    |    \\  |_> >  <_> )  \\___ / __ \\|  |_\\___  ||  |_> >___ \\\\  ___/ 
-\\____|__  /   __/ \\____/ \\___  >____  /____/ ____||   __/____  >\\___  >
-       \\/|__|               \\/     \\/     \\/     |__|       \\/     \\/ \n\n`);
-
-    difficulty = await ask('Please select difficulty... (1) Easy (2) Medium (3) Hard\n');
     
-    while (difficulty !== '1' && difficulty !== '2' && difficulty !=='3') {
-        console.log(`I know its a hard choice...`);
-        difficulty = await ask('Please answer the question...\n');
-    }
-    
-    console.log(`\n----------------------------------------------------------------------\n`);
-
-
     prologue();
 }
 
