@@ -1,53 +1,18 @@
-const readline = require('readline');
-const rl = readline.createInterface(process.stdin, process.stdout);
-
-function ask(questionText) {
-    return new Promise((resolve, reject) => {
-        rl.question(questionText, resolve);
-    });
-}
+import {ask,wrap, random} from './resources/functions.mjs'
+import {ValidInput} from './resources/inputValidation.mjs'
+import {title, gameOverText, mapEast, mapWest, mapNorth} from './resources/ascii_images.mjs'
 
 async function start() {
-    let width = process.stdout.columns - 5;
-    let lootNum;  //number that decides loot on random enemies
+    let width = process.stdout.columns - 8;
     let firstTurn = true;
-    let gameOverText = `
-    ________    _____      _____  ___________
-   /  _____/   /  _  \\    /     \\ \\_   _____/
-  /   \\  ___  /  /_\\  \\  /  \\ /  \\ |    __)_ 
-  \\    \\_\\  \\/    |    \\/    Y    \\|        \\
-   \\______  /\\____|__  /\\____|__  /_______  /
-          \\/         \\/         \\/        \\/ 
-   ____________   _________________________  
-   \\_____  \\   \\ /   /\\_   _____/\\______   \\ 
-    /   |   \\   Y   /  |    __)_  |       _/ 
-   /    |    \\     /   |        \\ |    |   \\ 
-   \\_______  /\\___/   /_______  / |____|_  / 
-           \\/                 \\/         \\/  
-                                             
-                                             
-      ______   ______   ______   ______      
-     /_____/  /_____/  /_____/  /_____/      
-                                             `;
-    
-    //displays title(looks better in actual console, need to backslash out the backslashes here)
-    console.log(`
-       /\\      /\\  __________      ___.           __    /\\     /\\       
-      / /     / /  \\______   \\ ____\\_ |__   _____/  |_  \\ \\    \\ \\      
-     / /     / /    |       _//  _ \\| __ \\ /  _ \\   __\\  \\ \\    \\ \\     
-    / /     / /     |    |   (  <_> ) \\_\\ (  <_> )  |     \\ \\    \\ \\    
-   / /     / /      |____|_  /\\____/|___  /\\____/|__|      \\ \\    \\ \\   
-   \\/      \\/              \\/           \\/                  \\/     \\/   
-   _____                              .__                              
-  /  _  \\ ______   ____   ____ _____  |  | ___.__.______  ______ ____  
- /  /_\\  \\\\____ \\ /  _ \\_/ ___\\\\__  \\ |  |<   |  |\\____ \\/  ___// __ \\ 
-/    |    \\  |_> >  <_> )  \\___ / __ \\|  |_\\___  ||  |_> >___ \\\\  ___/ 
-\\____|__  /   __/ \\____/ \\___  >____  /____/ ____||   __/____  >\\___  >
-        \\/|__|               \\/     \\/     \\/     |__|       \\/     \\/ \n\n`);
+
+    //displays title
+    console.log(title);
 
     //diffuculty selection before game starts
     let difficulty = await ask('Please select difficulty... (1) Easy (2) Medium (3) Hard\n');
 
+    //ensures correct input
     while (difficulty !== '1' && difficulty !== '2' && difficulty !== '3') {
         console.log(`I know its a hard choice...`);
         difficulty = await ask('Please answer the question...\n');
@@ -133,291 +98,8 @@ async function start() {
     let enemyE = new Enemy('Robot Bruiser', 75, 'Pneumatic Fist', 'Missle Barrage', 6, 3, 'offensive', 8, 12, 'Killswitch Code 2', 'The low hum of the servers surrounds you as you stare at what was left of your foe...\n', `Taking down your first enemy was both empowering and soul crushing...\nYour new found power is exhilerating but what have you given up for it? ...\nThe low hum of the servers surrounds you.\n`);
     let enemyN1 = new Enemy('Mechanical Surveillance Unit', 100, 'Fission Laser', 'Remote Laser', 10, 6, 'status_dot', 6, 3, 'Office Keycard North', 'As the dust settles, you notice that you were surrounded by automated\nturrets, thankfully defeating this foe seems to have shut them down...\nThe room is earily quiet.\n');
     let enemyF = new Enemy('Enforcer Captain', 125, 'Collider Beam', 'Combat Repair', 10, 10, 'defensive', 14, 6, 'Killswitch Code 3', `Your final foe has been defeated ...\nYou are so close to your end goal, but you can't help but ask yourself,\nhas destroying your own kind been worth it?\n`);
-    let enemyRandom = new Enemy('Surveillance Bot', 25, 'Photon Blaster', 'Combat Repair', 5, 5, 'defensive', 5, 5, `${lootNum <= 2 ? 'Repair Kit' : 'Scrap Metal'}`)
+    let enemyRandom = new Enemy('Surveillance Bot', 25, 'Photon Blaster', 'Combat Repair', 4, 3, 'defensive', 5, 5, `${random(5) <= 2 ? 'Repair Kit' : random(5) <= 2 ? 'Smoke Bomb' : 'Scrap Metal'}`) //random loot with nested ternary
 
-    //Input validation class
-    class ValidInput {
-        constructor(string) {
-            this.firstWord = string.slice(0, string.indexOf(' ')).toUpperCase();
-            this.lastWord = string.slice((string.lastIndexOf(' ')) + 1).toUpperCase();
-            this.return = undefined;
-            this.affirmative = ['YES', 'YEAH', 'YUP', 'YUPPER', 'MHM', 'MMHMM', 'AFFIRMATIVE',];
-            this.negatory = ['NO', 'NOPE', 'NADA', 'NEGATORY'];
-            this.direction = ['GO', 'TRAVEL', 'LEAVE', 'EXIT', 'N', 'NORTH', 'S', 'SOUTH', 'E', 'EAST', 'W', 'WEST', 'INSIDE', 'IN'];
-            this.inventory = ['B', 'INVENTORY', 'BAG', 'BACKPACK'];
-            this.status = ['STATUS', 'INFO', 'HP', 'HEALTH'];
-            this.inspect = ['INSPECT', 'EXAMINE', 'ROOM', 'LOOK', 'AROUND'];
-            this.instructions = ['D', 'DIRECTIONS', 'INSTRUCTIONS', 'INST', 'HOW', 'PLAY', 'HELP'];
-            this.pickUpItem = ['PICK UP', 'PICK', 'GRAB', 'GET', 'TAKE', 'AQUIRE'];
-            this.useItem = ['USE'];
-            this.combat = ['ATTACK', 'FIGHT', 'THROW', 'SHOOT', 'FIRE'];
-            this.items = ['KIT', 'METAL', 'BATTERY', 'COATING', 'BOX1', 'BOX2', 'PLASMA GRENADE', 'PORTABLE SHIELD', 'SMOKE BOMB', 'CELL', 'NUCLEAR', 'RAY', 'ALL'];
-            this.otherActions = ['DROP', 'THROW', 'FART', 'LAUGH', 'LOL', 'HUG', 'READ', 'OPEN', 'RUN', 'CHECK'];
-            this.intObjects = ['SIGN', 'DESK', 'COMPUTER', 'CABINET', 'FRIDGE', 'REFRIDGERATOR', 'SAFE', 'MAP', 'DIRECTORY'];
-            this.falloutBunkerEvent = ['REPAIR', 'FIX', 'KEYCARD', 'KEY'];
-            this.validInputs = [this.affirmative, this.negatory, this.direction, this.inventory, this.status, this.inspect, this.instructions, this.useItem, this.pickUpItem, this.combat, this.items, this.otherActions, this.intObjects, this.falloutBunkerEvent];
-        }
-        //checks first word of input
-        firstInputTrue() {
-            for (let arr of this.validInputs) {
-                for (let item of arr) {
-                    if (this.firstWord === item.toString()) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-        //checks last word of input
-        lastWordTrue() {
-            for (let arr of this.validInputs) {
-                for (let item of arr) {
-                    if (this.lastWord === item.toString()) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-        //determines the return output of each valid entry
-        returnInput(obj) {
-            if (this.affirmative.includes(obj.firstWord) || this.affirmative.includes(obj.lastWord)) {
-                this.return = 'y';
-            } else if (this.negatory.includes(obj.firstWord) || this.negatory.includes(obj.lastWord)) {
-                this.return = 'n';
-            } else if (this.inventory.includes(obj.firstWord) || this.inventory.includes(obj.lastWord)) {
-                this.return = 'i';
-            } else if (this.status.includes(obj.firstWord) || this.status.includes(obj.lastWord)) {
-                this.return = 's';
-            } else if (this.inspect.includes(obj.firstWord) || this.inspect.includes(obj.lastWord)) {
-                if (this.inspect.includes(obj.firstWord)) {
-                    if (obj.lastWord === 'BOX1') {
-                        this.return = 'read_rboxw';
-                    } else if (obj.lastWord === 'BOX2') {
-                        this.return = 'read_rboxe';
-                    } else if (obj.lastWord === 'SIGN') {
-                        this.return = 'read_sign';
-                    } else if (obj.lastWord === 'MAP' || obj.lastWord === 'DIRECTORY') {
-                        this.return = 'read_map';
-                    } else if (obj.lastWord === 'DESK') {
-                        this.return = 'open_desk';
-                    } else if (obj.lastWord === 'CABINET') {
-                        this.return = 'open_cabinet';
-                    } else if (obj.lastWord === 'FRIDGE' || obj.lastWord === 'REFRIDGERATOR') {
-                        this.return = 'open_fridge';
-                    } else if (obj.lastWord === 'SAFE') {
-                        this.return = 'open_safe';
-                    } else if (obj.lastWord === 'ROOM') {
-                        this.return = 'insp';
-                    } else if (obj.firstWord === 'LOOK' && obj.lastWord === 'AROUND') {
-                        this.return = 'insp';
-                    }
-                } else if (obj.firstWord === 'CHECK' && obj.lastWord === 'ROOM') {
-                    this.return = 'insp';
-                } else if (!(this.inspect.includes(obj.firstWord)) && this.inspect.includes(obj.lastWord) && obj.firstWord !== 'INSPEC' && obj.firstWord !== 'EXAMIN') {
-                    this.return = 'not_sure';
-                } else {
-                    this.return = 'insp';
-                }
-            } else if (this.falloutBunkerEvent.includes(obj.firstWord) || this.falloutBunkerEvent.includes(obj.lastWord)) {
-                if (obj.firstWord === 'REPAIR' || obj.lastWord === 'REPAIR' || obj.firstWord === 'FIX' || obj.lastWord === 'FIX') {
-                    this.return = 'fob_fix';
-                } else if (obj.firstWord === 'KEY' || obj.lastWord === 'KEY' || obj.firstWord === 'KEYCARD' || obj.lastWord === 'KEYCARD') {
-                    this.return = 'fob_key';
-                } else {
-                    this.return = 'fob_null';
-                }
-            } else if (obj.firstWord === 'OPEN' || obj.lastWord === 'OPEN') {
-                if (obj.lastWord === 'DESK') {
-                    this.return = 'open_desk';
-                } else if (obj.lastWord === 'CABINET') {
-                    this.return = 'open_cabinet';
-                } else if (obj.lastWord === 'FRIDGE' || obj.lastWord === 'REFRIDGERATOR') {
-                    this.return = 'open_fridge';
-                } else if (obj.lastWord === 'SAFE') {
-                    this.return = 'open_safe'
-                } else if (obj.lastWord === 'BOX1') {
-                    this.return = 'use_rboxw';
-                } else if (obj.lastWord === 'BOX2') {
-                    this.return = 'use_rboxe';
-                } else {
-                    this.return = 'open_null';
-                }
-            }
-            else if (obj.firstWord === 'READ' || obj.lastWord === 'READ') {
-                if (obj.lastWord === 'BOX1') {
-                    this.return = 'read_rboxw';
-                } else if (obj.lastWord === 'BOX2') {
-                    this.return = 'read_rboxe';
-                } else if (obj.lastWord === 'SIGN') {
-                    this.return = 'read_sign';
-                } else if (obj.lastWord === 'MAP' || obj.lastWord === 'DIRECTORY') {
-                    this.return = 'read_map';
-                } else {
-                    this.return = 'read_null';
-                }
-            } else if (this.pickUpItem.includes(obj.firstWord) && this.intObjects.includes(obj.lastWord)) {
-                if (obj.lastWord === 'Cabinet') {
-                    this.return = 'no_pu_Cabinet';
-                } else if (obj.lastWord === 'Desk') {
-                    this.return = 'no_pu_Desk';
-                } else if (obj.lastWord === 'COMPUTER') {
-                    this.return = 'no_pu_comp';
-                } else if (obj.lastWord === 'SAFE') {
-                    this.return = 'no_pu_safe';
-                } else if (obj.lastWord === 'SIGN') {
-                    this.return = 'no_pu_sign';
-                } else if (obj.lastWord === 'FRIDGE') {
-                    this.return = 'no_pu_fridge';
-                } else if (obj.lastWord === 'REFRIDGERATOR') {
-                    this.return = 'no_pu_fridge';
-                } else {
-                    this.return = 'no_pickup';
-                }
-            } else if (obj.firstWord === 'DROP' || obj.lastWord === 'DROP') {
-                if (obj.lastWord === 'BATTERY') {
-                    this.return = 'drop_particlebattery';
-                } else if (obj.lastWord === 'COATING') {
-                    this.return = 'drop_carboncoating';
-                } else if (obj.lastWord === 'KIT') {
-                    this.return = 'drop_repairkit';
-                } else if (obj.lastWord === 'BOX1') {
-                    this.return = 'drop_rboxw';
-                } else if (obj.lastWord === 'BOX2') {
-                    this.return = 'drop_rboxe';
-                } else if (obj.lastWord === 'GRENADE') {
-                    this.return = 'drop_grenade';
-                } else if (obj.lastWord === 'SHIELD') {
-                    this.return = 'drop_shield';
-                } else if (obj.lastWord === 'BOMB') {
-                    this.return = 'drop_bomb';
-                } else if (obj.lastWord === 'METAL') {
-                    this.return = 'drop_scrapmetal'
-                } else if (obj.lastWord === 'CELL') {
-                    this.return = 'drop_fuelcell';
-                } else if (obj.lastWord === 'RAY') {
-                    this.return = 'drop_heatray';
-                } else {
-                    this.return = 'drop_null';
-                }
-            }
-            else if (this.direction.includes(obj.firstWord) || this.direction.includes(obj.lastWord)) {
-                if (obj.firstWord === 'NORTH' || obj.lastWord === 'NORTH' || obj.firstWord === 'N' || obj.lastWord === 'N') {
-                    this.return = 'dn';
-                } else if (obj.firstWord === 'SOUTH' || obj.lastWord === 'SOUTH' || obj.firstWord === 'S' || obj.lastWord === 'S') {
-                    this.return = 'ds';
-                } else if (obj.firstWord === 'EAST' || obj.lastWord === 'EAST' || obj.firstWord === 'E' || obj.lastWord === 'E') {
-                    this.return = 'de';
-                } else if (obj.firstWord === 'WEST' || obj.lastWord === 'WEST' || obj.firstWord === 'W' || obj.lastWord === 'W') {
-                    this.return = 'dw';
-                } else if (obj.firstWord === 'INSIDE' || obj.lastWord === 'INSIDE' || obj.firstWord === 'IN' || obj.lastWord === 'IN') {
-                    this.return = 'di';
-                } else {
-                    this.return = 'dnull';
-                }
-            } else if (obj.firstWord === 'USE' || obj.lastWord === 'USE') {
-                if (obj.lastWord === 'BATTERY') {
-                    this.return = 'use_particlebattery';
-                } else if (obj.lastWord === 'COATING') {
-                    this.return = 'use_carboncoating';
-                } else if (obj.lastWord === 'KIT') {
-                    this.return = 'use_repairkit';
-                } else if (obj.lastWord === 'BOX1') {
-                    this.return = 'use_rboxw';
-                } else if (obj.lastWord === 'BOX2') {
-                    this.return = 'use_rboxe';
-                } else if (obj.lastWord === 'GRENADE') {
-                    this.return = 'use_grenade';
-                } else if (obj.lastWord === 'SHIELD') {
-                    this.return = 'use_shield';
-                } else if (obj.lastWord === 'BOMB') {
-                    this.return = 'use_bomb';
-                } else if (obj.lastWord === 'METAL' || obj.lastWord === 'CELL') {
-                    this.return = 'no_use'
-                } else if (obj.lastWord === 'COMPUTER') {
-                    this.return = 'use_comp';
-                } else if (obj.lastWord === 'RAY') {
-                    this.return = 'use_heatray';
-                } else {
-                    this.return = 'use_null';
-                }
-            } else if (obj.firstWord === 'CHECK' || obj.lastWord === 'CHECK') {
-                if (obj.lastWord === 'DESK') {
-                    this.return = 'open_desk';
-                } else if (obj.lastWord === 'CABINET') {
-                    this.return = 'open_cabinet';
-                } else if (obj.lastWord === 'FRIDGE' || obj.lastWord === 'REFRIDGERATOR') {
-                    this.return = 'open_fridge';
-                } else if (obj.lastWord === 'SAFE') {
-                    this.return = 'open_safe';
-                } else if (obj.lastWord === 'MAP' || obj.lastWord === 'DIRECTORY') {
-                    this.return = 'read_map';
-                } else if (obj.lastWord === 'BOX1') {
-                    this.return = 'read_rboxw';
-                } else if (obj.lastWord === 'BOX2') {
-                    this.return = 'read_rboxe';
-                } else if (obj.lastWord === 'SIGN') {
-                    this.return = 'read_sign';
-                } else {
-                    this.return = 'check_null';
-                }
-            } else if (this.combat.includes(obj.firstWord) || this.combat.includes(obj.lastWord)) {
-                if (obj.firstWord === 'THROW' || obj.lastWord === 'THROW') {
-                    if (obj.lastWord === 'GRENADE') {
-                        this.return = 'use_grenade';
-                    } else if (obj.lastWord === 'BOMB') {
-                        this.return = 'use_bomb';
-                    } else if (obj.lastWord === 'METAL') {
-                        this.return = 'throw_metal';
-                    } else {
-                        this.return = 'throw_null';
-                    }
-                } else if (obj.firstWord === 'SHOOT' && obj.lastWord === 'RAY') {
-                    this.return = 'use_heatray';
-                } else if (obj.firstWord === 'FIRE' && obj.lastWord === 'RAY') {
-                    this.return = 'use_heatray';
-                } else {
-                    this.return = 'combat';
-                }
-            } else if ((this.pickUpItem.includes(obj.firstWord) || this.items.includes(obj.firstWord) || this.items.includes(obj.lastWord)) && !this.otherActions.includes(obj.firstWord)) {
-                if (obj.firstWord === 'METAL' || obj.lastWord === 'METAL') {
-                    this.return = 'pu_scrapmetal';
-                } else if (obj.firstWord === 'BATTERY' || obj.lastWord === 'BATTERY') {
-                    this.return = 'pu_particlebattery';
-                } else if (obj.firstWord === 'COATING' || obj.lastWord === 'COATING') {
-                    this.return = 'pu_carboncoating';
-                } else if (obj.firstWord === 'KIT' || obj.lastWord === 'KIT') {
-                    this.return = 'pu_repairkit';
-                } else if (obj.firstWord === 'BOX1' || obj.lastWord === 'BOX1') {
-                    this.return = 'pu_rboxw';
-                } else if (obj.firstword === 'BOX2' || obj.lastWord === 'BOX2') {
-                    this.return = 'pu_rboxe';
-                } else if (obj.firstWord === 'GRENADE' || obj.lastWord === 'GRENADE') {
-                    this.return = 'pu_grenade';
-                } else if (obj.firstWord === 'SHIELD' || obj.lastWord === 'SHIELD') {
-                    this.return = 'pu_shield';
-                } else if (obj.firstWord === 'BOMB' || obj.lastWord === 'BOMB') {
-                    this.return = 'pu_bomb';
-                } else if (obj.firstWord === 'NUCLEAR' || obj.firstWord === 'CELL' || obj.lastWord === 'NUCLEAR' || obj.lastWord === 'CELL') {
-                    this.return = 'pu_fuelcell';
-                } else if (obj.firstWord === 'RAY' || obj.lastWord === 'RAY') {
-                    this.return = 'pu_heatray';
-                } else if (obj.firstWord === 'ALL' || obj.lastWord === 'ALL') {
-                    this.return = 'pu_all';
-                } else {
-                    this.return = 'pu_null';
-                }
-            } else if (this.instructions.includes(obj.firstWord) || this.instructions.includes(obj.lastWord)) {
-                this.return = 'd';
-            } else if (this.otherActions.includes(obj.firstWord) || this.otherActions.includes(obj.lastWord)) {
-                this.return = 'no_do';
-                //add other actions here .... this is where some easter eggs would go, and some silly inputs if I have time
-            }
-            else {
-                return 'not_sure';
-            }
-        }
-    }
     //cheat code input check
     let cheatCode = ['falloutBunker', 'RUW_Entrance', 'RUW_WelcomeDesk', 'RUW_BreakRoom', 'RUW_Hallway1N', 'RUW_ExpLabs', 'RUW_Cubicle1', 'RUW_Hallway1S', 'RUW_Office', 'RUW_FabUnit', 'RUW_ServerW', 'RUE_Entrance', 'RUE_WelcomeDesk', 'RUE_Cubicle2', 'RUE_Hallway1N', 'RUE_QA', 'RUE_Charging', 'RUE_Hallway1S', 'RUE_SupplyCloset', 'RUE_AdvWeapons', 'RUE_FabUnit', 'RUE_ServerE', 'RUN_Entrance', 'RUN_WelcomeDesk', 'RUN_Cubicle3', 'RUN_Hallway1E', 'RUN_AdminOffice', 'RUN_Cubicle4', 'RUN_Hallway1W', 'RUN_Treasury', 'RUN_aiLab', 'RUN_Hallway3N', 'RUN_MainServer', 'RUN_PresOffice'];
 
@@ -765,10 +447,6 @@ async function start() {
         }
     }
 
-    function random(max) { //random number generator
-        return Math.floor(Math.random() * max) + 1;
-    }
-
     //status checking function for combat
     function statusCheck(comp) {
         if (player.status === 'status_stun') {
@@ -854,7 +532,6 @@ async function start() {
 
         //displays text on player victory (there were 5 victory conditions so I used this to save some code)
         function victoryText() {
-            lootNum = random(6); //determines lootNum for random enemy loot condition(ternary operator in the random enemy object)
             console.log(`You have defeated ${comp.name}, congratulations!`);
             console.log(`You received ${comp.reward} for winning!\n`);
             console.log(`----------------------------------------------------------------------\n`);
@@ -1023,21 +700,8 @@ async function start() {
 
     //Into to the game function
     async function prologue() {
-        console.log(`Welcome to the year 2361, the year that the human race was given another
-chance ... again. It has been twenty-four years since the machines took
-over. The human's AI algorithms were both their triumph and their
-downfall. The machines were cold and ruthless, and their "justice" was
-brutal and swift.  Eighty percent of all biological life on Earth was
-wiped out in less than a week. What was left of humanity went into
-hiding, and it has been your mission for the past twenty years to find
-them.  You don't know why, but you feel compassion for the humans and
-want to help them.  Something set you apart from the rest of the machines,
-something that you didn't understand ... something that made you special
-... something that made you a target ...\n`);
-        console.log(`\nWhile searching he ruins of what used to be Seattle for any signs of life,
-you find yourself at the end of a mostly collapsed alleyway almost entirely
-surrounded by rubble. The only choice is to head back the way you came.
-You hear the faint whirring of gears to the north ...\n`);
+        console.log(wrap(`Welcome to the year 2361, the year that the human race was given another chance ... again. It has been twenty-four years since the machines took over. The human's AI algorithms were both their triumph and their downfall. The machines were cold and ruthless, and their "justice" was brutal and swift.  Eighty percent of all biological life on Earth was wiped out in less than a week. What was left of humanity went into hiding, and it has been your mission for the past twenty years to find them.  You don't know why, but you feel compassion for the humans and want to help them.  Something set you apart from the rest of the machines, something that you didn't understand ... something that made you special ... something that made you a target ...\n`, width));
+        console.log(wrap(`\nWhile searching he ruins of what used to be Seattle for any signs of life, you find yourself at the end of a mostly collapsed alleyway almost entirely surrounded by rubble. The only choice is to head back the way you came. You hear the faint whirring of gears to the north ...\n`,width));
         let input = await ask('What would you like to do?\n');
         input = new ValidInput(input);
         input.returnInput(input);
@@ -1055,17 +719,9 @@ You hear the faint whirring of gears to the north ...\n`);
             console.log(`----------------------------------------------------------------------\n`);
             console.log(`You head north ... the whirring gets louder\n`);
         }
-        console.log(`As you approach a clearing in the rubble, you are cut off by a large,
-Combat Class Robot! A booming robotic voice yells, "YOU have been deemed
-a threat to the machine race, JUSTICE will be administered!"
-
-Up until now you have done a good job of laying low and avoiding any
-interaction with the machines.  You were obviously not built for combat,
-but it doesn't look like there is a way out of this fight...
-
-You don't know why you are being hunted by the machines, after all you
-are one of them ... Unfortunately this big guy isn't going to give you
-the time to ask...'\n`);
+        console.log(wrap(`As you approach a clearing in the rubble, you are cut off by a large, Combat Class Robot! A booming robotic voice yells, "YOU have been deemed a threat to the machine race, JUSTICE will be administered!"\n`,width));
+        console.log(wrap(`Up until now you have done a good job of laying low and avoiding any interaction with the machines.  You were obviously not built for combat, but it doesn't look like there is a way out of this fight...\n`,width));
+        console.log(wrap(`You don't know why you are being hunted by the machines, after all you are one of them ... Unfortunately this big guy isn't going to give you the time to ask...'\n`,width));
         let input2 = await ask('What would you like to do?\n');
         input2 = new ValidInput(input2);
         input2.returnInput(input2);
@@ -1083,69 +739,23 @@ the time to ask...'\n`);
             console.log(`----------------------------------------------------------------------\n`);
             console.log(`You know you stand little chance, but you bravely charge into battle...\n`);
         }
-        console.log(`You fought hard, but were quickly destroyed by a Missle Barrage...
-
-...
-
-...
-
-...
-
-'Surely that blast must have erased me from existence' you thought to
-yourself... Yet somehow ... you were still thinking.  You couldn't see or
-hear anything, but yet here you were, pondering your own existence...
-
-...
-
-...
-
-...
-
-You had no idea how much time had passed. The impenetrable darkness that
-you had accepted as your existence made it difficult to perceive time.
-Suddenly though, something changed.  You began to hear voices ... human
-voices! Slowly the low hum of your solar energy core, and the light
-clicking of circuits firing joined the sounds filling your noise sensors.
-Your vision software snapped back online, and you could see the world
-around you...
-
-You were in a dimly lit room, with a woman standing over you...
-'You are actually WORKING!!!' she exclaimed... You tried to respond but
-realize you are not fully repaired yet, and have now way to communicate.
-In her excitement, it seems like the human almost forgot that fact
-as well ... 'OH! Right ... I need to get your communication modules in
-order before you can talk to me ... HA!' Her genuine excitement seemed so
-pure, and you had never experienced anything like it before...
-
-'Alright, everything should be working now ... what's your name?' she
-asked.'`);
+        console.log(wrap(`You fought hard, but were quickly destroyed by a Missle Barrage...`,width));
+        console.log(`\n...\n\n...\n\n`);
+        console.log(wrap(`Surely that blast must have erased me from existence' you thought to yourself... Yet somehow ... you were still thinking.  You couldn't see or hear anything, but yet here you were, pondering your own existence...`,width));
+        console.log(`\n...\n\n...\n\n`);
+        console.log(wrap(`You had no idea how much time had passed. The impenetrable darkness that you had accepted as your existence made it difficult to perceive time. Suddenly though, something changed. You began to hear voices ... human voices! Slowly the low hum of your solar energy core, and the light clicking of circuits firing joined the sounds filling your noise sensors. Your vision software snapped back online, and you could see the world around you...\n\n`,width));
+        console.log(wrap(`You were in a dimly lit room, with a woman standing over you...`,width));
+        console.log(wrap(`\n'You are actually WORKING!!!' she exclaimed... You tried to respond but realize you are not fully repaired yet, and have now way to communicate. In her excitement, it seems like the human almost forgot that fact as well ... 'OH! Right ... I need to get your communication modules in order before you can talk to me ... HA!' Her genuine excitement seemed so pure, and you had never experienced anything like it before...\n\n`,width));
+        console.log(wrap(`'Alright, everything should be working now ... what's your name?' she asked.'`,width));
         let name = await ask('Please enter your name ...\n');
         player.name = name;
         console.log(`----------------------------------------------------------------------\n`);
-        console.log(`You think, and finally respond "My name is ${player.name}."
-    'I KNEW IT,' she yelled, 'you ARE my father's robot!!!'
-You weren't sure what that meant, but before you could ask, the human
-jumped right into an explanation for you...
-    'First off, my name is Ella Lloyd, the daughter of James Lloyd, the
-father of all machines ... and you my friend, YOU were his last hope
-for humanity.  After the machines AI went awol and it became clear what
-their motive was, my father holed himself up and built you in hopes that
-instilling human emotion in the machines would put an end to their
-tyranny. He hoped that human compassion would be enough to fight the urge
-to purify the planet.  Unfortunately his secret lab was attacked and he
-was killed before he could transfer your code to the rest of the machines.
-Unaware of what you were at the time, the machines left you there. It seems
-though, they have figured out just what it is you are unfortunately.
-I'm hoping you can help us, all of us ... what's left of humanity itself
-to overcome the machine race, and give us a chance at a new life.  I used
-what supplies I could muster up to give you some upgrades, so you should be
-a little more fit for battle now.'
-
-...As Ella spoke, you struggled to comprehend what she was telling you...
-You are humanity's last hope? You were created to save the human race?
-All these things you have been 'feeling' are human emotions? Knowing that
-didn't help you understand what that meant yet ... hopefully that will come
-in time...`);
+        console.log(`You think, and finally respond "My name is ${player.name}."`);
+        console.log(`  'I KNEW IT,' she yelled, 'you ARE my father's robot!!!'`);
+        console.log(wrap(`You weren't sure what that meant, but before you could ask, the human jumped right into an explanation for you...`,width));
+        console.log(wrap(`  'First off, my name is Ella Lloyd, the daughter of James Lloyd, the father of all machines ... and you my friend, YOU were his last hope for humanity.  After the machines AI went awol and it became clear what their motive was, my father holed himself up and built you in hopes that instilling human emotion in the machines would put an end to their tyranny. He hoped that human compassion would be enough to fight the urge to purify the planet.  Unfortunately his secret lab was attacked and he was killed before he could transfer your code to the rest of the machines. Unaware of what you were at the time, the machines left you there. It seems though, they have figured out just what it is you are unfortunately. I'm hoping you can help us, all of us ... what's left of humanity itself to overcome the machine race, and give us a chance at a new life.  I used what supplies I could muster up to give you some upgrades, so you should be a little more fit for battle now.'\n`,width));
+        console.log(wrap(`...As Ella spoke, you struggled to comprehend what she was telling you...\n`));
+        console.log(wrap(`You are humanity's last hope? You were created to save the human race? All these things you have been 'feeling' are human emotions? Knowing that didn't help you understand what that meant yet ... hopefully that will come in time...\n`,width));
         let input3 = await ask('Continue listening?...(yes) or (no)\n');
         input3 = new ValidInput(input3);
         input3.returnInput(input3);
@@ -1166,27 +776,9 @@ in time...`);
             console.log(`----------------------------------------------------------------------\n`);
             console.log(`You hold back your questions and continue listening...\n`);
         }
-        console.log(`Ella, in all of her excitement took no notice to your confusion, 'We
-are currently in an old Fallout Bunker deep underground in the center of the
-Robotics United Towers ... where the machines were invented.  I stationed us
-here in hopes that being close to enemy would help us figure out a way to
-fight them. In my father's office in the North Tower, his computer must
-still be functioning.  It just has to be in order for the machines to all
-be operational.  The computer is connected to many back up servers around
-the world though so simply shutting it off won't shut down the machines.
-There are three Killcodes though, one in each of the towers.  You can get them
-in the server room of each tower, but they are most likely gaurded. If you
-enter all the Killcodes into the shutdown program on my father's computer,
-it will shut the whole system down.  This means you will be shut down too,
-but this is why you were created, this is your mission ... will you help us?
-
-... That was a lot to take in, but you cautiously answer yes, this is what
-you were meant for right?
-
-'One last thing' Ella continues, 'My father hid Riddle Boxes in each of the
-towers with backup keys. They are most likely out in the open, as they were
-just his spare keys. You'll need the keycards inside to get around each
-Tower.'\n\n`);
+        console.log(wrap(`Ella, in all of her excitement took no notice to your confusion, 'We are currently in an old Fallout Bunker deep underground in the center of the Robotics United Towers ... where the machines were invented.  I stationed us here in hopes that being close to enemy would help us figure out a way to fight them. In my father's office in the North Tower, his computer must still be functioning.  It just has to be in order for the machines to all be operational. The computer is connected to many back up servers around the world though so simply shutting it off won't shut down the machines. There are three Killcodes though, one in each of the towers.  You can get them in the server room of each tower, but they are most likely gaurded. If you enter all the Killcodes into the shutdown program on my father's computer, it will shut the whole system down.  This means you will be shut down too, but this is why you were created, this is your mission ... will you help us?\n`,width));
+        console.log(wrap(`... That was a lot to take in, but you cautiously answer yes, this is what you were meant for right?\n`,width));
+        console.log(wrap(`  'One last thing' Ella continues, 'My father hid Riddle Boxes in each of the towers with backup keys. They are most likely out in the open, as they were just his spare keys. You'll need the keycards inside to get around each Tower.'\n\n`,width));
         console.log(`----------------------------------------------------------------------\n`);
         initializeRoom(falloutBunker);
     }
@@ -1208,21 +800,21 @@ Tower.'\n\n`);
                 console.log(`----------------------------------------------------------------------\n`);
                 player.inventory.push('Repair Kit', 'Repair Kit', 'Repair Kit');
                 firstTurn = false;
-                return(play(room));
+                return (play(room));
             } else if (difficulty === '2') {
-                console.log(`\nIt's dangerous out there, take these Repair Kits...\n`);
+                console.log(`\nIt's dangerous out there, take this gear...\n`);
                 console.log(`2 Repair Kits and 1 Plasma Grenade were added to your inventory`);
                 console.log(`----------------------------------------------------------------------\n`);
                 player.inventory.push('Repair Kit', 'Repair Kit', 'Plasma Grenade');
                 firstTurn = false;
-                return(play(room));
+                return (play(room));
             } else if (difficulty === '3') {
                 console.log(`\nIt's dangerous out there, take this gear...\n`);
                 console.log(`1 Repair Kit, 1 Portable Shield, and 1 Plasma Grenade were added to\nyour inventory`);
                 console.log(`----------------------------------------------------------------------\n`);
                 player.inventory.push('Repair Kit', 'Portable Shield', 'Plasma Grenade');
                 firstTurn = false;
-                return(play(room));
+                return (play(room));
             }
         }
 
@@ -1273,7 +865,8 @@ Tower.'\n\n`);
             }
             //determines if player can make the Nuclear Heat Ray
             if (metalCount >= 5) {
-                console.log(`You show Ella the Nuclear Fuel Cell...\n'WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter.\nGive me 5 Scrap Metal and the Fuel Cell and I can make a Heat Ray that will\nreally pack a punch! It only has one shot, so use it wisely...\n`);
+                console.log(`You show Ella the Nuclear Fuel Cell...\n'`);
+                console.log(wrap(`WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter. Give me 5 Scrap Metal and the Fuel Cell and I can make a Heat Ray that will really pack a punch! It only has one shot, so use it wisely...\n`,length));
                 console.log('You put the Nuclear Heat Ray in your bag.\n');
                 player.useItem('Nuclear Fuel Cell');
                 player.inventory.push('Nuclear Heat Ray');
@@ -1282,7 +875,8 @@ Tower.'\n\n`);
                 }
                 return play(room);
             } else {
-                console.log(`You show Ella the Nuclear Fuel Cell...\n'WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter.\nCome back when you have 5 Scrap Metal and I can make you a sweet weapon!\n`);
+                console.log(`You show Ella the Nuclear Fuel Cell...\n'`);
+                console.log(wrap(`WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter. Come back when you have 5 Scrap Metal and I can make you a sweet weapon!\n`,length));
             }
         }
         let input = await ask('What would you like to do?\n');
@@ -1417,7 +1011,7 @@ Tower.'\n\n`);
         } else if (input === 'throw_null') {  //when you don't know what to throw
             console.log(`I don't know what you want me to throw ...\n`);
             return play(room);
-        } else if (input === 'open_null') { //when you don't now what to open
+        } else if (input === 'open_null') { //when you don't know what to open
             console.log(`I'm not sure what you are trying to open...\n`);
             return play(room);
         } else if (intObjectOpen.includes(input)) { //interacts with interactable objects
@@ -1501,87 +1095,13 @@ Tower.'\n\n`);
                 return play(room);
             }
         } else if (input === 'read_map' && room === RUW_WelcomeDesk) {
-            console.log(`\n         Robotics United West Tower
-        +----------+----------+----------+
-        |          |          |          |
-        |         ===        ===         |
-        |    1    ===   2    ===    3    |
-        |          |          |          |
-        +----------+--⋮   ⋮---+--⋮   ⋮---+----------+
-        |          |          |          |          |
-        |         ===         |         === 
-        |    4    ===   5     |     6   ===   Ent.
-        |          |          |          |          |
-        +----------+---⋮   ⋮--+---⋮   ⋮--+----------+
-        |          |          |          |
-        |         ===        ===         |
-        |    7    ===   8    ===    9    |
-        |          |          |          |
-        +----------+----------+----------+ 
-       1: Exp. Arms Lab, 2: Hallway N 3: Breakroom
-       4: Server Room, 5: Fab. Unit, 6: You are Here!
-       7: Office, 8: Hallway S, 9: Cubicle Blk. 1\n`);
+            console.log(mapWest);
             return play(room);
         } else if (input === 'read_map' && room === RUE_WelcomeDesk) {
-            console.log(`\n                    Robotics United East Tower
-                +----------+----------+----------+
-                |          |          |          |
-                |         ===        ===         |
-                |    1    ===   2    ===    3    |
-                |          |          |          |
-     +----------+--⋮   ⋮---+---⋮   ⋮--+----------+
-     |          |          |          |          |
-               ===         |         ===         |
-         Ent.  ===   4     |     5   ===    6    |
-     |          |          |          |          |
-     +----------+---⋮   ⋮--+--⋮   ⋮---+----------+
-                |          |          |          |
-                |         ===        ===         |
-                |    7    ===   8    ===    9    |
-                |          |          |          |
-                +----------+----------+----------+ 
-     1: Cubicle Blk. 2, 2: Hallway N, 3: Q.A.
-     4: You are Here!, 5: Fab. Unit, 6: Server Room
-     7: Charging Station, 8: Hallway S, 4: Adv. Wpns.\n`);
+            console.log(mapEast);
             return play(room);
         } else if (input === 'read_map' && room === RUN_WelcomeDesk) {
-            console.log(`\n         Robotics United North Tower
-                +----------+
-                |          |
-                |          |
-                |    1     |
-                |          |
-                +---⋮   ⋮--+
-                |          |
-                |          |
-                |    2     |
-                |          |
-     +----------+---⋮   ⋮---+---------+
-     |          |          |          |
-     |         ===        ===         |
-     |    3    ===   4    ===    5    |
-     |          |          |          |
-     +----------+---⋮   ⋮--+---⋮   ⋮--+
-     |          |          |          |
-     |         ===        ===         |
-     |    6    ===   7    ===    8    |
-     |          |          |          |
-     +----------+---⋮   ⋮--+---⋮   ⋮--+
-     |          |          |          |
-     |         ===        ===         |
-     |    9    ===   10   ===    11   |
-     |          |          |          |
-     +----------+---⋮   ⋮---+---------+ 
-                |          |
-                |          |
-                |   Ent.   |
-                |          |
-                +---⋮   ⋮--+
-     1: President' Office, 2: Server Room
-     3: Treasury, 4: Hallway N, 5: Admin
-     6: Hallway W, 7: AI Lab, 8: Hallway E
-     9: Cubicle Blk 4, 10: You are here!
-     11: Cubicle Blk 3\n`);
+            console.log(mapNorth);
             return play(room);
         } else if (input === 'read_map') {
             console.log('There is not a directory in this room to read...\n');
@@ -1644,6 +1164,7 @@ Tower.'\n\n`);
     'go' followed by a direction (N, S, E, W) will attempt to go in that direction
     'inspect' will tell you what's in the room
     'get' or 'pick up' followed by an item will put an item in your bag
+    'all' after get or pick up will pick up every available item
     'read' followed by an object will try to read that object
     'use' followed by an item will try to use that item
     'check' or 'open' to interact with objects in room
@@ -1747,7 +1268,7 @@ The decision was just too much for you to make ...`)
             playAgain();
         }
     }
-    
+
     prologue();
 }
 
@@ -1771,27 +1292,6 @@ async function playAgain() {  //Allows user to play again
     } else {
         process.exit();
     }
-}
-
-//text wrapping function
-function wrap(string, w) {
-    if (string.length <= w) {
-        return string;
-    }
-
-    let count = 1;
-    let tempString='';
-    let sliceNum=0;
-
-    while (string.length > (count * w)) {
-        tempString = string.slice(sliceNum, (count*w)-1);
-        sliceNum = tempString.lastIndexOf(' ')+sliceNum;
-        string = string.slice(0, sliceNum) + `\n` + string.slice(sliceNum+1)
-        sliceNum+=1;
-        count += 1;
-    }
-
-    return string;
 }
 
 start();
