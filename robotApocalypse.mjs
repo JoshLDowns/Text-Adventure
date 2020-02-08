@@ -225,7 +225,7 @@ async function start() {
     let RUW_ExpLabs = new Room('Experimental Arms Lab', wrap('It looks like the machines have already cleaned out most of the lab. There might still be something of use here though...\n', width), ['Particle Battery', 'Scrap Metal'], undefined, false, false, 'RUW_Hallway1N', false, false);
     let RUW_Cubicle1 = new Room('Cubicle Block 1', wrap('The room looks like it was a cubicle block at one point, but most of the cubicle walls have been destroyed. There is a mostly in tact desk in the corner.\n', width), ['Repair Kit'], undefined, 'RUW_WelcomeDesk', false, false, 'RUW_Hallway1S', false, 'Desk', []);
     let RUW_Hallway1S = new Room('Hallway 1S - W', wrap('The machines must have barracaded the Emergency Exit on the south wall before their attack. The pile of bones in the room is proof enough of that.\n', width), [], undefined, 'RUW_FabUnit', false, 'RUW_Cubicle1', 'RUW_Office', false);
-    let RUW_Office = new Room('R.U.West Office', wrap('The office seems to have mostly survived the attack some how. There is a filing cabinet that seems to be unscaythed in the corner. You also notice a strange box underneath a smashed desk\n', width), ['Riddle Box1'], undefined, false, false, 'RUW_Hallway1S', false, false, 'Filing Cabinet', ['Portable Shield']);
+    let RUW_Office = new Room('R.U.West Office', wrap('The office seems to have mostly survived the attack some how. There is a filing cabinet that seems to be unscaythed in the corner. You also notice a strange box underneath a smashed desk\n', width), ['West Riddle Box'], undefined, false, false, 'RUW_Hallway1S', false, false, 'Filing Cabinet', ['Portable Shield']);
     let RUW_FabUnit = new Room('Fabrication Unit West', wrap('At one point, specialized parts for various types of medical robots were built here. At this point, the room only builds fear in what was created here...\n', width), ['Thick Carbon Coating', 'Scrap Metal', 'Scrap Metal'], undefined, 'RUW_Hallway1N', 'RUW_Hallway1S', false, 'RUW_ServerW', false);
     let RUW_ServerW = new Room('Server Room West', wrap(`Immidiately upon entering the Server Room, you are greeted by a nimble but heavily armed Combat Class Robot. 'INTRUDER DETECTED!!! It fires a shot that narrowly misses, you spring into action...\n`, width), [], enemyW, false, false, 'RUW_FabUnit', false, 'Office Keycard West');
     //R.U. East
@@ -233,7 +233,7 @@ async function start() {
     let RUE_WelcomeDesk = new Room('Welcome Desk', wrap('The vaulted ceilings of the once grand welcome lounge has mostly collapsed, leaving a mess of rubble covering most of the room... The Cirrculation Desk stoically stands in the middle of the room, almost as if it is proud to have survived the attack... At least the directory with a nice map of the tower is still mostly legible...\n', width), ['Scrap Metal', 'Scrap Metal'], undefined, 'RUE_Cubicle2', 'RUE_Charging', false, 'RUE_Entrance', false, 'Desk', ['Repair Kit']);
     let RUE_Cubicle2 = new Room('Cubicle Block 2', wrap('There must not have been many people in this cubicle block during the attack, as it is still in pretty good shape. There is sure to be something of use here...\n', width), ['Repair Kit'], undefined, false, 'RUE_WelcomeDesk', 'RUE_Hallway1N', false, false, 'Desk', ['Plasma Grenade']);
     let RUE_Hallway1N = new Room('Hallway 1N - E', wrap('Upon entering the hallway, you see an Employee of the Month picture that somehow survived the attack undamaged hanging on the wall... The man looked so happy...\n', width), ['Scrap Metal'], undefined, false, 'RUE_FabUnit', 'RUE_QA', 'RUE_Cubicle2', false);
-    let RUE_QA = new Room('Quality Assurance', wrap('The QA room is large but mostly empty. Anything of use must have already been salvaged by the machines... You notice a strange box on one of the tables...\n', width), ['Riddle Box2'], undefined, false, false, false, 'RUE_Hallway1N', false);
+    let RUE_QA = new Room('Quality Assurance', wrap('The QA room is large but mostly empty. Anything of use must have already been salvaged by the machines... You notice a strange box on one of the tables...\n', width), ['East Riddle Box'], undefined, false, false, false, 'RUE_Hallway1N', false);
     let RUE_Charging = new Room('Charging Station', wrap('This room was used to give new Robots their first initial charge after after being fabricated. As this was a fully automated unit, the room is mostly untouched, and looks just like it did in the past...\n', width), ['Repair Kit'], undefined, 'RUE_WelcomeDesk', false, 'RUE_Hallway1S', false, false);
     let RUE_Hallway1S = new Room('Hallway 1S - E', wrap('It looks like the humans fought hard in this hallway. Bullet holes cover the walls, and there are two downed robots amongst the bones on the floor. There is a supply closet on the south wall, but it appears to be locked...\n', width), ['Scrap Metal', 'Scrap Metal'], undefined, 'RUE_FabUnit', 'RUE_SupplyCloset', 'RUE_AdvWeapons', 'RUE_Charging', false);
     let RUE_SupplyCloset = new Room('Supply Closet', wrap('It appears the invaders missed this closet during their sweep, as there are a few potentially useful items amongst the various cleaning and maintenance supplies...\n', width), ['Plasma Grenade', 'Nuclear Fuel Cell', 'Repair Kit'], undefined, 'RUE_Hallway1S', false, false, false, 'Office Keycard East');
@@ -303,8 +303,8 @@ async function start() {
         'Portable Shield': 'Generates a temporary shield',
         'Nuclear Heat Ray': 'A very powerful weapon, it only has one shot...',
         'Smoke Bomb': 'Covers area in smoke, making you harder to hit',
-        'Riddle Box1': 'There is something inscribed on the box...',
-        'Riddle Box2': 'There is something inscribed on the box...',
+        'West Riddle Box': 'There is something inscribed on the box...',
+        'East Riddle Box': 'There is something inscribed on the box...',
         'Office Keycard West': 'Opens doors in R.U. West Tower',
         'Office Keycard East': 'Opens doors in R.U. East Tower',
         'Office Keycard North': 'Opens doors in R.U. North Tower',
@@ -327,7 +327,7 @@ async function start() {
     }
 
     //possible item array
-    let possibleItems = ['pu_scrapmetal', 'pu_particlebattery', 'pu_carboncoating', 'pu_repairkit', 'pu_rboxw', 'pu_rboxe', 'pu_grenade', 'pu_shield', 'pu_bomb', 'pu_fuelcell', 'pu_heatray', 'pu_all'];
+    let possibleItems = ['pu_scrapmetal', 'pu_particlebattery', 'pu_carboncoating', 'pu_repairkit', 'pu_rbox', 'pu_grenade', 'pu_shield', 'pu_bomb', 'pu_fuelcell', 'pu_heatray', 'pu_all'];
 
     // pick up item lookup object
     let itemLookUp = {
@@ -340,12 +340,11 @@ async function start() {
         pu_fuelcell: 'Nuclear Fuel Cell',
         pu_heatray: 'Nuclear Heat Ray',
         pu_bomb: 'Smoke Bomb',
-        pu_rboxw: 'Riddle Box1',
-        pu_rboxe: 'Riddle Box2'
+        pu_rbox: ['West Riddle Box', 'East Riddle Box']
     }
 
     //dropable item arary
-    let dropableItems = ['drop_scrapmetal', 'drop_particlebattery', 'drop_carboncoating', 'drop_repairkit', 'drop_rboxw', 'drop_rboxe', 'drop_grenade', 'drop_shield', 'drop_bomb', 'drop_fuelcell', 'drop_heatray']
+    let dropableItems = ['drop_scrapmetal', 'drop_particlebattery', 'drop_carboncoating', 'drop_repairkit', 'drop_rbox', 'drop_grenade', 'drop_shield', 'drop_bomb', 'drop_fuelcell', 'drop_heatray']
 
     //drop item lookup object
     let dropItemLookUp = {
@@ -358,12 +357,11 @@ async function start() {
         drop_fuelcell: 'Nuclear Fuel Cell',
         drop_heatray: 'Nuclear Heat Ray',
         drop_bomb: 'Smoke Bomb',
-        drop_rboxw: 'Riddle Box1',
-        drop_rboxe: 'Riddle Box2'
+        drop_rbox: ['West Riddle Box', 'East Riddle Box']
     }
 
     //useable item array
-    let useableItems = ['use_particlebattery', 'use_carboncoating', 'use_rboxw', 'use_rboxe', 'use_repairkit', 'use_grenade', 'use_shield', 'use_bomb', 'use_heatray'];
+    let useableItems = ['use_particlebattery', 'use_carboncoating', 'use_rbox', 'use_repairkit', 'use_grenade', 'use_shield', 'use_bomb', 'use_heatray'];
 
     //useable item lookup object
     let useableItemLookUp = {
@@ -374,8 +372,7 @@ async function start() {
         use_shield: 'Portable Shield',
         use_bomb: 'Smoke Bomb',
         use_heatray: 'Nuclear Heat Ray',
-        use_rboxw: 'Riddle Box1',
-        use_rboxe: 'Riddle Box2'
+        use_rbox: ['West Riddle Box', 'East Riddle Box']
     }
 
     //when called with an item (and enemy or answer if necessary) it determines what action to take
@@ -421,17 +418,17 @@ async function start() {
             } else {
                 return console.log(`You throw a Smoke Bomb! Gee golly that was exciting!\n`);
             }
-        } else if (item === 'use_rboxw') {
+        } else if (item === 'use_rbox' && player.inventory.includes('West Riddle Box')) {
             if (answer === 'WET') {
-                player.useItem(useableItemLookUp[item]);
+                player.useItem(useableItemLookUp[item[0]]);
                 player.inventory.push('Office Keycard West');
                 return console.log('You solved the riddle!  There was a Keycard to the West tower inside!\n');
             } else {
                 return console.log(`That's a tough riddle, gonna have to think about that one...\n`);
             }
-        } else if (item === 'use_rboxe') {
+        } else if (item === 'use_rbox' && player.inventory.includes('East Riddle Box')) {
             if (answer === 'SILENCE') {
-                player.useItem(useableItemLookUp[item]);
+                player.useItem(useableItemLookUp[item[1]]);
                 player.inventory.push('Office Keycard East');
                 return console.log('You solved the riddle!  There was a Keycard to the East tower inside!\n');
             } else {
@@ -445,6 +442,8 @@ async function start() {
             } else {
                 return console.log(wrap(`You fired the Nuclear Heat Ray! That hole in the wall would have been more impressive if it was through a robot instead...\n`, width));
             }
+        } else {
+            return console.log(wrap(`You can't use that item!!!`, width));
         }
     }
 
@@ -960,6 +959,13 @@ async function start() {
         } else if (possibleItems.includes(input)) {  //picks up items in room
             input = input.toString();
             let currentItem = itemLookUp[input];
+            if (input === 'pu_rbox') {
+                if (room.inventory.includes('West Riddle Box')) {
+                    currentItem = 'West Riddle Box';
+                } else if (room.inventory.includes('East Riddle Box')) {
+                    currentItem = 'East Riddle Box';
+                }
+            }
             let currentInventory = room.inventory;
             if (currentInventory.length !== 0 && input === 'pu_all') {  //picks up all items in room
                 console.log(`You put the following items in your bag:\n${currentInventory.join(`\n`)}\n-----------------------------------------------------------------\n`);
@@ -976,7 +982,9 @@ async function start() {
                 console.log(`You put ${currentItem} in your bag...\n`);
                 return play(room);
             } else if (currentInventory.length !== 0 && !currentInventory.includes(currentItem)) {
-                console.log(`There is no ${currentItem} in this room!\n`);
+                if (input === 'pu_rbox') {
+                    console.log('There are no Riddle Boxes in this room!\n')
+                } else console.log(`There is no ${currentItem} in this room!\n`);
                 return play(room);
             } else {
                 console.log('There are no items in this room...\n');
@@ -987,13 +995,20 @@ async function start() {
             return play(room);
         } else if (dropableItems.includes(input)) {  //drops item of choice if you have it
             let currentItem = dropItemLookUp[input];
+            if (input === 'drop_box') {
+                if (player.inventory.includes('East Riddle Box')) {
+                    currentItem = 'East Riddle Box';
+                } else if (player.inventory.includes('West Riddle Box')) {
+                    currentItem = 'West Riddle Box';
+                }
+            }
             if (player.inventory.length === 0) {
                 console.log(`You don't have any items to drop!\n`);
                 return play(room);
             } else if (!player.inventory.includes(currentItem)) {
                 console.log(`You don't have a ${currentItem} to drop...\n`);
                 return play(room);
-            } else {
+            } else { 
                 player.useItem(currentItem);
                 room.inventory.push(currentItem);
                 console.log(`You dropped ${currentItem}...\n`);
@@ -1035,28 +1050,22 @@ async function start() {
         } else if (input === 'no_use') { //catches items you can't use
             console.log(`You cannot use that item right now...\n`);
             return play(room);
-        } else if (input === 'use_rboxw') { //checks for riddle box1 and uses it
-            if (player.inventory.includes('Riddle Box1')) {
-                let answer = await ask(`What is the answer to the riddle inscribed on this box?\n...you can 'read' or 'check' the box to see what it says!...\n`);
+        } else if (input === 'use_rbox') { //checks for riddle box1 and uses it
+            if (player.inventory.includes('West Riddle Box') || player.inventory.includes('East Riddle Box')) {
+                if (player.inventory.includes('West Riddle Box')) {
+                    console.log(wrap('There is a riddle on the box, it reads: If you throw a blue stone into the red sea, what does it become?\n\n', width));
+                } else if (player.inventory.includes('East Riddle Box')) {
+                    console.log(wrap('There is a riddle on the box, it reads: What is so delicate that even just saying its name can break it?\n\n', width));
+                }
+                let answer = await ask(`What is the answer to the riddle inscribed on this box?\n`);
                 answer = answer.toString().toUpperCase()
-                itemEffect('use_rboxw', undefined, answer);
+                itemEffect('use_rbox', undefined, answer);
                 return play(room);
             } else {
                 console.log(`I'm not sure what you are trying to use...\n`);
                 return play(room);
             }
-        } else if (input === 'use_rboxe') { //checks for riddle box2 and uses it
-            if (player.inventory.includes('Riddle Box2')) {
-                let answer = await ask(`What is the answer to the riddle inscribed on this box?\n...you can 'read' or 'check' the box to see what it says!...\n`);
-                answer = answer.toString().toUpperCase()
-                itemEffect('use_rboxe', undefined, answer);
-                return play(room);
-            } else {
-                console.log(`I'm not sure what you are trying to use...\n`);
-                return play(room);
-            }
-        }
-        else if (useableItems.includes(input)) {  //uses items in inventory
+        } else if (useableItems.includes(input)) {  //uses items in inventory
             input = input.toString();
             let itemToUse = useableItemLookUp[input];
             let userInventory = player.inventory;
@@ -1079,22 +1088,6 @@ async function start() {
         } else if (input === 'read_sign' && room !== RUW_Entrance && room !== RUE_Entrance && room !== RUN_Entrance) {
             console.log(`\nThere is no sign to read...\n`);
             return play(room);
-        } else if (input === 'read_rboxw') {
-            if (player.inventory.includes('Riddle Box1')) {
-                console.log('\nThere is a riddle on the box, it reads:\nIf you throw a blue stone into the red sea, what does it become?\n...maybe try opening it?...\n');
-                return play(room);
-            } else {
-                console.log(`I don't know what you want me to read...`);
-                return play(room);
-            }
-        } else if (input === 'read_rboxe') {
-            if (player.inventory.includes('Riddle Box2')) {
-                console.log('\nThere is a riddle on the box, it reads:\nWhat is so delicate that even just saying its name can break it?\n...maybe try opening it?...\n');
-                return play(room);
-            } else {
-                console.log(`I don't know what you want me to read...`);
-                return play(room);
-            }
         } else if (input === 'read_map' && room === RUW_WelcomeDesk) {
             console.log(mapWest);
             return play(room);

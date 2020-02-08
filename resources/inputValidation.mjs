@@ -13,7 +13,7 @@ class ValidInput {
         this.pickUpItem = ['PICK UP', 'PICK', 'GRAB', 'GET', 'TAKE', 'AQUIRE'];
         this.useItem = ['USE'];
         this.combat = ['ATTACK', 'FIGHT', 'THROW', 'SHOOT', 'FIRE'];
-        this.items = ['KIT', 'METAL', 'BATTERY', 'COATING', 'BOX1', 'BOX2', 'PLASMA GRENADE', 'PORTABLE SHIELD', 'SMOKE BOMB', 'CELL', 'NUCLEAR', 'RAY', 'ALL'];
+        this.items = ['KIT', 'METAL', 'BATTERY', 'COATING', 'BOX', 'PLASMA GRENADE', 'PORTABLE SHIELD', 'SMOKE BOMB', 'CELL', 'NUCLEAR', 'RAY', 'ALL'];
         this.otherActions = ['DROP', 'THROW', 'FART', 'LAUGH', 'LOL', 'HUG', 'READ', 'OPEN', 'RUN', 'CHECK'];
         this.intObjects = ['SIGN', 'DESK', 'COMPUTER', 'CABINET', 'FRIDGE', 'REFRIDGERATOR', 'SAFE', 'MAP', 'DIRECTORY'];
         this.falloutBunkerEvent = ['REPAIR', 'FIX', 'KEYCARD', 'KEY'];
@@ -53,10 +53,8 @@ class ValidInput {
             this.return = 's';
         } else if (this.inspect.includes(obj.firstWord) || this.inspect.includes(obj.lastWord)) {
             if (this.inspect.includes(obj.firstWord)) {
-                if (obj.lastWord === 'BOX1') {
-                    this.return = 'read_rboxw';
-                } else if (obj.lastWord === 'BOX2') {
-                    this.return = 'read_rboxe';
+                if (obj.lastWord === 'BOX') {
+                    this.return = 'use_rbox';
                 } else if (obj.lastWord === 'SIGN') {
                     this.return = 'read_sign';
                 } else if (obj.lastWord === 'MAP' || obj.lastWord === 'DIRECTORY') {
@@ -98,19 +96,15 @@ class ValidInput {
                 this.return = 'open_fridge';
             } else if (obj.lastWord === 'SAFE') {
                 this.return = 'open_safe'
-            } else if (obj.lastWord === 'BOX1') {
-                this.return = 'use_rboxw';
-            } else if (obj.lastWord === 'BOX2') {
-                this.return = 'use_rboxe';
+            } else if (obj.lastWord === 'BOX') {
+                this.return = 'use_rbox';
             } else {
                 this.return = 'open_null';
             }
         }
         else if (obj.firstWord === 'READ' || obj.lastWord === 'READ') {
-            if (obj.lastWord === 'BOX1') {
-                this.return = 'read_rboxw';
-            } else if (obj.lastWord === 'BOX2') {
-                this.return = 'read_rboxe';
+            if (obj.lastWord === 'BOX') {
+                this.return = 'use_rbox';
             } else if (obj.lastWord === 'SIGN') {
                 this.return = 'read_sign';
             } else if (obj.lastWord === 'MAP' || obj.lastWord === 'DIRECTORY') {
@@ -143,10 +137,8 @@ class ValidInput {
                 this.return = 'drop_carboncoating';
             } else if (obj.lastWord === 'KIT') {
                 this.return = 'drop_repairkit';
-            } else if (obj.lastWord === 'BOX1') {
-                this.return = 'drop_rboxw';
-            } else if (obj.lastWord === 'BOX2') {
-                this.return = 'drop_rboxe';
+            } else if (obj.lastWord === 'BOX') {
+                this.return = 'drop_rbox';
             } else if (obj.lastWord === 'GRENADE') {
                 this.return = 'drop_grenade';
             } else if (obj.lastWord === 'SHIELD') {
@@ -162,8 +154,7 @@ class ValidInput {
             } else {
                 this.return = 'drop_null';
             }
-        }
-        else if (this.direction.includes(obj.firstWord) || this.direction.includes(obj.lastWord)) {
+        } else if (this.direction.includes(obj.firstWord) || this.direction.includes(obj.lastWord)) {
             if (obj.firstWord === 'NORTH' || obj.lastWord === 'NORTH' || obj.firstWord === 'N' || obj.lastWord === 'N') {
                 this.return = 'dn';
             } else if (obj.firstWord === 'SOUTH' || obj.lastWord === 'SOUTH' || obj.firstWord === 'S' || obj.lastWord === 'S') {
@@ -184,10 +175,8 @@ class ValidInput {
                 this.return = 'use_carboncoating';
             } else if (obj.lastWord === 'KIT') {
                 this.return = 'use_repairkit';
-            } else if (obj.lastWord === 'BOX1') {
-                this.return = 'use_rboxw';
-            } else if (obj.lastWord === 'BOX2') {
-                this.return = 'use_rboxe';
+            } else if (obj.lastWord === 'BOX') {
+                this.return = 'use_rbox';
             } else if (obj.lastWord === 'GRENADE') {
                 this.return = 'use_grenade';
             } else if (obj.lastWord === 'SHIELD') {
@@ -214,10 +203,8 @@ class ValidInput {
                 this.return = 'open_safe';
             } else if (obj.lastWord === 'MAP' || obj.lastWord === 'DIRECTORY') {
                 this.return = 'read_map';
-            } else if (obj.lastWord === 'BOX1') {
-                this.return = 'read_rboxw';
-            } else if (obj.lastWord === 'BOX2') {
-                this.return = 'read_rboxe';
+            } else if (obj.lastWord === 'BOX') {
+                this.return = 'use_rbox';
             } else if (obj.lastWord === 'SIGN') {
                 this.return = 'read_sign';
             } else {
@@ -250,10 +237,8 @@ class ValidInput {
                 this.return = 'pu_carboncoating';
             } else if (obj.firstWord === 'KIT' || obj.lastWord === 'KIT') {
                 this.return = 'pu_repairkit';
-            } else if (obj.firstWord === 'BOX1' || obj.lastWord === 'BOX1') {
-                this.return = 'pu_rboxw';
-            } else if (obj.firstword === 'BOX2' || obj.lastWord === 'BOX2') {
-                this.return = 'pu_rboxe';
+            } else if (obj.firstWord === 'BOX' || obj.lastWord === 'BOX') {
+                this.return = 'pu_rbox';
             } else if (obj.firstWord === 'GRENADE' || obj.lastWord === 'GRENADE') {
                 this.return = 'pu_grenade';
             } else if (obj.firstWord === 'SHIELD' || obj.lastWord === 'SHIELD') {
