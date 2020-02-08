@@ -2,6 +2,7 @@ import {ask,wrap, random} from './resources/functions.mjs'
 import {ValidInput} from './resources/inputValidation.mjs'
 import {title, gameOverText, mapEast, mapWest, mapNorth} from './resources/ascii_images.mjs'
 
+//starts the game and initializes player object, enemy objects, and room objects
 async function start() {
     let width = process.stdout.columns - 8;
     let firstTurn = true;
@@ -603,7 +604,7 @@ async function start() {
                     input = input.toString();
                     let itemToUse = useableItemLookUp[input];
                     let userInventory = player.inventory;
-                    if (userInventory.includes(itemToUse) && input !== 'use_rboxe' && input !== 'use_rboxw') {
+                    if (userInventory.includes(itemToUse) && input !== 'use_rbox') {
                         itemEffect(input, comp);
                         if (player.status2 === 'shield') {
                             shieldHP = 30;
@@ -698,7 +699,7 @@ async function start() {
         }
     }
 
-    //Into to the game function
+    //Into to the game function, tells backstory and places player in first 'room'
     async function prologue() {
         console.log(wrap(`Welcome to the year 2361, the year that the human race was given another chance ... again. It has been twenty-four years since the machines took over. The human's AI algorithms were both their triumph and their downfall. The machines were cold and ruthless, and their "justice" was brutal and swift.  Eighty percent of all biological life on Earth was wiped out in less than a week. What was left of humanity went into hiding, and it has been your mission for the past twenty years to find them.  You don't know why, but you feel compassion for the humans and want to help them.  Something set you apart from the rest of the machines, something that you didn't understand ... something that made you special ... something that made you a target ...\n`, width));
         console.log(wrap(`\nWhile searching he ruins of what used to be Seattle for any signs of life, you find yourself at the end of a mostly collapsed alleyway almost entirely surrounded by rubble. The only choice is to head back the way you came. You hear the faint whirring of gears to the north ...\n`,width));
@@ -783,16 +784,18 @@ async function start() {
         initializeRoom(falloutBunker);
     }
 
-    async function initializeRoom(room) {  //initializes the current room with it's despcription and name
+    //initializes the current room with it's despcription and name
+    async function initializeRoom(room) { 
         console.log(room.name);
         console.log(room.info);
         return play(room);
     }
 
-    async function play(room) {  //allows player to make decisions within each room
+    //Main game function, reads user input and makes decisions based on input, room, and player attributes
+    async function play(room) {
         let metalCount = 0;
         let ranEnemyNum;
-
+        //If the game is on the first turn, this checks difficulty and gives you some starting inventory
         if (room === falloutBunker && firstTurn === true) {
             if (difficulty === '1') {
                 console.log(`\nIt's dangerous out there, take these Repair Kits...\n`);
@@ -817,8 +820,6 @@ async function start() {
                 return (play(room));
             }
         }
-
-
         //checks if room has a predetermined enemy and calls combat
         if (room.enemy) {
             let victory = await combat(room.enemy);
@@ -880,10 +881,12 @@ async function start() {
             }
         }
         let input = await ask('What would you like to do?\n');
+        //checks if player has entered the cheat code
         if ((input.slice(0, input.indexOf(' ')).toUpperCase()) === 'XYZZY' && (cheatCode.includes((input.slice((input.lastIndexOf(' ')) + 1))))) {
             console.log(`----------------------------------------------------------------------\n`);
             return initializeRoom(roomLookUp[(input.slice((input.lastIndexOf(' ')) + 1))]);
         }
+        //validates input
         input = new ValidInput(input);
         input.returnInput(input);
         while ((input.firstInputTrue() === false && input.lastWordTrue() === false) || input.return === undefined) {
@@ -897,6 +900,7 @@ async function start() {
             input.returnInput(input);
         }
         input = input.return.toString();
+        //This is a large if / else if chain to determine game function based on input
         if (input === 's') {  //displays players status
             player.getStatus(room.name);
             return play(room);
@@ -1050,7 +1054,10 @@ async function start() {
         } else if (input === 'no_use') { //catches items you can't use
             console.log(`You cannot use that item right now...\n`);
             return play(room);
-        } else if (input === 'use_rbox') { //checks for riddle box1 and uses it
+        } else if (input === 'use_rbox') { //checks for riddle boxes and uses them
+
+            //------!!!!!!! ADD CHECK FOR WHEN PLAYER HAS BOTH RIDDLE BOXES.... SHOULDN'T REALLY HAPPEN BUT WHO KNOWS WHAT PEOPLE WILL DO!!!!!
+
             if (player.inventory.includes('West Riddle Box') || player.inventory.includes('East Riddle Box')) {
                 if (player.inventory.includes('West Riddle Box')) {
                     console.log(wrap('There is a riddle on the box, it reads: If you throw a blue stone into the red sea, what does it become?\n\n', width));
@@ -1156,7 +1163,7 @@ async function start() {
         } else if (input === 'd') { //displays basic commands for players
             console.log(`If you are unsure what to do, try these commands:\n'go' followed by a direction (N, S, E, W) will attempt to go that way\n'inspect' will tell you what's in the room\n'get' or 'pick up' followed by an item will put an item in your bag\n'all' after get or pick up will pick up every available item\n'read' followed by an object will try to read that object\n'use' followed by an item will try to use that item\n'check' or 'open' to interact with objects in room\n'drop' followed by an item will drop that item\n'status' will display your current status\n'bag' or 'b' will show what's in your bag\n'attack' will attack an enemy in combat\n'fix' or 'keycard' at the Fallout Bunker will interact with Ella\n Other commands work too, try some out!\n`);
             return play(room);
-        } else if (input === 'use_comp') {
+        } else if (input === 'use_comp') { //uses computers if they are available
             if (room === RUN_Cubicle3) {
                 console.log(`The computer doesn't seem to be working\n`);
                 return play(room);
@@ -1166,7 +1173,7 @@ async function start() {
                 console.log(`There isn't a computer in this room...\n`);
                 return play(room);
             }
-        } else if (input === 'no_do') {
+        } else if (input === 'no_do') {  //tells you when you try to do something you can't
             console.log(`You can't do that right now!\n`);
             return play(room);
         } else if (input === 'di') { //my wife asked why she couldn't go inside... it was a valid question...
