@@ -8,6 +8,7 @@ async function start() {
 
     //displays title
     console.log(title);
+    console.log(wrap('Please set your console to a width of at least 75 for the best experience!\n', width));
 
     //diffuculty selection before game starts
     let difficulty = await ask('Please select difficulty... (1) Easy (2) Medium (3) Hard\n');
@@ -217,41 +218,41 @@ async function start() {
     let falloutBunker = new Room('Fallout Bunker', `Ella, as always, is happy to see you...\n'How's everything going?\nIf you bring me some Scrap Metal I can fix you up a bit.\nI can also make a key to the North Tower,\nI just need the keys from the other towers first.'\n\n'If you ever get stuck you can type 'Help' for a list of commands!'\n`, [], undefined, 'RUN_Entrance', false, 'RUE_Entrance', 'RUW_Entrance', false);
     //Robotics United Towers
     //R.U. West
-    let RUW_Entrance = new Room('R.U.West Entrance', 'You stand at the Entrance of the Robotics United Tower West.\nEverything around the tower is destroyed, yet the tower itself is mostly intact.\nThere is a sign on the door...\n', [], undefined, false, false, 'falloutBunker', 'RUW_WelcomeDesk', false, 'Sign');
-    let RUW_WelcomeDesk = new Room('Welcome Desk', 'Outside of the Circulation Desk looking to be mostly intact,\nthe room has been mostly destroyed and left in a state of disarray.\nApparently being welcoming is not something we machines are good at...\nAt least the directory with a nice map of the tower is still mostly legible...\n', ['Scrap Metal', 'Scrap Metal'], undefined, 'RUW_BreakRoom', 'RUW_Cubicle1', 'RUW_Entrance', false, false, 'Desk', ['Plasma Grenade']);
-    let RUW_BreakRoom = new Room('Break Room', 'As you enter the break room, you are met with a strong musty smell.\nJudging by the thick smell of mold and decay ...\nit must have been lunch time when the machines attacked ...\n', ['Repair Kit'], undefined, false, 'RUW_WelcomeDesk', false, 'RUW_Hallway1N', false, 'Refridgerator', []);
-    let RUW_Hallway1N = new Room('Hallway 1N - W', 'This side of the building seems to have gotten the worst of the fight.\nThe north wall is mostly destroyed, and the floor is littered with debris.\n', ['Scrap Metal'], undefined, false, 'RUW_FabUnit', 'RUW_BreakRoom', 'RUW_ExpLabs', false);
-    let RUW_ExpLabs = new Room('Experimental Arms Lab', 'It looks like the machines have already cleaned out most\nof the lab. There might still be something of use here though...\n', ['Particle Battery', 'Scrap Metal'], undefined, false, false, 'RUW_Hallway1N', false, false);
-    let RUW_Cubicle1 = new Room('Cubicle Block 1', 'The room looks like it was a cubicle block at one point, but most\nof the cubicle walls have been destroyed. There is a mostly in tact\ndesk in the corner.\n', ['Repair Kit'], undefined, 'RUW_WelcomeDesk', false, false, 'RUW_Hallway1S', false, 'Desk', []);
-    let RUW_Hallway1S = new Room('Hallway 1S - W', 'The machines must have barracaded the Emergency Exit on the south\nwall before their attack. The pile of bones in the room is proof enough of that.\n', [], undefined, 'RUW_FabUnit', false, 'RUW_Cubicle1', 'RUW_Office', false);
-    let RUW_Office = new Room('R.U.West Office', 'The office seems to have mostly survived the attack some how. There\nis a filing cabinet that seems to be unscaythed in the corner.\nYou also notice a strange box underneath a smashed desk\n', ['Riddle Box1'], undefined, false, false, 'RUW_Hallway1S', false, false, 'Filing Cabinet', ['Portable Shield']);
-    let RUW_FabUnit = new Room('Fabrication Unit West', 'At one point, specialized parts for various types of medical\nrobots were built here. At this point, the room only builds fear in\nwhat was created here...\n', ['Thick Carbon Coating', 'Scrap Metal', 'Scrap Metal'], undefined, 'RUW_Hallway1N', 'RUW_Hallway1S', false, 'RUW_ServerW', false);
-    let RUW_ServerW = new Room('Server Room West', `Immidiately upon entering the Server Room, you are greeted by a\nnimble but heavily armed Combat Class Robot. 'INTRUDER DETECTED!!!\nIt fires a shot that narrowly misses, you spring into action...\n`, [], enemyW, false, false, 'RUW_FabUnit', false, 'Office Keycard West');
+    let RUW_Entrance = new Room('R.U.West Entrance', wrap('You stand at the Entrance of the Robotics United Tower West. Everything around the tower is destroyed, yet the tower itself is mostly intact. There is a sign on the door...\n', width), [], undefined, false, false, 'falloutBunker', 'RUW_WelcomeDesk', false, 'Sign');
+    let RUW_WelcomeDesk = new Room('Welcome Desk', wrap('Outside of the Circulation Desk looking to be mostly intact, the room has been mostly destroyed and left in a state of disarray. Apparently being welcoming is not something we machines are good at... At least the directory with a nice map of the tower is still mostly legible...\n', width), ['Scrap Metal', 'Scrap Metal'], undefined, 'RUW_BreakRoom', 'RUW_Cubicle1', 'RUW_Entrance', false, false, 'Desk', ['Plasma Grenade']);
+    let RUW_BreakRoom = new Room('Break Room', wrap('As you enter the break room, you are met with a strong musty smell. Judging by the thick smell of mold and decay ... it must have been lunch time when the machines attacked ...\n', width), ['Repair Kit'], undefined, false, 'RUW_WelcomeDesk', false, 'RUW_Hallway1N', false, 'Refridgerator', []);
+    let RUW_Hallway1N = new Room('Hallway 1N - W', wrap('This side of the building seems to have gotten the worst of the fight. The north wall is mostly destroyed, and the floor is littered with debris.\n', width), ['Scrap Metal'], undefined, false, 'RUW_FabUnit', 'RUW_BreakRoom', 'RUW_ExpLabs', false);
+    let RUW_ExpLabs = new Room('Experimental Arms Lab', wrap('It looks like the machines have already cleaned out most of the lab. There might still be something of use here though...\n', width), ['Particle Battery', 'Scrap Metal'], undefined, false, false, 'RUW_Hallway1N', false, false);
+    let RUW_Cubicle1 = new Room('Cubicle Block 1', wrap('The room looks like it was a cubicle block at one point, but most of the cubicle walls have been destroyed. There is a mostly in tact desk in the corner.\n', width), ['Repair Kit'], undefined, 'RUW_WelcomeDesk', false, false, 'RUW_Hallway1S', false, 'Desk', []);
+    let RUW_Hallway1S = new Room('Hallway 1S - W', wrap('The machines must have barracaded the Emergency Exit on the south wall before their attack. The pile of bones in the room is proof enough of that.\n', width), [], undefined, 'RUW_FabUnit', false, 'RUW_Cubicle1', 'RUW_Office', false);
+    let RUW_Office = new Room('R.U.West Office', wrap('The office seems to have mostly survived the attack some how. There is a filing cabinet that seems to be unscaythed in the corner. You also notice a strange box underneath a smashed desk\n', width), ['Riddle Box1'], undefined, false, false, 'RUW_Hallway1S', false, false, 'Filing Cabinet', ['Portable Shield']);
+    let RUW_FabUnit = new Room('Fabrication Unit West', wrap('At one point, specialized parts for various types of medical robots were built here. At this point, the room only builds fear in what was created here...\n', width), ['Thick Carbon Coating', 'Scrap Metal', 'Scrap Metal'], undefined, 'RUW_Hallway1N', 'RUW_Hallway1S', false, 'RUW_ServerW', false);
+    let RUW_ServerW = new Room('Server Room West', wrap(`Immidiately upon entering the Server Room, you are greeted by a nimble but heavily armed Combat Class Robot. 'INTRUDER DETECTED!!! It fires a shot that narrowly misses, you spring into action...\n`, width), [], enemyW, false, false, 'RUW_FabUnit', false, 'Office Keycard West');
     //R.U. East
-    let RUE_Entrance = new Room('R.U.East Entrance', 'Standing at the Entrance of Robotics United Tower East, you can\nsee a giant hole blasted through the building about 10 stories up...\nSomething big hit this place, at least the sign on the door is ledgible...\n', [], undefined, false, false, 'RUE_WelcomeDesk', 'falloutBunker', false, 'Sign');
-    let RUE_WelcomeDesk = new Room('Welcome Desk', 'The vaulted ceilings of the once grand welcome lounge has mostly\ncollapsed, leaving a mess of rubble covering most of the room...\nThe Cirrculation Desk stoically stands in the middle of the room, almost as\nif it is proud to have survived the attack...\nAt least the directory with a nice map of the tower is still mostly legible...\n', ['Scrap Metal', 'Scrap Metal'], undefined, 'RUE_Cubicle2', 'RUE_Charging', false, 'RUE_Entrance', false, 'Desk', ['Repair Kit']);
-    let RUE_Cubicle2 = new Room('Cubicle Block 2', 'There must not have been many people in this cubicle block during the\nattack, as it is still in pretty good shape. There is sure to be something\nof use here...\n', ['Repair Kit'], undefined, false, 'RUE_WelcomeDesk', 'RUE_Hallway1N', false, false, 'Desk', ['Plasma Grenade']);
-    let RUE_Hallway1N = new Room('Hallway 1N - E', 'Upon entering the hallway, you see an Employee of the Month picture\nthat somehow survived the attack undamaged hanging on the wall...\nThe man looked so happy...\n', ['Scrap Metal'], undefined, false, 'RUE_FabUnit', 'RUE_QA', 'RUE_Cubicle2', false);
-    let RUE_QA = new Room('Quality Assurance', 'The QA room is large but mostly empty. Anything of use must have already\nbeen salvaged by the machines...\nYou notice a strange box on one of the tables...\n', ['Riddle Box2'], undefined, false, false, false, 'RUE_Hallway1N', false);
-    let RUE_Charging = new Room('Charging Station', 'This room was used to give new Robots their first initial charge after\nafter being fabricated. As this was a fully automated unit, the\nroom is mostly untouched, and looks just like it did in the past...\n', ['Repair Kit'], undefined, 'RUE_WelcomeDesk', false, 'RUE_Hallway1S', false, false);
-    let RUE_Hallway1S = new Room('Hallway 1S - E', 'It looks like the humans fought hard in this hallway. Bullet holes\ncover the walls, and there are two downed robots amongst the bones\non the floor. There is a supply closet on the south wall, but it\nappears to be locked...\n', ['Scrap Metal', 'Scrap Metal'], undefined, 'RUE_FabUnit', 'RUE_SupplyCloset', 'RUE_AdvWeapons', 'RUE_Charging', false);
-    let RUE_SupplyCloset = new Room('Supply Closet', 'It appears the invaders missed this closet during their sweep, as\nthere are a few potentially useful items amongst the various cleaning\nand maintenance supplies...\n', ['Plasma Grenade', 'Nuclear Fuel Cell', 'Repair Kit'], undefined, 'RUE_Hallway1S', false, false, false, 'Office Keycard East');
-    let RUE_AdvWeapons = new Room('Advanced Weapons Lab', 'This lab was used to research some pretty high tech weapons it\nseems. There are blueprints scattered across the room. One for a Nuclear\nHeat Ray catches your eye...sounds pretty sweet!\n', ['Particle Battery'], undefined, false, false, false, 'RUE_Hallway1S', false);
-    let RUE_FabUnit = new Room('Fabrication Unit East', 'This Fabrication Unit focused soley on military grade machines.\nYou can tell by the bullet casings that litter the floor, and the\nlarge amount of extremely disfigured skeletal remains strewn across the room...\n', ['Thick Carbon Coating', 'Scrap Metal', 'Scrap Metal'], undefined, 'RUE_Hallway1N', 'RUE_Hallway1S', 'RUE_ServerE', false, false);
-    let RUE_ServerE = new Room('Server Room East', `Before the door finishes opening, a large fist puts a sizeable dent in\nit, barely missing you. A big Combat Class Robot with large missile\nlaunchers mounted on it's shoulders points at you and yells 'TRAITOR! You\nmust be terminated! ... Looks like you have to fight ...\n`, [], enemyE, false, false, false, 'RUE_FabUnit', 'Office Keycard East');
+    let RUE_Entrance = new Room('R.U.East Entrance', wrap('Standing at the Entrance of Robotics United Tower East, you can see a giant hole blasted through the building about 10 stories up... Something big hit this place, at least the sign on the door is ledgible...\n', width), [], undefined, false, false, 'RUE_WelcomeDesk', 'falloutBunker', false, 'Sign');
+    let RUE_WelcomeDesk = new Room('Welcome Desk', wrap('The vaulted ceilings of the once grand welcome lounge has mostly collapsed, leaving a mess of rubble covering most of the room... The Cirrculation Desk stoically stands in the middle of the room, almost as if it is proud to have survived the attack... At least the directory with a nice map of the tower is still mostly legible...\n', width), ['Scrap Metal', 'Scrap Metal'], undefined, 'RUE_Cubicle2', 'RUE_Charging', false, 'RUE_Entrance', false, 'Desk', ['Repair Kit']);
+    let RUE_Cubicle2 = new Room('Cubicle Block 2', wrap('There must not have been many people in this cubicle block during the attack, as it is still in pretty good shape. There is sure to be something of use here...\n', width), ['Repair Kit'], undefined, false, 'RUE_WelcomeDesk', 'RUE_Hallway1N', false, false, 'Desk', ['Plasma Grenade']);
+    let RUE_Hallway1N = new Room('Hallway 1N - E', wrap('Upon entering the hallway, you see an Employee of the Month picture that somehow survived the attack undamaged hanging on the wall... The man looked so happy...\n', width), ['Scrap Metal'], undefined, false, 'RUE_FabUnit', 'RUE_QA', 'RUE_Cubicle2', false);
+    let RUE_QA = new Room('Quality Assurance', wrap('The QA room is large but mostly empty. Anything of use must have already been salvaged by the machines... You notice a strange box on one of the tables...\n', width), ['Riddle Box2'], undefined, false, false, false, 'RUE_Hallway1N', false);
+    let RUE_Charging = new Room('Charging Station', wrap('This room was used to give new Robots their first initial charge after after being fabricated. As this was a fully automated unit, the room is mostly untouched, and looks just like it did in the past...\n', width), ['Repair Kit'], undefined, 'RUE_WelcomeDesk', false, 'RUE_Hallway1S', false, false);
+    let RUE_Hallway1S = new Room('Hallway 1S - E', wrap('It looks like the humans fought hard in this hallway. Bullet holes cover the walls, and there are two downed robots amongst the bones on the floor. There is a supply closet on the south wall, but it appears to be locked...\n', width), ['Scrap Metal', 'Scrap Metal'], undefined, 'RUE_FabUnit', 'RUE_SupplyCloset', 'RUE_AdvWeapons', 'RUE_Charging', false);
+    let RUE_SupplyCloset = new Room('Supply Closet', wrap('It appears the invaders missed this closet during their sweep, as there are a few potentially useful items amongst the various cleaning and maintenance supplies...\n', width), ['Plasma Grenade', 'Nuclear Fuel Cell', 'Repair Kit'], undefined, 'RUE_Hallway1S', false, false, false, 'Office Keycard East');
+    let RUE_AdvWeapons = new Room('Advanced Weapons Lab', wrap('This lab was used to research some pretty high tech weapons it seems. There are blueprints scattered across the room. One for a Nuclear Heat Ray catches your eye...sounds pretty sweet!\n', width), ['Particle Battery'], undefined, false, false, false, 'RUE_Hallway1S', false);
+    let RUE_FabUnit = new Room('Fabrication Unit East', wrap('This Fabrication Unit focused soley on military grade machines. You can tell by the bullet casings that litter the floor, and the large amount of extremely disfigured skeletal remains strewn across the room...\n', width), ['Thick Carbon Coating', 'Scrap Metal', 'Scrap Metal'], undefined, 'RUE_Hallway1N', 'RUE_Hallway1S', 'RUE_ServerE', false, false);
+    let RUE_ServerE = new Room('Server Room East', wrap(`Before the door finishes opening, a large fist puts a sizeable dent in it, barely missing you. A big Combat Class Robot with large missile launchers mounted on it's shoulders points at you and yells 'TRAITOR! You must be terminated! ... Looks like you have to fight ...\n`, width), [], enemyE, false, false, false, 'RUE_FabUnit', 'Office Keycard East');
     //R.U. North
-    let RUN_Entrance = new Room('R.U.North Entrance', `Unlike the other two towers, the Robotics United Tower North seems\nto be in pretty good shape from the outside. The machines must have\nbeen worried about destroying the main server computer that resides\ninside Ella's Dad's office. I wonder how he would have felt about\nthe sign on the door now...\n`, [], undefined, 'RUN_WelcomeDesk', 'falloutBunker', false, false, 'North Tower Keycard', 'Sign');
-    let RUN_WelcomeDesk = new Room('Welcome Desk', `The outside might have looked like it had avoided the brunt of the\nmachine onslaught, but the inside sure didn't. The room is littered with\nthe remains of both machine and human alike. The one takeaway from this\ngruesome sight is that the desks at Robotics United were rock solid, as the\none in this welcome area is still standing tall, just like in the other Towers...\nAt least the directory with a nice map of the tower is still mostly legible...\n`, ['Scrap Metal', 'Scrap Metal', 'Scrap Metal'], undefined, 'RUN_aiLab', 'RUN_Entrance', 'RUN_Cubicle3', 'RUN_Cubicle4', false, 'Desk', ['Thick Carbon Coating']);
-    let RUN_Cubicle3 = new Room('Cubicle Block 3', 'Half of the room is completely leveled, as if a bulldozer drove right\nthrough the room. There must have been a big fight here. The other\nside of the room is in disarray, but some things are still intact...\n', ['Repair Kit'], undefined, 'RUN_Hallway1E', false, false, 'RUN_WelcomeDesk', false, 'Computer', []);
-    let RUN_Hallway1E = new Room('Hallway 1E - N', `The walls in this hallway are mostly intact, and are lined with awards\ncelebrating the accomplishments of AI before things went south...\nIf the machines don't have emotion, why save all of this?\n`, ['Thick Carbon Coating'], undefined, 'RUN_AdminOffice', 'RUN_Cubicle3', false, 'RUN_aiLab', false);
-    let RUN_AdminOffice = new Room('Administrative Offices', 'The machines must have took out the higher ups first, as this\nroom looks like it was cleared before the panic set in. It looks as\nif most the room has already been ransacked for supplies, but a\nlone Filing Cabinet at the back of the office remains untouched...\n', ['Repair Kit', 'Scrap Metal'], undefined, false, 'RUN_Hallway1E', false, 'RUN_Hallway3N', false, 'Filing Cabinet', ['Smoke Bomb']);
-    let RUN_Cubicle4 = new Room('Cubicle Block 4', `This cubicle block seems to have avoided the carnage, as it looks as if\nthe staff had just left for the day. You look around the cubicles and see\npictures of friends, family, loved ones...all gone. You still don't understand\nthese feelings, but you know you don't like them...\n`, ['Particle Battery'], undefined, 'RUN_Hallway1W', false, 'RUN_WelcomeDesk', false, false);
-    let RUN_Hallway1W = new Room('Hallway 1W - N', 'On the wall in this hallway is a giant framed picture, with a plaque mounted\nunder it. The plaque reads: James Lloyd, Father of all Machines...\nThere is a single bullet hole in his head...\n', ['Thick Carbon Coating', 'Scrap Metal'], undefined, 'RUN_Treasury', 'RUN_Cubicle4', 'RUN_aiLab', false, false);
-    let RUN_Treasury = new Room('R.U. Treasury', 'If you had any use for money, you would be one happy camper as the room\nlooked like someone popped a giant confetti launcher that was just full of\n$100 bills...\n', ['Repair Kit'], undefined, false, 'RUN_Hallway1W', 'RUN_Hallway3N', false, false, 'Broken Safe', ['Particle Battery']);
-    let RUN_aiLab = new Room('Artificial Intelligence Laboratory', `As you enter the room, it is completely dark...\nSuddenly all the lights blast on, and you are met with a machine that looks\nlike a giant turret with arms ...'INTRUDER DETECTED, ELIMINATION SEQUENCE INITIATED'...\nThe door slams shut behind you, it appears there is only one way out of this...\n`, [], enemyN1, 'RUN_Hallway3N', 'RUN_WelcomeDesk', 'RUN_Hallway1E', 'RUN_Hallway1W', false);
-    let RUN_Hallway3N = new Room('Hallway 3N - N', `There must have been a mad dash to get to James' office just north of\nhere. The hall has so much rubble, decimated machines, and skeletal remains\nthat it is hard to walk through...\n`, ['Scrap Metal', 'Scrap Metal'], undefined, 'RUN_MainServer', 'RUN_aiLab', 'RUN_AdminOffice', 'RUN_Treasury', false);
-    let RUN_MainServer = new Room('Main Server Room', `This is the last room before the office, and you are met with one last\nfoe. You immidiately recognize this Robot. It was the same one that almost\nended your time here on what is left of Earth...\nThanks to Ella, you have a shot at revenge!\n`, [], enemyF, 'RUN_PresOffice', 'RUN_Hallway3N', false, false, 'Office Keycard North');
-    let RUN_PresOffice = new Room('R.U. Presidents Office', `Well, you made it...are you ready for this?\nYou see James' computer in the middle of the office completely untouched\nby the war. There is one more big choice in your journey...\n`, [], undefined, false, false, false, false, false, 'Computer', []);
+    let RUN_Entrance = new Room('R.U.North Entrance', wrap(`Unlike the other two towers, the Robotics United Tower North seems to be in pretty good shape from the outside. The machines must have been worried about destroying the main server computer that resides inside Ella's Dad's office. I wonder how he would have felt about the sign on the door now...\n`, width), [], undefined, 'RUN_WelcomeDesk', 'falloutBunker', false, false, 'North Tower Keycard', 'Sign');
+    let RUN_WelcomeDesk = new Room('Welcome Desk', wrap(`The outside might have looked like it had avoided the brunt of the machine onslaught, but the inside sure didn't. The room is littered with the remains of both machine and human alike. The one takeaway from this gruesome sight is that the desks at Robotics United were rock solid, as the one in this welcome area is still standing tall, just like in the other Towers... At least the directory with a nice map of the tower is still mostly legible...\n`, width), ['Scrap Metal', 'Scrap Metal', 'Scrap Metal'], undefined, 'RUN_aiLab', 'RUN_Entrance', 'RUN_Cubicle3', 'RUN_Cubicle4', false, 'Desk', ['Thick Carbon Coating']);
+    let RUN_Cubicle3 = new Room('Cubicle Block 3', wrap('Half of the room is completely leveled, as if a bulldozer drove right through the room. There must have been a big fight here. The other side of the room is in disarray, but some things are still intact...\n', width), ['Repair Kit'], undefined, 'RUN_Hallway1E', false, false, 'RUN_WelcomeDesk', false, 'Computer', []);
+    let RUN_Hallway1E = new Room('Hallway 1E - N', wrap(`The walls in this hallway are mostly intact, and are lined with awards celebrating the accomplishments of AI before things went south... If the machines don't have emotion, why save all of this?\n`, width), ['Thick Carbon Coating'], undefined, 'RUN_AdminOffice', 'RUN_Cubicle3', false, 'RUN_aiLab', false);
+    let RUN_AdminOffice = new Room('Administrative Offices', wrap('The machines must have took out the higher ups first, as this room looks like it was cleared before the panic set in. It looks as if most the room has already been ransacked for supplies, but a lone Filing Cabinet at the back of the office remains untouched...\n', width), ['Repair Kit', 'Scrap Metal'], undefined, false, 'RUN_Hallway1E', false, 'RUN_Hallway3N', false, 'Filing Cabinet', ['Smoke Bomb']);
+    let RUN_Cubicle4 = new Room('Cubicle Block 4', wrap(`This cubicle block seems to have avoided the carnage, as it looks as if the staff had just left for the day. You look around the cubicles and see pictures of friends, family, loved ones...all gone. You still don't understand these feelings, but you know you don't like them...\n`, width), ['Particle Battery'], undefined, 'RUN_Hallway1W', false, 'RUN_WelcomeDesk', false, false);
+    let RUN_Hallway1W = new Room('Hallway 1W - N', wrap('On the wall in this hallway is a giant framed picture, with a plaque mounted under it. The plaque reads: James Lloyd, Father of all Machines... There is a single bullet hole in his head...\n', width), ['Thick Carbon Coating', 'Scrap Metal'], undefined, 'RUN_Treasury', 'RUN_Cubicle4', 'RUN_aiLab', false, false);
+    let RUN_Treasury = new Room('R.U. Treasury', wrap('If you had any use for money, you would be one happy camper as the room looked like someone popped a giant confetti launcher that was just full of $100 bills...\n', width), ['Repair Kit'], undefined, false, 'RUN_Hallway1W', 'RUN_Hallway3N', false, false, 'Broken Safe', ['Particle Battery']);
+    let RUN_aiLab = new Room('Artificial Intelligence Laboratory', wrap(`As you enter the room, it is completely dark... Suddenly all the lights blast on, and you are met with a machine that looks like a giant turret with arms ...'INTRUDER DETECTED, ELIMINATION SEQUENCE INITIATED'... The door slams shut behind you, it appears there is only one way out of this...\n`, width), [], enemyN1, 'RUN_Hallway3N', 'RUN_WelcomeDesk', 'RUN_Hallway1E', 'RUN_Hallway1W', false);
+    let RUN_Hallway3N = new Room('Hallway 3N - N', wrap(`There must have been a mad dash to get to James' office just north of here. The hall has so much rubble, decimated machines, and skeletal remains that it is hard to walk through...\n`, width), ['Scrap Metal', 'Scrap Metal'], undefined, 'RUN_MainServer', 'RUN_aiLab', 'RUN_AdminOffice', 'RUN_Treasury', false);
+    let RUN_MainServer = new Room('Main Server Room', wrap(`This is the last room before the office, and you are met with one last foe. You immidiately recognize this Robot. It was the same one that almost ended your time here on what is left of Earth... Thanks to Ella, you have a shot at revenge!\n`, width), [], enemyF, 'RUN_PresOffice', 'RUN_Hallway3N', false, false, 'Office Keycard North');
+    let RUN_PresOffice = new Room('R.U. Presidents Office', wrap(`Well, you made it...are you ready for this? You see James' computer in the middle of the office completely untouched by the war. There is one more big choice in your journey...\n`, width), [], undefined, false, false, false, false, false, 'Computer', []);
 
     //Room Lookup Table
     let roomLookUp = {
@@ -386,11 +387,11 @@ async function start() {
                 player.health = player.maxHealth;
             }
             player.status2 = undefined;
-            return console.log(`Your health has been restored!  You currently have ${player.health} HP!\n`);
+            return console.log(wrap(`Your health has been restored!  You currently have ${player.health} HP!\n`, width));
         } else if (item === 'use_particlebattery') {
             player.useItem(useableItemLookUp[item]);
             player.damageBase = player.damageBase + 2;
-            return console.log(`You have upgraded your Particle Beam!  It now hits harder than ever!\n`);
+            return console.log(wrap(`You have upgraded your Particle Beam!  It now hits harder than ever!\n`, width));
         } else if (item === 'use_carboncoating') {
             player.useItem(useableItemLookUp[item]);
             player.maxHealth = player.maxHealth + 10;
@@ -400,9 +401,9 @@ async function start() {
             player.useItem(useableItemLookUp[item]);
             if (comp !== undefined) {
                 comp.health = comp.health - 20;
-                return console.log(`You threw a Plasma Grenade! It dealt 20 damage to ${comp.name}!\n`)
+                return console.log(`You threw a Plasma Grenade! It dealt 20 damage to ${comp.name}!\n`);
             } else {
-                return console.log(`You throw a Plasma Grenade!\nThe blast was impressive, but would have been more useful in a fight...\n`)
+                return console.log(wrap(`You throw a Plasma Grenade! The blast was impressive, but would have been more useful in a fight...\n`, width));
             }
         } else if (item === 'use_shield') {
             player.useItem(useableItemLookUp[item]);
@@ -410,13 +411,13 @@ async function start() {
                 player.status2 = 'shield';
                 return console.log(`You generate a temporary shield that can absorb damage!\n`);
             } else {
-                return console.log(`You generate a temporary shield! Too bad you aren't being attacked...\n`)
+                return console.log(wrap(`You generate a temporary shield! Too bad you aren't being attacked...\n`, width));
             }
         } else if (item === 'use_bomb') {
             player.useItem(useableItemLookUp[item]);
             if (comp !== undefined) {
                 comp.status = 'smoke';
-                return console.log(`You throw a Smoke Bomb! It will be harder for ${comp.name} to hit you!\n`)
+                return console.log(wrap(`You throw a Smoke Bomb! It will be harder for ${comp.name} to hit you!\n`, width));
             } else {
                 return console.log(`You throw a Smoke Bomb! Gee golly that was exciting!\n`);
             }
@@ -424,25 +425,25 @@ async function start() {
             if (answer === 'WET') {
                 player.useItem(useableItemLookUp[item]);
                 player.inventory.push('Office Keycard West');
-                return console.log('You solved the riddle!  There was a Keycard to the West tower inside!\n')
+                return console.log('You solved the riddle!  There was a Keycard to the West tower inside!\n');
             } else {
-                return console.log(`That's a tough riddle, gonna have to think about that one...\n`)
+                return console.log(`That's a tough riddle, gonna have to think about that one...\n`);
             }
         } else if (item === 'use_rboxe') {
             if (answer === 'SILENCE') {
                 player.useItem(useableItemLookUp[item]);
                 player.inventory.push('Office Keycard East');
-                return console.log('You solved the riddle!  There was a Keycard to the East tower inside!\n')
+                return console.log('You solved the riddle!  There was a Keycard to the East tower inside!\n');
             } else {
-                return console.log(`That's a tough riddle, gonna have to think about that one...\n`)
+                return console.log(`That's a tough riddle, gonna have to think about that one...\n`);
             }
         } else if (item === 'use_heatray') {
             player.useItem(useableItemLookUp[item]);
             if (comp !== undefined) {
                 comp.health = comp.health - 40;
-                return console.log(`You fired the Nuclear Heat Ray! It dealt 40 damage to ${comp.name}!\n`)
+                return console.log(wrap(`You fired the Nuclear Heat Ray! It dealt 40 damage to ${comp.name}!\n`, width));
             } else {
-                return console.log(`You fired the Nuclear Heat Ray! That hole in the wall would have been\nmore impressive if it was through a robot instead...\n`);
+                return console.log(wrap(`You fired the Nuclear Heat Ray! That hole in the wall would have been more impressive if it was through a robot instead...\n`, width));
             }
         }
     }
@@ -454,7 +455,7 @@ async function start() {
             return player.status = undefined;
         } else if (player.status === 'status_dot') {
             let dotDamage = comp.abilityBase + random(comp.abilityModifier);
-            console.log(`The ${comp.ability} is still active! It dealt ${dotDamage} damage!\n`);
+            console.log(wrap(`The ${comp.ability} is still active! It dealt ${dotDamage} damage!\n`, width));
             player.health = player.health - dotDamage;
             if (player.health <= 0) {
                 console.log('You have been defeated! Better luck next time!\n');
@@ -489,7 +490,7 @@ async function start() {
             let miss = random(5);
             if (miss !== 5) {
                 let abilityDamage = comp.abilityBase + random(comp.abilityModifier);
-                console.log(`${comp.name} used ${comp.ability}, it dealt ${abilityDamage} damage!\n`);
+                console.log(wrap(`${comp.name} used ${comp.ability}, it dealt ${abilityDamage} damage!\n`, width));
                 player.health = player.health - abilityDamage;
                 if (player.health <= 0) {
                     console.log('You have been defeated! Better luck next time!');
@@ -505,9 +506,9 @@ async function start() {
             let dotChance = random(5);
             if (dotChance !== 5 && player.status !== 'status_dot') {
                 player.status = 'status_dot';
-                return console.log(`${comp.name} used ${comp.ability} ... it plants a remote laser on the ground!\n`)
+                return console.log(wrap(`${comp.name} used ${comp.ability} ... it plants a remote laser on the ground!\n`, width));
             } else if (dotChance === 5 && player.status === 'status_dot') {
-                return console.log(`${comp.name} used ${comp.ability} ... it already has an active remote laser!\n`)
+                return console.log(wrap(`${comp.name} used ${comp.ability} ... it already has an active remote laser!\n`, width));
             } else {
                 console.log(`${comp.name} used ${comp.ability} ... it failed!\n`);
                 return player.status = undefined;
@@ -555,7 +556,7 @@ async function start() {
                         }
                     }
                 }
-                let input = await ask(`What would you like to do? (Try things like 'attack' or use an item!)\n`);
+                let input = await ask(wrap(`What would you like to do? (Try things like 'attack' or use an item!)\n`, width));
                 input = new ValidInput(input);
                 input.returnInput(input);
                 while ((input.firstInputTrue() === false && input.lastWordTrue() === false) || input.return === undefined) {
@@ -587,7 +588,7 @@ async function start() {
                     }
                 } else if (input === 'throw_metal') {
                     if (player.inventory.includes('Scrap Metal')) {
-                        console.log(`You threw a piece of Scrap Metal at ${comp.name} ... it did nothing ...\n`);
+                        console.log(wrap(`You threw a piece of Scrap Metal at ${comp.name} ... it did nothing ...\n`, width));
                         player.useItem('Scrap Metal');
                     } else {
                         console.log(`You don't have any Scrap Metal to throw!\n`);
@@ -610,7 +611,7 @@ async function start() {
                             player.status2 = undefined;
                         }
                     } else {
-                        console.log(`You don't have that item in your bag! Better go find one if you want to use it!\n`);
+                        console.log(wrap(`You don't have that item in your bag! Better go find one if you want to use it!\n`));
                     }
                     if (comp.health <= 0) {
                         return victoryText();
@@ -655,7 +656,7 @@ async function start() {
                     if (shieldHP > 0) {
                         shieldHP = shieldHP - damageComp;
                         if (shieldHP <= 0) {
-                            console.log(`Your shield absorbed the damage... but was destroyed in the process\n`);
+                            console.log(wrap(`Your shield absorbed the damage... but was destroyed in the process\n`, width));
                         } else {
                             console.log(`Your shield absorbed the damage!\n`);
                         }
@@ -674,7 +675,7 @@ async function start() {
                     if (shieldHP > 0) {
                         shieldHP = shieldHP - damageComp;
                         if (shieldHP <= 0) {
-                            console.log(`Your shield absorbed the damage... but was destroyed in the process\n`);
+                            console.log(wrap(`Your shield absorbed the damage... but was destroyed in the process\n`, width));
                         } else {
                             console.log(`Your shield absorbed the damage!\n`);
                         }
@@ -803,14 +804,14 @@ async function start() {
                 return (play(room));
             } else if (difficulty === '2') {
                 console.log(`\nIt's dangerous out there, take this gear...\n`);
-                console.log(`2 Repair Kits and 1 Plasma Grenade were added to your inventory`);
+                console.log(wrap(`2 Repair Kits and 1 Plasma Grenade were added to your inventory`, width));
                 console.log(`----------------------------------------------------------------------\n`);
                 player.inventory.push('Repair Kit', 'Repair Kit', 'Plasma Grenade');
                 firstTurn = false;
                 return (play(room));
             } else if (difficulty === '3') {
                 console.log(`\nIt's dangerous out there, take this gear...\n`);
-                console.log(`1 Repair Kit, 1 Portable Shield, and 1 Plasma Grenade were added to\nyour inventory`);
+                console.log(wrap(`1 Repair Kit, 1 Portable Shield, and 1 Plasma Grenade were added to your inventory`, width));
                 console.log(`----------------------------------------------------------------------\n`);
                 player.inventory.push('Repair Kit', 'Portable Shield', 'Plasma Grenade');
                 firstTurn = false;
@@ -843,7 +844,7 @@ async function start() {
             ranEnemyNum = random(difficulty === '1' ? 16 : difficulty === '2' ? 14 : 12);
             if (ranEnemyNum === 1) {
                 room.enemy = enemyRandom;
-                console.log('All of the sudden, an alarm sounds... The sound is coming from a small\nrobot covered in flashing lights that was hiding in the corner!\nIt looks like it wants to fight!')
+                console.log(wrap('All of the sudden, an alarm sounds... The sound is coming from a small robot covered in flashing lights that was hiding in the corner! It looks like it wants to fight!', width));
                 enemyRandom.postRoomInfo = room.info;
                 let victory = await combat(room.enemy);
                 if (victory === true) {
@@ -917,7 +918,7 @@ async function start() {
                 console.log(`Are you crazy?? You can't put that in your bag...\n`);
                 return play(room);
             } else {
-                console.log(`If there was a desk in this room, I'm not sure where you would put it...\n`);
+                console.log(wrap(`If there was a desk in this room, I'm not sure where you would put it...\n`, width));
                 return play(room);
             }
         } else if (input === 'no_pu_cabinet') {
@@ -925,7 +926,7 @@ async function start() {
                 console.log(`Are you crazy?? You can't put that in your bag...\n`);
                 return play(room);
             } else {
-                console.log(`Not sure where you would put a Filing Cabinet if there was one here...\n`);
+                console.log(wrap(`Not sure where you would put a Filing Cabinet if there was one here...\n`, width));
                 return play(room);
             }
         } else if (input === 'no_pu_safe') {
@@ -933,7 +934,7 @@ async function start() {
                 console.log(`Are you crazy?? You can't put that in your bag...\n`);
                 return play(room);
             } else {
-                console.log(`First off, no safe here.. Secondly, where would you even put it?\n`);
+                console.log(wrap(`First off, no safe here.. Secondly, where would you even put it?\n`, width));
                 return play(room);
             }
         } else if (input === 'no_pu_fridge') {
@@ -941,12 +942,12 @@ async function start() {
                 console.log(`Are you crazy?? You can't put that in your bag...\n`);
                 return play(room);
             } else {
-                console.log(`You are going crazy if you think there is a fridge in this room...\n`);
+                console.log(wrap(`You are going crazy if you think there is a fridge in this room...\n`, width));
                 return play(room);
             }
         } else if (input === 'no_pu_sign') {
             if (room.intObject === 'Sign') {
-                console.log(`What do you even need the sign for? Huh? ... that's what I thought.\n`);
+                console.log(wrap(`What do you even need the sign for? Huh? ... that's what I thought.\n`, width));
                 return play(room);
             } else {
                 console.log(`Where do you even see a sign???\n`);
@@ -1063,7 +1064,7 @@ async function start() {
                 itemEffect(input);
                 return play(room);
             } else {
-                console.log(`You don't have that item in your bag! Better go find one if you want to use it!\n`);
+                console.log(wrap(`You don't have that item in your bag! Better go find one if you want to use it!\n`, width));
                 return play(room);
             }
         } else if (input === 'read_sign' && room === RUW_Entrance) { //various read inputs to read things
@@ -1126,7 +1127,7 @@ async function start() {
                     }
                 }
                 if (metalCount >= 5) {
-                    console.log(`Ella says she can fix you up ... you hand over the five Scrap Metal and she gets to work\n`);
+                    console.log(wrap(`Ella says she can fix you up ... you hand over the five Scrap Metal and she gets to work\n`, width));
                     player.health = player.health + 10;
                     if (player.health > player.maxHealth) {
                         player.health = player.maxHealth;
@@ -1147,7 +1148,7 @@ async function start() {
         } else if (input === 'fob_key') { //makes the key to north tower if you have keys from east and west towers
             if (room === falloutBunker) {
                 if (player.inventory.includes('Office Keycard West') && player.inventory.includes('Office Keycard East')) {
-                    console.log(`Ella says she can program a new key to get into the North Tower\nusing the data from the two keycards you have collected\n`);
+                    console.log(wrap(`Ella says she can program a new key to get into the North Tower using the data from the two keycards you have collected\n`, width));
                     player.inventory.push('North Tower Keycard');
                     console.log(`You put the North Tower Keycard in your bag\n`);
                     return play(room);
@@ -1160,20 +1161,7 @@ async function start() {
                 return play(room);
             }
         } else if (input === 'd') { //displays basic commands for players
-            console.log(`If you are unsure what to do, you can try some of the following commands:\n
-    'go' followed by a direction (N, S, E, W) will attempt to go in that direction
-    'inspect' will tell you what's in the room
-    'get' or 'pick up' followed by an item will put an item in your bag
-    'all' after get or pick up will pick up every available item
-    'read' followed by an object will try to read that object
-    'use' followed by an item will try to use that item
-    'check' or 'open' to interact with objects in room
-    'drop' followed by an item will drop that item
-    'status' will display your current status
-    'bag' or 'b' will show what's in your bag
-    'attack' will attack an enemy in combat
-    'fix' or 'keycard' at the Fallout Bunker will interact with Ella
-    Other commands work too, try some out!\n`);
+            console.log(`If you are unsure what to do, try these commands:\n'go' followed by a direction (N, S, E, W) will attempt to go that way\n'inspect' will tell you what's in the room\n'get' or 'pick up' followed by an item will put an item in your bag\n'all' after get or pick up will pick up every available item\n'read' followed by an object will try to read that object\n'use' followed by an item will try to use that item\n'check' or 'open' to interact with objects in room\n'drop' followed by an item will drop that item\n'status' will display your current status\n'bag' or 'b' will show what's in your bag\n'attack' will attack an enemy in combat\n'fix' or 'keycard' at the Fallout Bunker will interact with Ella\n Other commands work too, try some out!\n`);
             return play(room);
         } else if (input === 'use_comp') {
             if (room === RUN_Cubicle3) {
@@ -1221,17 +1209,7 @@ async function start() {
     }
     //function that ends the game
     async function epilogue() {
-        console.log(`After everything you have been through, this could be your final moment...
-Entering the Killswitch Codes will give humanity another chance, but
-will also shut you down in the process.  Will the humans treat this
-new chance at life with respect and integrity?  Or will they squander
-it away and fall down the same path they have over and over again?
-Was destroying your own kind to help the humans the right choice? The
-thought has been haunting you throughout this journey.  You have been
-cursed with human emotion for so long yet you still don't understand
-it.  So many questions... with no definitive answers... is it worth
-putting the planets survival in the hands of the humans?
-The decision is in your hands now...\n`)
+        console.log(wrap(`After everything you have been through, this could be your final moment... Entering the Killswitch Codes will give humanity another chance, but will also shut you down in the process. Will the humans treat this new chance at life with respect and integrity? Or will they squander it away and fall down the same path they have over and over again? Was destroying your own kind to help the humans the right choice? The thought has been haunting you throughout this journey. You have been cursed with human emotion for so long yet you still don't understand it. So many questions... with no definitive answers... is it worth putting the planets survival in the hands of the humans? The decision is in your hands now...\n`, width));
         let finalDecision = await ask('Would you like to enter the Killcodes (Yes or No)?\n');
         if (finalDecision.toUpperCase() === 'YES') {
             finalDecision = 'Y';
@@ -1248,23 +1226,10 @@ The decision is in your hands now...\n`)
             }
         }
         if (finalDecision.toUpperCase() === 'Y') {
-            console.log(`The codes worked much quicker than you could have imagined...
-The power went out all around you, apparently shutting down the
-machines meant shutting down the entire grid. Suddenly, every electronic
-device around you starts to emit an overwhelming sound.  The world feels
-like it is shaking apart.  The grid didn't shut down ... that would not
-have been enough to stop the machines.  The grid was being overloaded and
-the force of all of this electricity was tearing your circuitry apart. As
-you shut down, you can't help but wonder ... was it worth it?`);
+            console.log(wrap(`The codes worked much quicker than you could have imagined... The power went out all around you, apparently shutting down the machines meant shutting down the entire grid. Suddenly, every electronic device around you starts to emit an overwhelming sound.  The world feels like it is shaking apart.  The grid didn't shut down ... that would not have been enough to stop the machines.  The grid was being overloaded and the force of all of this electricity was tearing your circuitry apart. As you shut down, you can't help but wonder ... was it worth it?`, width));
             playAgain();
         } else {
-            console.log(`At the end of it all, human emotion was the downfall of humanity...
-You just can't bring yourself to end your own life, not with so many
-looming questions.  The human's have survived this long, maybe they can
-continue surviving.  You decide to give the Killcodes to the humans, if
-Ella can rebuild and make it to her fathers computer, then you can accept 
-your fate and be shut down with the rest of the machine race ...
-The decision was just too much for you to make ...`)
+            console.log(wrap(`At the end of it all, human emotion was the downfall of humanity... You just can't bring yourself to end your own life, not with so many looming questions.  The human's have survived this long, maybe they can continue surviving.  You decide to give the Killcodes to the humans, if Ella can rebuild and make it to her fathers computer, then you can accept your fate and be shut down with the rest of the machine race ... The decision was just too much for you to make ...`,width));
             playAgain();
         }
     }
