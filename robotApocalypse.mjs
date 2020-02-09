@@ -42,8 +42,14 @@ async function start() {
         status2: undefined,
         hasKilled: false,
         ability1: undefined,
+        ability1Supply: undefined,
+        ability1Modifier: undefined,
         ability2: undefined,
+        ability2Supply: undefined,
+        ability2Modifier: undefined,
         ability3: undefined,
+        ability3Supply: undefined,
+        ability3Modifier: undefined,
         useItem: function (item) { //removes item from inventory on use
             for (let element of this.inventory) {
                 if (element === item) {
@@ -87,7 +93,7 @@ async function start() {
 
     //Enemy Class
     class Enemy {
-        constructor(name, health, attack, ability, damageBase, damageModifier, abilityType, abilityBase, abilityModifier, reward, postRoomInfo, postRoomInfo2) {
+        constructor(name, health, attack, ability, damageBase, damageModifier, abilityType, abilityBase, abilityModifier, reward, postRoomInfo, postRoomInfo2, postRoomInventory) {
             this.name = name;
             this.health = health;
             this.attack = attack;
@@ -100,16 +106,17 @@ async function start() {
             this.reward = reward;
             this.postRoomInfo = postRoomInfo;
             this.postRoomInfo2 = postRoomInfo2;
+            this.postRoomInventory = postRoomInventory;
             this.status = undefined;
         }
     }
 
     //Enemy Objects
-    let enemyW = new Enemy('Robot Sentry', 40, 'Plasma Ray', 'Static Discharge', 6, 9, 'status_stun', undefined, undefined, 'Killswitch Code 1', wrap('The low hum of the servers surrounds you as you stare at what was left of your foe...\n', width), wrap(`Taking down your first enemy was both empowering and soul crushing... Your new found power is exhilerating but what have you given up for it? ... The low hum of the servers surrounds you.\n`, width));
-    let enemyE = new Enemy('Robot Bruiser', 75, 'Pneumatic Fist', 'Missle Barrage', 6, 3, 'offensive', 8, 12, 'Killswitch Code 2', wrap('The low hum of the servers surrounds you as you stare at what was left of your foe...\n', width), wrap(`Taking down your first enemy was both empowering and soul crushing... Your new found power is exhilerating but what have you given up for it? ... The low hum of the servers surrounds you.\n`, width));
-    let enemyN1 = new Enemy('Mechanical Surveillance Unit', 100, 'Fission Laser', 'Remote Laser', 10, 6, 'status_dot', 6, 3, 'Office Keycard North', 'As the dust settles, you notice that you were surrounded by automated\nturrets, thankfully defeating this foe seems to have shut them down...\nThe room is earily quiet.\n');
-    let enemyF = new Enemy('Enforcer Captain', 125, 'Collider Beam', 'Combat Repair', 10, 10, 'defensive', 14, 6, 'Killswitch Code 3', `Your final foe has been defeated ...\nYou are so close to your end goal, but you can't help but ask yourself,\nhas destroying your own kind been worth it?\n`);
-    let enemyRandom = new Enemy('Surveillance Bot', 25, 'Photon Blaster', 'Combat Repair', 4, 3, 'defensive', 5, 5, `${random(5) <= 2 ? 'Repair Kit' : random(5) <= 2 ? 'Smoke Bomb' : 'Scrap Metal'}`) //random loot with nested ternary
+    let enemyW = new Enemy('Robot Sentry', 40, 'Plasma Ray', 'Static Discharge', 6, 9, 'status_stun', undefined, undefined, 'Killswitch Code 1', wrap('The low hum of the servers surrounds you as you stare at what was left of your foe...\n', width), wrap(`Taking down your first enemy was both empowering and soul crushing... Your new found power is exhilerating but what have you given up for it? ... The low hum of the servers surrounds you.\n`, width), ['Combat Repair Module', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal']);
+    let enemyE = new Enemy('Robot Bruiser', 75, 'Pneumatic Fist', 'Missle Barrage', 6, 3, 'offensive', 8, 12, 'Killswitch Code 2', wrap('The low hum of the servers surrounds you as you stare at what was left of your foe...\n', width), wrap(`Taking down your first enemy was both empowering and soul crushing... Your new found power is exhilerating but what have you given up for it? ... The low hum of the servers surrounds you.\n`, width), ['Missle Launcher', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal']);
+    let enemyN1 = new Enemy('Mechanical Surveillance Unit', 100, 'Fission Laser', 'Remote Laser', 10, 6, 'status_dot', 6, 3, 'Office Keycard North', wrap('As the dust settles, you notice that you were surrounded by automated turrets, thankfully defeating this foe seems to have shut them down... The room is earily quiet.\n', width), undefined, ['Fission Cannon', 'Scrap Metal', 'Scrap Metal']);
+    let enemyF = new Enemy('Enforcer Captain', 125, 'Collider Beam', 'Combat Repair', 10, 10, 'defensive', 14, 6, 'Killswitch Code 3', wrap(`Your final foe has been defeated ... You are so close to your end goal, but you can't help but ask yourself, has destroying your own kind been worth it?\n`, width));
+    let enemyRandom = new Enemy('Surveillance Bot', 25, 'Photon Blaster', 'Combat Repair', 4, 3, 'defensive', 5, 5, `${random(5) <= 2 ? 'Repair Kit' : random(5) <= 2 ? 'Smoke Bomb' : random(5) <= 2 ? 'Plasma Grenade' : 'Scrap Metal'}`) //random loot with nested ternary
 
     //cheat code input check
     let cheatCode = ['falloutBunker', 'RUW_Entrance', 'RUW_WelcomeDesk', 'RUW_BreakRoom', 'RUW_Hallway1N', 'RUW_ExpLabs', 'RUW_Cubicle1', 'RUW_Hallway1S', 'RUW_Office', 'RUW_FabUnit', 'RUW_ServerW', 'RUE_Entrance', 'RUE_WelcomeDesk', 'RUE_Cubicle2', 'RUE_Hallway1N', 'RUE_QA', 'RUE_Charging', 'RUE_Hallway1S', 'RUE_SupplyCloset', 'RUE_AdvWeapons', 'RUE_FabUnit', 'RUE_ServerE', 'RUN_Entrance', 'RUN_WelcomeDesk', 'RUN_Cubicle3', 'RUN_Hallway1E', 'RUN_AdminOffice', 'RUN_Cubicle4', 'RUN_Hallway1W', 'RUN_Treasury', 'RUN_aiLab', 'RUN_Hallway3N', 'RUN_MainServer', 'RUN_PresOffice'];
@@ -334,7 +341,10 @@ async function start() {
         'North Tower Keycard': 'Opens gate to R.U. North Tower',
         'Killswitch Code 1': 'One of Three codes needed',
         'Killswitch Code 2': 'One of Three codes needed',
-        'Killswitch Code 3': 'One of Three codes needed'
+        'Killswitch Code 3': 'One of Three codes needed',
+        'Missle Launcher': 'Maybe Ella can do something with this...',
+        'Combat Repair Module': 'Maybe Ella can do something with this...',
+        'Fission Cannon': 'Maybe Ella can do something with this...'
     }
 
     //interactable open objects arrays
@@ -350,7 +360,7 @@ async function start() {
     }
 
     //possible item array
-    let possibleItems = ['pu_scrapmetal', 'pu_particlebattery', 'pu_carboncoating', 'pu_repairkit', 'pu_rbox', 'pu_grenade', 'pu_shield', 'pu_bomb', 'pu_fuelcell', 'pu_heatray', 'pu_all'];
+    let possibleItems = ['pu_scrapmetal', 'pu_particlebattery', 'pu_carboncoating', 'pu_repairkit', 'pu_rbox', 'pu_grenade', 'pu_shield', 'pu_bomb', 'pu_fuelcell', 'pu_heatray', 'pu_all', 'pu_launcher', 'pu_module', 'pu_cannon'];
 
     // pick up item lookup object
     let itemLookUp = {
@@ -363,11 +373,14 @@ async function start() {
         pu_fuelcell: 'Nuclear Fuel Cell',
         pu_heatray: 'Nuclear Heat Ray',
         pu_bomb: 'Smoke Bomb',
-        pu_rbox: ['West Riddle Box', 'East Riddle Box']
+        pu_rbox: ['West Riddle Box', 'East Riddle Box'],
+        pu_launcher: 'Missle Launcher',
+        pu_module: 'Combat Repair Module',
+        pu_cannon: 'Fission Cannon'
     }
 
     //dropable item arary
-    let dropableItems = ['drop_scrapmetal', 'drop_particlebattery', 'drop_carboncoating', 'drop_repairkit', 'drop_rbox', 'drop_grenade', 'drop_shield', 'drop_bomb', 'drop_fuelcell', 'drop_heatray']
+    let dropableItems = ['drop_scrapmetal', 'drop_particlebattery', 'drop_carboncoating', 'drop_repairkit', 'drop_rbox', 'drop_grenade', 'drop_shield', 'drop_bomb', 'drop_fuelcell', 'drop_heatray', 'drop_launcher', 'drop_module', 'drop_cannon']
 
     //drop item lookup object
     let dropItemLookUp = {
@@ -380,7 +393,10 @@ async function start() {
         drop_fuelcell: 'Nuclear Fuel Cell',
         drop_heatray: 'Nuclear Heat Ray',
         drop_bomb: 'Smoke Bomb',
-        drop_rbox: ['West Riddle Box', 'East Riddle Box']
+        drop_rbox: ['West Riddle Box', 'East Riddle Box'],
+        drop_launcher: 'Missle Launcher',
+        drop_module: 'Combat Repair Module',
+        drop_cannon: 'Fission Cannon'
     }
 
     //useable item array
@@ -505,19 +521,19 @@ async function start() {
         if (room === falloutBunker && firstTurn === true) {
             if (difficulty === '1') {
                 console.log(`\nIt's dangerous out there, take these Repair Kits...\n`);
-                console.log(`3 Repair Kits were added to your inventory`);
+                console.log(`3 Repair Kits were added to your inventory\n`);
                 player.inventory.push('Repair Kit', 'Repair Kit', 'Repair Kit');
                 firstTurn = false;
                 return (play(room));
             } else if (difficulty === '2') {
                 console.log(`\nIt's dangerous out there, take this gear...\n`);
-                console.log(wrap(`2 Repair Kits and 1 Plasma Grenade were added to your inventory`, width));
+                console.log(wrap(`2 Repair Kits and 1 Plasma Grenade were added to your inventory\n`, width));
                 player.inventory.push('Repair Kit', 'Repair Kit', 'Plasma Grenade');
                 firstTurn = false;
                 return (play(room));
             } else if (difficulty === '3') {
                 console.log(`\nIt's dangerous out there, take this gear...\n`);
-                console.log(wrap(`1 Repair Kit, 1 Portable Shield, and 1 Plasma Grenade were added to your inventory`, width));
+                console.log(wrap(`1 Repair Kit, 1 Portable Shield, and 1 Plasma Grenade were added to your inventory\n`, width));
                 player.inventory.push('Repair Kit', 'Portable Shield', 'Plasma Grenade');
                 firstTurn = false;
                 return (play(room));
@@ -533,12 +549,14 @@ async function start() {
                 }
                 if (player.hasKilled === true) {
                     room.info = room.enemy.postRoomInfo;
+                    room.inventory = room.enemy.postRoomInventory
                     room.enemy = undefined;
                     console.log(`----------------------------------------------------------------------\n\n`);
                     return initializeRoom(room);
                 } else {
                     player.hasKilled = true;
                     room.info = room.enemy.postRoomInfo2;
+                    room.inventory = room.enemy.postRoomInventory
                     room.enemy = undefined;
                     console.log(`----------------------------------------------------------------------\n\n`);
                     return initializeRoom(room);
@@ -633,6 +651,7 @@ async function start() {
             return play(room);
         } else if (input === 'i') {  //shows inventory
             player.inspectBag();
+            console.log('\n');
             return play(room);
         } else if (input === 'pu_null') { //pu_null and no_pu statements catch items you can't add to inventory
             console.log(`I'm not sure what you are trying to pick up...\n`);

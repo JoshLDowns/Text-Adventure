@@ -13,10 +13,10 @@ class ValidInput {
         this.pickUpItem = ['PICK UP', 'PICK', 'GRAB', 'GET', 'TAKE', 'AQUIRE'];
         this.useItem = ['USE'];
         this.combat = ['ATTACK', 'FIGHT', 'THROW', 'SHOOT', 'FIRE'];
-        this.items = ['KIT', 'METAL', 'BATTERY', 'COATING', 'BOX', 'PLASMA GRENADE', 'PORTABLE SHIELD', 'SMOKE BOMB', 'CELL', 'NUCLEAR', 'RAY', 'ALL'];
+        this.items = ['KIT', 'METAL', 'BATTERY', 'COATING', 'BOX', 'PLASMA GRENADE', 'PORTABLE SHIELD', 'SMOKE BOMB', 'CELL', 'NUCLEAR', 'RAY', 'ALL', 'LAUNCHER', 'MODULE', 'CANNON'];
         this.otherActions = ['DROP', 'THROW', 'FART', 'LAUGH', 'LOL', 'HUG', 'READ', 'OPEN', 'RUN', 'CHECK'];
         this.intObjects = ['SIGN', 'DESK', 'COMPUTER', 'CABINET', 'FRIDGE', 'REFRIDGERATOR', 'SAFE', 'MAP', 'DIRECTORY'];
-        this.falloutBunkerEvent = ['REPAIR', 'FIX', 'KEYCARD', 'KEY'];
+        this.falloutBunkerEvent = ['REPAIR', 'FIX', 'KEYCARD', 'KEY', 'CRAFT'];
         this.validInputs = [this.affirmative, this.negatory, this.direction, this.inventory, this.status, this.inspect, this.instructions, this.useItem, this.pickUpItem, this.combat, this.items, this.otherActions, this.intObjects, this.falloutBunkerEvent];
     }
     //checks first word of input
@@ -151,6 +151,12 @@ class ValidInput {
                 this.return = 'drop_fuelcell';
             } else if (obj.lastWord === 'RAY') {
                 this.return = 'drop_heatray';
+            } else if (obj.lastWord === 'LAUNCHER') {
+                this.return = 'drop_launcher';
+            } else if (obj.lastWord === 'MODULE') {
+                this.return = 'drop_module';
+            } else if (obj.lastWord === 'CANNON') {
+                this.return = 'drop_cannon';
             } else {
                 this.return = 'drop_null';
             }
@@ -249,6 +255,12 @@ class ValidInput {
                 this.return = 'pu_fuelcell';
             } else if (obj.firstWord === 'RAY' || obj.lastWord === 'RAY') {
                 this.return = 'pu_heatray';
+            } else if (obj.firstWord === 'LAUNCHER' || obj.lastWord === 'LAUNCHER') {
+                this.return = 'pu_launcher';
+            } else if (obj.firstWord === 'MODULE' || obj.lastWord === 'MODULE') {
+                this.return = 'pu_module';
+            } else if (obj.firstWord === 'CANNON' || obj.lastWord === 'CANNON') {
+                this.return = 'pu_cannon';
             } else if (obj.firstWord === 'ALL' || obj.lastWord === 'ALL') {
                 this.return = 'pu_all';
             } else {
