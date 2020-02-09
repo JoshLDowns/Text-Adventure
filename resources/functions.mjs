@@ -14,13 +14,15 @@ let useableItemLookUp = {
   use_rbox: ['West Riddle Box', 'East Riddle Box']
 }
 
+//accepts input
 export function ask(questionText) {
   return new Promise((resolve, reject) => {
     rl.question(questionText, resolve);
   });
 }
 
-export function wrap(string, w) { //text wrapping function
+//text wrapping function, accepts string and width(w) and wraps text accordingly
+export function wrap(string, w) {
     if (string.length <= w) {
         return string;
     }
@@ -40,10 +42,12 @@ export function wrap(string, w) { //text wrapping function
     return string;
 }
 
-export function random(max) { //random number generator
+//random number generator
+export function random(max) { 
     return Math.floor(Math.random() * max) + 1;
 }
 
+//determines effect of items being used by player (user)
 export function itemEffect(item, comp, answer, user) {
   if (item === 'use_repairkit') {
       user.useItem(useableItemLookUp[item]);

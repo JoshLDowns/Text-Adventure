@@ -1,6 +1,6 @@
 import {ask,wrap, random, itemEffect} from './resources/functions.mjs'
 import {ValidInput} from './resources/inputValidation.mjs'
-import {title, gameOverText, mapEast, mapWest, mapNorth} from './resources/ascii_images.mjs'
+import {title, gameOverText, mapEast, mapWest, mapNorth, thanks} from './resources/ascii_images.mjs'
 import {combat} from './resources/combat.mjs'
 
 //starts the game and initializes player object, enemy objects, and room objects
@@ -41,6 +41,9 @@ async function start() {
         status: undefined,
         status2: undefined,
         hasKilled: false,
+        ability1: undefined,
+        ability2: undefined,
+        ability3: undefined,
         useItem: function (item) { //removes item from inventory on use
             for (let element of this.inventory) {
                 if (element === item) {
@@ -930,7 +933,7 @@ async function start() {
     }
     //function that ends the game
     async function epilogue() {
-        console.log(wrap(`After everything you have been through, this could be your final moment... Entering the Killswitch Codes will give humanity another chance, but will also shut you down in the process. Will the humans treat this new chance at life with respect and integrity? Or will they squander it away and fall down the same path they have over and over again? Was destroying your own kind to help the humans the right choice? The thought has been haunting you throughout this journey. You have been cursed with human emotion for so long yet you still don't understand it. So many questions... with no definitive answers... is it worth putting the planets survival in the hands of the humans? The decision is in your hands now...\n`, width));
+        console.log(wrap(`\nAfter everything you have been through, this could be your final moment... Entering the Killswitch Codes will give humanity another chance, but will also shut you down in the process. Will the humans treat this new chance at life with respect and integrity? Or will they squander it away and fall down the same path they have over and over again? Was destroying your own kind to help the humans the right choice? The thought has been haunting you throughout this journey. You have been cursed with human emotion for so long yet you still don't understand it. So many questions... with no definitive answers... is it worth putting the planets survival in the hands of the humans? The decision is in your hands now...\n`, width));
         let finalDecision = await ask('Would you like to enter the Killcodes (Yes or No)?\n');
         if (finalDecision.toUpperCase() === 'YES') {
             finalDecision = 'Y';
@@ -947,10 +950,14 @@ async function start() {
             }
         }
         if (finalDecision.toUpperCase() === 'Y') {
-            console.log(wrap(`The codes worked much quicker than you could have imagined... The power went out all around you, apparently shutting down the machines meant shutting down the entire grid. Suddenly, every electronic device around you starts to emit an overwhelming sound.  The world feels like it is shaking apart.  The grid didn't shut down ... that would not have been enough to stop the machines.  The grid was being overloaded and the force of all of this electricity was tearing your circuitry apart. As you shut down, you can't help but wonder ... was it worth it?`, width));
+            console.log(wrap(`\nThe codes worked much quicker than you could have imagined... The power went out all around you, apparently shutting down the machines meant shutting down the entire grid. Suddenly, every electronic device around you starts to emit an overwhelming sound.  The world feels like it is shaking apart.  The grid didn't shut down ... that would not have been enough to stop the machines.  The grid was being overloaded and the force of all of this electricity was tearing your circuitry apart. As you shut down, you can't help but wonder ... was it worth it?`, width));
+            console.log(thanks);
+            console.log(`\n`);
             playAgain();
         } else {
-            console.log(wrap(`At the end of it all, human emotion was the downfall of humanity... You just can't bring yourself to end your own life, not with so many looming questions.  The human's have survived this long, maybe they can continue surviving.  You decide to give the Killcodes to the humans, if Ella can rebuild and make it to her fathers computer, then you can accept your fate and be shut down with the rest of the machine race ... The decision was just too much for you to make ...`,width));
+            console.log(wrap(`\nAt the end of it all, human emotion was the downfall of humanity... You just can't bring yourself to end your own life, not with so many looming questions.  The human's have survived this long, maybe they can continue surviving.  You decide to give the Killcodes to the humans, if Ella can rebuild and make it to her fathers computer, then you can accept your fate and be shut down with the rest of the machine race ... The decision was just too much for you to make ...`,width));
+            console.log(thanks);
+            console.log(`\n`);
             playAgain();
         }
     }
@@ -959,7 +966,7 @@ async function start() {
 }
 
 async function playAgain() {  //Allows user to play again
-    let again = await ask("\n\nWould you like to play again? (Yes or No)?\n");
+    let again = await ask("\nWould you like to play again? (Yes or No)?\n");
     if (again.toUpperCase() === 'YES') {
         again = 'Y';
     } else if (again.toUpperCase() === 'NO') {

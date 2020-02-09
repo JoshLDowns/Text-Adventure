@@ -1,8 +1,10 @@
 import { ValidInput } from './inputValidation.mjs'
 import { ask, wrap, random, itemEffect } from './functions.mjs'
 
+//defines width for wrap function
 let width = process.stdout.columns - 8;
 
+//useable item array
 let useableItems = ['use_particlebattery', 'use_carboncoating', 'use_rbox', 'use_repairkit', 'use_grenade', 'use_shield', 'use_bomb', 'use_heatray'];
 
 //useable item lookup object
@@ -17,6 +19,7 @@ let useableItemLookUp = {
     use_rbox: ['West Riddle Box', 'East Riddle Box']
 }
 
+//combat function
 export async function combat(comp, user) {
     let damageUser = 0;
     let damageComp = 0;
