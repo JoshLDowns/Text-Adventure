@@ -1,6 +1,19 @@
 import readline from 'readline';
 const rl = readline.createInterface(process.stdin, process.stdout);
 
+let width = process.stdout.columns - 8;
+
+let useableItemLookUp = {
+  use_repairkit: 'Repair Kit',
+  use_particlebattery: 'Particle Battery',
+  use_carboncoating: 'Thick Carbon Coating',
+  use_grenade: 'Plasma Grenade',
+  use_shield: 'Portable Shield',
+  use_bomb: 'Smoke Bomb',
+  use_heatray: 'Nuclear Heat Ray',
+  use_rbox: ['West Riddle Box', 'East Riddle Box']
+}
+
 export function ask(questionText) {
   return new Promise((resolve, reject) => {
     rl.question(questionText, resolve);
@@ -31,7 +44,7 @@ export function random(max) { //random number generator
     return Math.floor(Math.random() * max) + 1;
 }
 
-/*export function itemEffect(item, comp, answer, user) {
+export function itemEffect(item, comp, answer, user) {
   if (item === 'use_repairkit') {
       user.useItem(useableItemLookUp[item]);
       user.health = user.health + 30;
@@ -44,61 +57,76 @@ export function random(max) { //random number generator
   } else if (item === 'use_particlebattery') {
       user.useItem(useableItemLookUp[item]);
       user.damageBase = user.damageBase + 2;
-      return console.log(wrap(`You have upgraded your Particle Beam!  It now hits harder than ever!\n`, width));
+      console.log(wrap(`You have upgraded your Particle Beam!  It now hits harder than ever!\n`, width));
+      return user;
   } else if (item === 'use_carboncoating') {
       user.useItem(useableItemLookUp[item]);
       user.maxHealth = user.maxHealth + 10;
       user.health = user.health + 10;
-      return console.log(`You have increased your maximum HP by 10 points!\n`);
+      console.log(`You have increased your maximum HP by 10 points!\n`);
+      return user;
   } else if (item === 'use_grenade') {
       user.useItem(useableItemLookUp[item]);
       if (comp !== undefined) {
           comp.health = comp.health - 20;
-          return console.log(`You threw a Plasma Grenade! It dealt 20 damage to ${comp.name}!\n`);
+          console.log(`You threw a Plasma Grenade! It dealt 20 damage to ${comp.name}!\n`);
+          return user;
       } else {
-          return console.log(wrap(`You throw a Plasma Grenade! The blast was impressive, but would have been more useful in a fight...\n`, width));
-      }
+          console.log(wrap(`You throw a Plasma Grenade! The blast was impressive, but would have been more useful in a fight...\n`, width));
+          return user;
+       }
   } else if (item === 'use_shield') {
       user.useItem(useableItemLookUp[item]);
       if (comp !== undefined) {
           user.status2 = 'shield';
-          return console.log(`You generate a temporary shield that can absorb damage!\n`);
+          console.log(`You generate a temporary shield that can absorb damage!\n`);
+          return user;
       } else {
-          return console.log(wrap(`You generate a temporary shield! Too bad you aren't being attacked...\n`, width));
+          console.log(wrap(`You generate a temporary shield! Too bad you aren't being attacked...\n`, width));
+          return user;
       }
   } else if (item === 'use_bomb') {
       user.useItem(useableItemLookUp[item]);
       if (comp !== undefined) {
           comp.status = 'smoke';
-          return console.log(wrap(`You throw a Smoke Bomb! It will be harder for ${comp.name} to hit you!\n`, width));
+          console.log(wrap(`You throw a Smoke Bomb! It will be harder for ${comp.name} to hit you!\n`, width));
+          return user;
       } else {
-          return console.log(`You throw a Smoke Bomb! Gee golly that was exciting!\n`);
+          console.log(`You throw a Smoke Bomb! Gee golly that was exciting!\n`);
+          return user;
       }
   } else if (item === 'use_rbox' && user.inventory.includes('West Riddle Box')) {
       if (answer === 'WET') {
           user.useItem(useableItemLookUp[item][0]);
           user.inventory.push('Office Keycard West');
-          return console.log('You solved the riddle!  There was a Keycard to the West tower inside!\n');
+          console.log('You solved the riddle!  There was a Keycard to the West tower inside!\n');
+          return user;
       } else {
-          return console.log(`That's a tough riddle, gonna have to think about that one...\n`);
+          console.log(`That's a tough riddle, gonna have to think about that one...\n`);
+          return user;
       }
   } else if (item === 'use_rbox' && user.inventory.includes('East Riddle Box')) {
       if (answer === 'SILENCE') {
           user.useItem(useableItemLookUp[item][1]);
           user.inventory.push('Office Keycard East');
-          return console.log('You solved the riddle!  There was a Keycard to the East tower inside!\n');
+          console.log('You solved the riddle!  There was a Keycard to the East tower inside!\n');
+          return user;
       } else {
-          return console.log(`That's a tough riddle, gonna have to think about that one...\n`);
+          console.log(`That's a tough riddle, gonna have to think about that one...\n`);
+          return user;
       }
   } else if (item === 'use_heatray') {
       user.useItem(useableItemLookUp[item]);
       if (comp !== undefined) {
           comp.health = comp.health - 40;
-          return console.log(wrap(`You fired the Nuclear Heat Ray! It dealt 40 damage to ${comp.name}!\n`, width));
+          console.log(wrap(`You fired the Nuclear Heat Ray! It dealt 40 damage to ${comp.name}!\n`, width));
+          return user;
       } else {
-          return console.log(wrap(`You fired the Nuclear Heat Ray! That hole in the wall would have been more impressive if it was through a robot instead...\n`, width));
+          console.log(wrap(`You fired the Nuclear Heat Ray! That hole in the wall would have been more impressive if it was through a robot instead...\n`, width));
+          return user;
       }
   } else {
-      return console.log(wrap(`You can't use that item!!!`, width));
+      console.log(wrap(`You can't use that item!!!`, width));
+      return user;
   }
-}*/
+}

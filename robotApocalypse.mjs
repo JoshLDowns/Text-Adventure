@@ -1,4 +1,4 @@
-import {ask,wrap, random} from './resources/functions.mjs'
+import {ask,wrap, random, itemEffect} from './resources/functions.mjs'
 import {ValidInput} from './resources/inputValidation.mjs'
 import {title, gameOverText, mapEast, mapWest, mapNorth} from './resources/ascii_images.mjs'
 import {combat} from './resources/combat.mjs'
@@ -375,78 +375,6 @@ async function start() {
         use_bomb: 'Smoke Bomb',
         use_heatray: 'Nuclear Heat Ray',
         use_rbox: ['West Riddle Box', 'East Riddle Box']
-    }
-
-    //when called with an item (and enemy or answer if necessary) it determines what action to take
-    function itemEffect(item, comp, answer) {
-        if (item === 'use_repairkit') {
-            player.useItem(useableItemLookUp[item]);
-            player.health = player.health + 30;
-            if (player.health > player.maxHealth) {
-                player.health = player.maxHealth;
-            }
-            player.status2 = undefined;
-            return console.log(wrap(`Your health has been restored!  You currently have ${player.health} HP!\n`, width));
-        } else if (item === 'use_particlebattery') {
-            player.useItem(useableItemLookUp[item]);
-            player.damageBase = player.damageBase + 2;
-            return console.log(wrap(`You have upgraded your Particle Beam!  It now hits harder than ever!\n`, width));
-        } else if (item === 'use_carboncoating') {
-            player.useItem(useableItemLookUp[item]);
-            player.maxHealth = player.maxHealth + 10;
-            player.health = player.health + 10;
-            return console.log(`You have increased your maximum HP by 10 points!\n`);
-        } else if (item === 'use_grenade') {
-            player.useItem(useableItemLookUp[item]);
-            if (comp !== undefined) {
-                comp.health = comp.health - 20;
-                return console.log(`You threw a Plasma Grenade! It dealt 20 damage to ${comp.name}!\n`);
-            } else {
-                return console.log(wrap(`You throw a Plasma Grenade! The blast was impressive, but would have been more useful in a fight...\n`, width));
-            }
-        } else if (item === 'use_shield') {
-            player.useItem(useableItemLookUp[item]);
-            if (comp !== undefined) {
-                player.status2 = 'shield';
-                return console.log(`You generate a temporary shield that can absorb damage!\n`);
-            } else {
-                return console.log(wrap(`You generate a temporary shield! Too bad you aren't being attacked...\n`, width));
-            }
-        } else if (item === 'use_bomb') {
-            player.useItem(useableItemLookUp[item]);
-            if (comp !== undefined) {
-                comp.status = 'smoke';
-                return console.log(wrap(`You throw a Smoke Bomb! It will be harder for ${comp.name} to hit you!\n`, width));
-            } else {
-                return console.log(`You throw a Smoke Bomb! Gee golly that was exciting!\n`);
-            }
-        } else if (item === 'use_rbox' && player.inventory.includes('West Riddle Box')) {
-            if (answer === 'WET') {
-                player.useItem(useableItemLookUp[item][0]);
-                player.inventory.push('Office Keycard West');
-                return console.log('You solved the riddle!  There was a Keycard to the West tower inside!\n');
-            } else {
-                return console.log(`That's a tough riddle, gonna have to think about that one...\n`);
-            }
-        } else if (item === 'use_rbox' && player.inventory.includes('East Riddle Box')) {
-            if (answer === 'SILENCE') {
-                player.useItem(useableItemLookUp[item][1]);
-                player.inventory.push('Office Keycard East');
-                return console.log('You solved the riddle!  There was a Keycard to the East tower inside!\n');
-            } else {
-                return console.log(`That's a tough riddle, gonna have to think about that one...\n`);
-            }
-        } else if (item === 'use_heatray') {
-            player.useItem(useableItemLookUp[item]);
-            if (comp !== undefined) {
-                comp.health = comp.health - 40;
-                return console.log(wrap(`You fired the Nuclear Heat Ray! It dealt 40 damage to ${comp.name}!\n`, width));
-            } else {
-                return console.log(wrap(`You fired the Nuclear Heat Ray! That hole in the wall would have been more impressive if it was through a robot instead...\n`, width));
-            }
-        } else {
-            return console.log(wrap(`You can't use that item!!!`, width));
-        }
     }
 
     //Into to the game function, tells backstory and places player in first 'room'
@@ -826,7 +754,7 @@ async function start() {
                 }
                 let answer = await ask(`What is the answer to the riddle inscribed on this box?\n`);
                 answer = answer.toString().toUpperCase()
-                itemEffect('use_rbox', undefined, answer);
+                player = itemEffect('use_rbox', undefined, answer, player);
                 return play(room);
             } else {
                 console.log(`I'm not sure what you are trying to use...\n`);
@@ -837,7 +765,7 @@ async function start() {
             let itemToUse = useableItemLookUp[input];
             let userInventory = player.inventory;
             if (userInventory.includes(itemToUse)) {
-                itemEffect(input);
+                player = itemEffect(input, undefined, undefined, player);
                 return play(room);
             } else {
                 console.log(wrap(`You don't have that item in your bag! Better go find one if you want to use it!\n`, width));
