@@ -5,10 +5,13 @@ import {combat} from './resources/combat.mjs'
 
 //starts the game and initializes player object, enemy objects, and room objects
 async function start() {
+
+    //global variable declaration (width is declared after width warning so wrap function works better)
     let width = process.stdout.columns - 8;
     let firstTurn = true;
 
     //displays title
+    console.clear();
     console.log(title);
     console.log(wrap('Please set your console to a width of at least 75 for the best experience!\n', width));
 
@@ -22,6 +25,9 @@ async function start() {
     }
 
     console.log(`\n----------------------------------------------------------------------\n`);
+
+    //reassign width if player adjusted window after warning
+    width = process.stdout.columns - 8;
 
     //player object
     let player = {
@@ -70,7 +76,6 @@ async function start() {
                         itemCount += 1;
                     }
                 }
-                console.log('\n');
             } else {
                 console.log('You currently are not carrying any items in your bag.\n');
             }
@@ -97,8 +102,8 @@ async function start() {
     }
 
     //Enemy Objects
-    let enemyW = new Enemy('Robot Sentry', 40, 'Plasma Ray', 'Static Discharge', 6, 9, 'status_stun', undefined, undefined, 'Killswitch Code 1', 'The low hum of the servers surrounds you as you stare at what was left of your foe...\n', `Taking down your first enemy was both empowering and soul crushing...\nYour new found power is exhilerating but what have you given up for it? ...\nThe low hum of the servers surrounds you.\n`);
-    let enemyE = new Enemy('Robot Bruiser', 75, 'Pneumatic Fist', 'Missle Barrage', 6, 3, 'offensive', 8, 12, 'Killswitch Code 2', 'The low hum of the servers surrounds you as you stare at what was left of your foe...\n', `Taking down your first enemy was both empowering and soul crushing...\nYour new found power is exhilerating but what have you given up for it? ...\nThe low hum of the servers surrounds you.\n`);
+    let enemyW = new Enemy('Robot Sentry', 40, 'Plasma Ray', 'Static Discharge', 6, 9, 'status_stun', undefined, undefined, 'Killswitch Code 1', wrap('The low hum of the servers surrounds you as you stare at what was left of your foe...\n', width), wrap(`Taking down your first enemy was both empowering and soul crushing... Your new found power is exhilerating but what have you given up for it? ... The low hum of the servers surrounds you.\n`, width));
+    let enemyE = new Enemy('Robot Bruiser', 75, 'Pneumatic Fist', 'Missle Barrage', 6, 3, 'offensive', 8, 12, 'Killswitch Code 2', wrap('The low hum of the servers surrounds you as you stare at what was left of your foe...\n', width), wrap(`Taking down your first enemy was both empowering and soul crushing... Your new found power is exhilerating but what have you given up for it? ... The low hum of the servers surrounds you.\n`, width));
     let enemyN1 = new Enemy('Mechanical Surveillance Unit', 100, 'Fission Laser', 'Remote Laser', 10, 6, 'status_dot', 6, 3, 'Office Keycard North', 'As the dust settles, you notice that you were surrounded by automated\nturrets, thankfully defeating this foe seems to have shut them down...\nThe room is earily quiet.\n');
     let enemyF = new Enemy('Enforcer Captain', 125, 'Collider Beam', 'Combat Repair', 10, 10, 'defensive', 14, 6, 'Killswitch Code 3', `Your final foe has been defeated ...\nYou are so close to your end goal, but you can't help but ask yourself,\nhas destroying your own kind been worth it?\n`);
     let enemyRandom = new Enemy('Surveillance Bot', 25, 'Photon Blaster', 'Combat Repair', 4, 3, 'defensive', 5, 5, `${random(5) <= 2 ? 'Repair Kit' : random(5) <= 2 ? 'Smoke Bomb' : 'Scrap Metal'}`) //random loot with nested ternary
@@ -138,13 +143,16 @@ async function start() {
                     newRoom = this.north;
                     newRoom = roomLookUp[newRoom];
                     if (newRoom.keycard && player.inventory.includes(newRoom.keycard)) {
+                        console.clear();
                         console.log(`----------------------------------------------------------------------\n`);
-                        console.log('You scan your keycard, the door unlocks!');
+                        console.log('You scan your keycard, the door unlocks!\n\n');
                         return newRoom;
                     } else if (newRoom.keycard && !player.inventory.includes(newRoom.keycard)) {
                         console.log(`You need ${newRoom.keycard} to enter this room ... \n`);
+                        console.log(`----------------------------------------------------------------------\n`);
                         return false;
                     } else {
+                        console.clear();
                         console.log(`----------------------------------------------------------------------\n`);
                         return newRoom;
                     }
@@ -152,13 +160,16 @@ async function start() {
                     newRoom = this.south;
                     newRoom = roomLookUp[newRoom];
                     if (newRoom.keycard && player.inventory.includes(newRoom.keycard)) {
+                        console.clear();
                         console.log(`----------------------------------------------------------------------\n`);
-                        console.log('You scan your keycard, the door unlocks!');
+                        console.log('You scan your keycard, the door unlocks!\n\n');
                         return newRoom;
                     } else if (newRoom.keycard && !player.inventory.includes(newRoom.keycard)) {
                         console.log(`You need ${newRoom.keycard} to enter this room ... \n`);
+                        console.log(`----------------------------------------------------------------------\n`);
                         return false;
                     } else {
+                        console.clear();
                         console.log(`----------------------------------------------------------------------\n`);
                         return newRoom;
                     }
@@ -166,13 +177,16 @@ async function start() {
                     newRoom = this.east;
                     newRoom = roomLookUp[newRoom];
                     if (newRoom.keycard && player.inventory.includes(newRoom.keycard)) {
+                        console.clear();
                         console.log(`----------------------------------------------------------------------\n`);
-                        console.log('You scan your keycard, the door unlocks!');
+                        console.log('You scan your keycard, the door unlocks!\n\n');
                         return newRoom;
                     } else if (newRoom.keycard && !player.inventory.includes(newRoom.keycard)) {
                         console.log(`You need ${newRoom.keycard} to enter this room ... \n`);
+                        console.log(`----------------------------------------------------------------------\n`);
                         return false;
                     } else {
+                        console.clear();
                         console.log(`----------------------------------------------------------------------\n`);
                         return newRoom;
                     }
@@ -180,19 +194,23 @@ async function start() {
                     newRoom = this.west;
                     newRoom = roomLookUp[newRoom];
                     if (newRoom.keycard && player.inventory.includes(newRoom.keycard)) {
+                        console.clear();
                         console.log(`----------------------------------------------------------------------\n`);
-                        console.log('You scan your keycard, the door unlocks!');
+                        console.log('You scan your keycard, the door unlocks!\n\n');
                         return newRoom;
                     } else if (newRoom.keycard && !player.inventory.includes(newRoom.keycard)) {
                         console.log(`You need ${newRoom.keycard} to enter this room ... \n`);
+                        console.log(`----------------------------------------------------------------------\n`);
                         return false;
                     } else {
+                        console.clear();
                         console.log(`----------------------------------------------------------------------\n`);
                         return newRoom;
                     }
                 }
             } else {
                 console.log('There is nothing in that direction ...\n')
+                console.log(`----------------------------------------------------------------------\n`);
                 return false;
             }
         }
@@ -200,10 +218,10 @@ async function start() {
         inspectRoom() {
             if (this.inventory.length !== 0 || this.intObjInv !== undefined) {
                 if (this.inventory.length !== 0 && this.intObjInv !== undefined) {
-                    console.log(`Upon looking around, you notice that the following items are in ${this.name}:`);
+                    console.log(wrap(`Upon looking around, you notice that the following items are in ${this.name}:`, width));
                     console.log(this.inventory.join(', ') + `\nThere is also a ${this.intObject} in the room\n`);
                 } else if (this.inventory.length !== 0 && this.intObj === undefined) {
-                    console.log(`Upon looking around, you notice that the following items are in ${this.name}:`);
+                    console.log(wrap(`Upon looking around, you notice that the following items are in ${this.name}:`, width));
                     console.log(this.inventory.join(', ') + `\n`);
                 } else {
                     console.log(`There is a ${this.intObject} in the room\n`);
@@ -391,6 +409,7 @@ async function start() {
             input.returnInput(input);
         }
         input = input.return.toString();
+        console.clear();
         if (input !== 'dn') {
             console.log(`----------------------------------------------------------------------\n`);
             console.log(`No time for nonsense, there is only one way to go ... you head north\n`);
@@ -411,6 +430,7 @@ async function start() {
             input2.returnInput(input2);
         }
         input2 = input2.return.toString();
+        console.clear();
         if (input2 !== 'combat') {
             console.log(`----------------------------------------------------------------------\n`);
             console.log(`No time for nonsense, the machine has you pinned, you must fight...\n`);
@@ -428,6 +448,7 @@ async function start() {
         console.log(wrap(`'Alright, everything should be working now ... what's your name?' she asked.'`,width));
         let name = await ask('Please enter your name ...\n');
         player.name = name;
+        console.clear();
         console.log(`----------------------------------------------------------------------\n`);
         console.log(`You think, and finally respond "My name is ${player.name}."`);
         console.log(`  'I KNEW IT,' she yelled, 'you ARE my father's robot!!!'`);
@@ -445,6 +466,7 @@ async function start() {
             input3.returnInput(input3);
         }
         input3 = input3.return.toString();
+        console.clear();
         if (input3 === 'n') {
             console.log(`----------------------------------------------------------------------\n`);
             console.log(`Doesn't look like Ella is going to give you a choice ...\n`);
@@ -458,6 +480,8 @@ async function start() {
         console.log(wrap(`Ella, in all of her excitement took no notice to your confusion, 'We are currently in an old Fallout Bunker deep underground in the center of the Robotics United Towers ... where the machines were invented.  I stationed us here in hopes that being close to enemy would help us figure out a way to fight them. In my father's office in the North Tower, his computer must still be functioning.  It just has to be in order for the machines to all be operational. The computer is connected to many back up servers around the world though so simply shutting it off won't shut down the machines. There are three Killcodes though, one in each of the towers.  You can get them in the server room of each tower, but they are most likely gaurded. If you enter all the Killcodes into the shutdown program on my father's computer, it will shut the whole system down.  This means you will be shut down too, but this is why you were created, this is your mission ... will you help us?\n`,width));
         console.log(wrap(`... That was a lot to take in, but you cautiously answer yes, this is what you were meant for right?\n`,width));
         console.log(wrap(`  'One last thing' Ella continues, 'My father hid Riddle Boxes in each of the towers with backup keys. They are most likely out in the open, as they were just his spare keys. You'll need the keycards inside to get around each Tower.'\n\n`,width));
+        console.log(`----------------------------------------------------------------------\n`);
+        console.clear();
         console.log(`----------------------------------------------------------------------\n`);
         initializeRoom(falloutBunker);
     }
@@ -473,26 +497,24 @@ async function start() {
     async function play(room) {
         let metalCount = 0;
         let ranEnemyNum;
+        console.log(`----------------------------------------------------------------------\n`);
         //If the game is on the first turn, this checks difficulty and gives you some starting inventory
         if (room === falloutBunker && firstTurn === true) {
             if (difficulty === '1') {
                 console.log(`\nIt's dangerous out there, take these Repair Kits...\n`);
                 console.log(`3 Repair Kits were added to your inventory`);
-                console.log(`----------------------------------------------------------------------\n`);
                 player.inventory.push('Repair Kit', 'Repair Kit', 'Repair Kit');
                 firstTurn = false;
                 return (play(room));
             } else if (difficulty === '2') {
                 console.log(`\nIt's dangerous out there, take this gear...\n`);
                 console.log(wrap(`2 Repair Kits and 1 Plasma Grenade were added to your inventory`, width));
-                console.log(`----------------------------------------------------------------------\n`);
                 player.inventory.push('Repair Kit', 'Repair Kit', 'Plasma Grenade');
                 firstTurn = false;
                 return (play(room));
             } else if (difficulty === '3') {
                 console.log(`\nIt's dangerous out there, take this gear...\n`);
                 console.log(wrap(`1 Repair Kit, 1 Portable Shield, and 1 Plasma Grenade were added to your inventory`, width));
-                console.log(`----------------------------------------------------------------------\n`);
                 player.inventory.push('Repair Kit', 'Portable Shield', 'Plasma Grenade');
                 firstTurn = false;
                 return (play(room));
@@ -509,11 +531,13 @@ async function start() {
                 if (player.hasKilled === true) {
                     room.info = room.enemy.postRoomInfo;
                     room.enemy = undefined;
+                    console.log(`----------------------------------------------------------------------\n\n`);
                     return initializeRoom(room);
                 } else {
                     player.hasKilled = true;
                     room.info = room.enemy.postRoomInfo2;
                     room.enemy = undefined;
+                    console.log(`----------------------------------------------------------------------\n\n`);
                     return initializeRoom(room);
                 }
             } else {
@@ -535,6 +559,7 @@ async function start() {
                     enemyRandom.health = 35;
                     room.enemy = undefined;
                     room.foughtRando = true;
+                    console.log(`----------------------------------------------------------------------\n\n`);
                     return initializeRoom(room);
                 } else {
                     console.log('You have been defeated! Better luck next time!');
@@ -566,12 +591,15 @@ async function start() {
             } else {
                 console.log(`You show Ella the Nuclear Fuel Cell...\n'`);
                 console.log(wrap(`WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter. Come back when you have 5 Scrap Metal and I can make you a sweet weapon!\n`, width));
+                console.log(`----------------------------------------------------------------------\n`);
             }
+            
         }
         let input = await ask('What would you like to do?\n');
         //checks if player has entered the cheat code
         if ((input.slice(0, input.indexOf(' ')).toUpperCase()) === 'XYZZY' && (cheatCode.includes((input.slice((input.lastIndexOf(' ')) + 1))))) {
-            console.log(`----------------------------------------------------------------------\n`);
+            console.clear();
+            console.log(`----------------------------------------------------------------------\n\n`);
             return initializeRoom(roomLookUp[(input.slice((input.lastIndexOf(' ')) + 1))]);
         }
         //validates input
@@ -579,9 +607,11 @@ async function start() {
         input.returnInput(input);
         while ((input.firstInputTrue() === false && input.lastWordTrue() === false) || input.return === undefined) {
             console.log('I am not sure what that means...\n');
+            console.log(`----------------------------------------------------------------------\n`);
             input = await ask('What would you like to do?\n');
             if ((input.slice(0, input.indexOf(' ')).toUpperCase()) === 'XYZZY' && (cheatCode.includes((input.slice((input.lastIndexOf(' ')) + 1))))) {
-                console.log(`----------------------------------------------------------------------\n`);
+                console.clear();
+                console.log(`----------------------------------------------------------------------\n\n`);
                 return initializeRoom(roomLookUp[(input.slice((input.lastIndexOf(' ')) + 1))]);
             }
             input = new ValidInput(input);
@@ -660,7 +690,7 @@ async function start() {
             }
             let currentInventory = room.inventory;
             if (currentInventory.length !== 0 && input === 'pu_all') {  //picks up all items in room
-                console.log(`You put the following items in your bag:\n${currentInventory.join(`\n`)}\n-----------------------------------------------------------------\n`);
+                console.log(`You put the following items in your bag:\n${currentInventory.join(`\n`)}\n`);
                 let n = currentInventory.length;
                 for (let i = 0; i < n; i++) {
                     player.inventory.push(currentInventory[0]);
@@ -841,7 +871,7 @@ async function start() {
                     console.log(`You put the North Tower Keycard in your bag\n`);
                     return play(room);
                 } else {
-                    console.log(`Ella says you need the data from Office Keycard East and West to program a new one\n`);
+                    console.log(wrap(`Ella says you need the data from Office Keycard East and West to program a new one\n`, width));
                     return play(room);
                 }
             } else {
@@ -866,13 +896,16 @@ async function start() {
             return play(room);
         } else if (input === 'di') { //my wife asked why she couldn't go inside... it was a valid question...
             if (room === RUE_Entrance) {
-                console.log(`----------------------------------------------------------------------\n`);
+                console.clear();
+                console.log(`----------------------------------------------------------------------\n\n`);
                 return initializeRoom(RUE_WelcomeDesk);
             } else if (room === RUW_Entrance) {
-                console.log(`----------------------------------------------------------------------\n`);
+                console.clear();
+                console.log(`----------------------------------------------------------------------\n\n`);
                 return initializeRoom(RUW_WelcomeDesk);
             } else if (room === RUN_Entrance) {
-                console.log(`----------------------------------------------------------------------\n`);
+                console.clear();
+                console.log(`----------------------------------------------------------------------\n\n`);
                 return initializeRoom(RUN_WelcomeDesk);
             } else {
                 console.log(`You are already inside a building...\n`);
