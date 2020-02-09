@@ -1,6 +1,7 @@
 import {ask,wrap, random} from './resources/functions.mjs'
 import {ValidInput} from './resources/inputValidation.mjs'
 import {title, gameOverText, mapEast, mapWest, mapNorth} from './resources/ascii_images.mjs'
+import {combat} from './resources/combat.mjs'
 
 //starts the game and initializes player object, enemy objects, and room objects
 async function start() {
@@ -421,7 +422,7 @@ async function start() {
             }
         } else if (item === 'use_rbox' && player.inventory.includes('West Riddle Box')) {
             if (answer === 'WET') {
-                player.useItem(useableItemLookUp[item[0]]);
+                player.useItem(useableItemLookUp[item][0]);
                 player.inventory.push('Office Keycard West');
                 return console.log('You solved the riddle!  There was a Keycard to the West tower inside!\n');
             } else {
@@ -429,7 +430,7 @@ async function start() {
             }
         } else if (item === 'use_rbox' && player.inventory.includes('East Riddle Box')) {
             if (answer === 'SILENCE') {
-                player.useItem(useableItemLookUp[item[1]]);
+                player.useItem(useableItemLookUp[item][1]);
                 player.inventory.push('Office Keycard East');
                 return console.log('You solved the riddle!  There was a Keycard to the East tower inside!\n');
             } else {
@@ -445,257 +446,6 @@ async function start() {
             }
         } else {
             return console.log(wrap(`You can't use that item!!!`, width));
-        }
-    }
-
-    //status checking function for combat
-    function statusCheck(comp) {
-        if (player.status === 'status_stun') {
-            console.log(`You are still stunned!\n`)
-            return player.status = undefined;
-        } else if (player.status === 'status_dot') {
-            let dotDamage = comp.abilityBase + random(comp.abilityModifier);
-            console.log(wrap(`The ${comp.ability} is still active! It dealt ${dotDamage} damage!\n`, width));
-            player.health = player.health - dotDamage;
-            if (player.health <= 0) {
-                console.log('You have been defeated! Better luck next time!\n');
-                console.log(gameOverText);
-                playAgain();
-            } else {
-                return console.log(`Your currently have ${player.health} HP!\n`);
-            }
-        }
-    }
-
-    //called in combat when conditions are met, determines the enemy ability and its effect
-    function useCompAbility(comp) {
-        if (comp.abilityType === 'status_stun') {
-            let stunChance = random(5);
-            if (stunChance !== 1) {
-                console.log(`${comp.name} used ${comp.ability}! It dealt 10 damage!\nYou are stunned from the attack!\n`);
-                player.health = player.health - 10;
-                if (player.health <= 0) {
-                    console.log('You have been defeated! Better luck next time!');
-                    console.log(gameOverText);
-                    playAgain();
-                } else {
-                    console.log(`Your currently have ${player.health} HP!\n`);
-                    return player.status = 'status_stun';
-                }
-            } else {
-                console.log(`${comp.name} used ${comp.ability} ... it failed!\n`);
-                return player.status = undefined;
-            }
-        } else if (comp.abilityType === 'offensive') {
-            let miss = random(5);
-            if (miss !== 5) {
-                let abilityDamage = comp.abilityBase + random(comp.abilityModifier);
-                console.log(wrap(`${comp.name} used ${comp.ability}, it dealt ${abilityDamage} damage!\n`, width));
-                player.health = player.health - abilityDamage;
-                if (player.health <= 0) {
-                    console.log('You have been defeated! Better luck next time!');
-                    console.log(gameOverText);
-                    playAgain();
-                } else {
-                    return console.log(`Your currently have ${player.health} HP!\n`);
-                }
-            } else {
-                return console.log(`${comp.name} used ${comp.ability} ... it missed!\n`);
-            }
-        } else if (comp.abilityType === 'status_dot') {
-            let dotChance = random(5);
-            if (dotChance !== 5 && player.status !== 'status_dot') {
-                player.status = 'status_dot';
-                return console.log(wrap(`${comp.name} used ${comp.ability} ... it plants a remote laser on the ground!\n`, width));
-            } else if (dotChance === 5 && player.status === 'status_dot') {
-                return console.log(wrap(`${comp.name} used ${comp.ability} ... it already has an active remote laser!\n`, width));
-            } else {
-                console.log(`${comp.name} used ${comp.ability} ... it failed!\n`);
-                return player.status = undefined;
-            }
-        } else if (comp.abilityType === 'defensive') {
-            let totalHeal = comp.abilityBase + random(comp.abilityModifier);
-            comp.health = comp.health + totalHeal;
-            return console.log(`${comp.name} used ${comp.ability} ... it restored ${totalHeal} HP!\n`)
-        }
-    }
-
-    //combat function
-    async function combat(comp) {
-        let damageUser = 0;
-        let damageComp = 0;
-        let criticalHit;
-        let miss;
-        let compAbility;
-        let statusCount;
-        let shieldHP = 0;
-        player.status = undefined;
-
-        //displays text on player victory (there were 5 victory conditions so I used this to save some code)
-        function victoryText() {
-            console.log(`You have defeated ${comp.name}, congratulations!`);
-            console.log(`You received ${comp.reward} for winning!\n`);
-            console.log(`----------------------------------------------------------------------\n`);
-            player.inventory.push(comp.reward);
-            return true;
-        }
-
-        while (player.health > 0 || comp.health > 0) {  //Loop that breaks when either user or computer hits 0 or less HP
-            //Player Turn
-            player.status2 = undefined; //emergency reset to status in case it gets skipped (happened once, can't figure out why still...)
-            if (player.status === 'status_stun') {
-                statusCheck(comp);
-            } else {
-                if (player.status === 'status_dot') {
-                    statusCheck(comp);
-                    if (statusCount !== 0) {
-                        statusCount = statusCount - 1
-                        if (statusCount === 0) {
-                            player.status = undefined;
-                            console.log(`${comp.name}'s ${comp.ability} is no longer active!\n`);
-                        }
-                    }
-                }
-                let input = await ask(wrap(`What would you like to do? (Try things like 'attack' or use an item!)\n`, width));
-                input = new ValidInput(input);
-                input.returnInput(input);
-                while ((input.firstInputTrue() === false && input.lastWordTrue() === false) || input.return === undefined) {
-                    console.log('I am not sure what that means...\n');
-                    input = await ask('What would you like to do?\n');
-                    input = new ValidInput(input);
-                    input.returnInput(input);
-                }
-                input = input.return.toString();
-                if (input === 'combat') {
-                    criticalHit = random(5);
-                    miss = random(5);
-                    damageUser = player.damageBase + random(player.damageModifier);  //damage + modifier (like dice roll)
-                    if (miss === 5) {
-                        console.log(`Your ${player.attack} missed!\n`)
-                    } else if (criticalHit === 5) {
-                        damageUser = damageUser + (Math.ceil(player.damageBase * .75));
-                        console.log(`You fired your ${player.attack}!  It was a Critical Hit!!\nIt dealt ${damageUser} damage!\n`);
-                        comp.health = comp.health - damageUser;
-                        if (comp.health <= 0) {
-                            return victoryText();
-                        }
-                    } else {
-                        console.log(`You fired your ${player.attack}!  It dealt ${damageUser} damage!\n`);
-                        comp.health = comp.health - damageUser;
-                        if (comp.health <= 0) {
-                            return victoryText();
-                        }
-                    }
-                } else if (input === 'throw_metal') {
-                    if (player.inventory.includes('Scrap Metal')) {
-                        console.log(wrap(`You threw a piece of Scrap Metal at ${comp.name} ... it did nothing ...\n`, width));
-                        player.useItem('Scrap Metal');
-                    } else {
-                        console.log(`You don't have any Scrap Metal to throw!\n`);
-                    }
-                } else if (input === 'throw_null') {
-                    console.log(`I don't know what you want me to throw\n`);
-                }
-                else if (input === 'use_null') {
-                    console.log(`I'm not sure what item you are trying to use...\n`);
-                } else if (input === 'no_use') {
-                    console.log(`You cannot use that item right now...\n`);
-                } else if (useableItems.includes(input)) {  //uses items in inventory
-                    input = input.toString();
-                    let itemToUse = useableItemLookUp[input];
-                    let userInventory = player.inventory;
-                    if (userInventory.includes(itemToUse) && input !== 'use_rbox') {
-                        itemEffect(input, comp);
-                        if (player.status2 === 'shield') {
-                            shieldHP = 30;
-                            player.status2 = undefined;
-                        }
-                    } else {
-                        console.log(wrap(`You don't have that item in your bag! Better go find one if you want to use it!\n`));
-                    }
-                    if (comp.health <= 0) {
-                        return victoryText();
-                    }
-                } else {
-                    console.log('Now is not the time or place for that! ... ATTACK!\n');
-                    criticalHit = random(5);
-                    miss = random(5);
-                    damageUser = player.damageBase + random(player.damageModifier);  //damage + modifier (like dice roll)
-                    if (miss === 5) {
-                        console.log(`Your ${player.attack} missed!`)
-                    } else if (criticalHit === 5) {
-                        damageUser = damageUser + (Math.ceil(player.damageBase * .75));
-                        console.log(`You fired your ${player.attack}!  It was a Critical Hit!!\nIt dealt ${damageUser} damage!\n`);
-                        comp.health = comp.health - damageUser;
-                        if (comp.health <= 0) {
-                            return victoryText();
-                        }
-                    } else {
-                        console.log(`You fired your ${player.attack}!  It dealt ${damageUser} damage!\n`);
-                        comp.health = comp.health - damageUser;
-                        if (comp.health <= 0) {
-                            return victoryText();
-                        }
-                    }
-                }
-            }
-            //Computer Enemy turn
-            compAbility = random(4);
-            if (compAbility !== 4) {
-                criticalHit = random(5);
-                miss = random(5);
-                if (comp.status === 'smoke') {
-                    miss = random(3);
-                }
-                damageComp = comp.damageBase + random(comp.damageModifier) + 1;
-                if (miss === 1) {
-                    console.log(`${comp.name} fired a ${comp.attack} ... it missed!\n`);
-                } else if (criticalHit === 5) {
-                    damageComp = damageComp + (Math.ceil(comp.damageBase * .75));
-                    console.log(`${comp.name} fired a ${comp.attack} ... it was a critical hit!\nIt dealt ${damageComp} damage!\n`);
-                    if (shieldHP > 0) {
-                        shieldHP = shieldHP - damageComp;
-                        if (shieldHP <= 0) {
-                            console.log(wrap(`Your shield absorbed the damage... but was destroyed in the process\n`, width));
-                        } else {
-                            console.log(`Your shield absorbed the damage!\n`);
-                        }
-                    } else {
-                        player.health = player.health - damageComp;
-                        if (player.health <= 0) {
-                            console.log('You have been defeated! Better luck next time!');
-                            console.log(gameOverText);
-                            playAgain();
-                        } else {
-                            console.log(`Your currently have ${player.health} HP!\n`);
-                        }
-                    }
-                } else {
-                    console.log(`${comp.name} fired a ${comp.attack}, it dealt ${damageComp} damage!\n`);
-                    if (shieldHP > 0) {
-                        shieldHP = shieldHP - damageComp;
-                        if (shieldHP <= 0) {
-                            console.log(wrap(`Your shield absorbed the damage... but was destroyed in the process\n`, width));
-                        } else {
-                            console.log(`Your shield absorbed the damage!\n`);
-                        }
-                    } else {
-                        player.health = player.health - damageComp;
-                        if (player.health <= 0) {
-                            console.log('You have been defeated! Better luck next time!');
-                            console.log(gameOverText);
-                            playAgain();
-                        } else {
-                            console.log(`Your currently have ${player.health} HP!\n`);
-                        }
-                    }
-                }
-            } else {
-                useCompAbility(comp);
-                if (statusCount !== 0 && player.status === 'status_dot') {
-                    statusCount = random(4);
-                }
-            }
         }
     }
 
@@ -822,8 +572,9 @@ async function start() {
         }
         //checks if room has a predetermined enemy and calls combat
         if (room.enemy) {
-            let victory = await combat(room.enemy);
-            if (victory === true) {
+            let victory = await combat(room.enemy,player);
+            if (victory[0] === true) {
+                player = victory[1];
                 if (room.enemy === enemyRandom) {
                     enemyRandom.health = 25;
                 }
@@ -837,6 +588,10 @@ async function start() {
                     room.enemy = undefined;
                     return initializeRoom(room);
                 }
+            } else {
+                console.log('You have been defeated! Better luck next time!');
+                console.log(gameOverText);
+                playAgain();
             }
         }
         //determines if random enemy spawns in room
@@ -846,12 +601,17 @@ async function start() {
                 room.enemy = enemyRandom;
                 console.log(wrap('All of the sudden, an alarm sounds... The sound is coming from a small robot covered in flashing lights that was hiding in the corner! It looks like it wants to fight!', width));
                 enemyRandom.postRoomInfo = room.info;
-                let victory = await combat(room.enemy);
-                if (victory === true) {
+                let victory = await combat(room.enemy, player);
+                if (victory[0] === true) {
+                    player = victory[1];
                     enemyRandom.health = 35;
                     room.enemy = undefined;
                     room.foughtRando = true;
                     return initializeRoom(room);
+                } else {
+                    console.log('You have been defeated! Better luck next time!');
+                    console.log(gameOverText);
+                    playAgain();
                 }
             }
         }
