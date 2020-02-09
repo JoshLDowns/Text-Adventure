@@ -867,7 +867,7 @@ async function start() {
             //determines if player can make the Nuclear Heat Ray
             if (metalCount >= 5) {
                 console.log(`You show Ella the Nuclear Fuel Cell...\n'`);
-                console.log(wrap(`WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter. Give me 5 Scrap Metal and the Fuel Cell and I can make a Heat Ray that will really pack a punch! It only has one shot, so use it wisely...\n`,length));
+                console.log(wrap(`WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter. Give me 5 Scrap Metal and the Fuel Cell and I can make a Heat Ray that will really pack a punch! It only has one shot, so use it wisely...\n`, width));
                 console.log('You put the Nuclear Heat Ray in your bag.\n');
                 player.useItem('Nuclear Fuel Cell');
                 player.inventory.push('Nuclear Heat Ray');
@@ -877,7 +877,7 @@ async function start() {
                 return play(room);
             } else {
                 console.log(`You show Ella the Nuclear Fuel Cell...\n'`);
-                console.log(wrap(`WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter. Come back when you have 5 Scrap Metal and I can make you a sweet weapon!\n`,length));
+                console.log(wrap(`WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter. Come back when you have 5 Scrap Metal and I can make you a sweet weapon!\n`, width));
             }
         }
         let input = await ask('What would you like to do?\n');
