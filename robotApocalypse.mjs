@@ -2,6 +2,8 @@ import {ask,wrap, random, itemEffect} from './resources/functions.mjs'
 import {ValidInput} from './resources/inputValidation.mjs'
 import {title, gameOverText, mapEast, mapWest, mapNorth, thanks} from './resources/ascii_images.mjs'
 import {combat} from './resources/combat.mjs'
+import {difficultyChoice} from './resources/inquire_funcs.mjs'
+//import inquirer from 'inquirer'
 
 //starts the game and initializes player object, enemy objects, and room objects
 async function start() {
@@ -16,13 +18,17 @@ async function start() {
     console.log(wrap('Please set your console to a width of at least 75 for the best experience!\n', width));
 
     //diffuculty selection before game starts
-    let difficulty = await ask('Please select difficulty... (1) Easy (2) Medium (3) Hard\n');
+    // let difficulty = await ask('Please select difficulty... (1) Easy (2) Medium (3) Hard\n');
 
     //ensures correct input
-    while (difficulty !== '1' && difficulty !== '2' && difficulty !== '3') {
-        console.log(`I know its a hard choice...`);
-        difficulty = await ask('Please answer the question...\n');
-    }
+    // while (difficulty !== '1' && difficulty !== '2' && difficulty !== '3') {
+    //     console.log(`I know its a hard choice...`);
+    //     difficulty = await ask('Please answer the question...\n');
+    // }
+
+    let difficulty = await difficultyChoice();
+    console.log(difficulty);
+    
 
     console.log(`\n----------------------------------------------------------------------\n`);
 
@@ -1006,5 +1012,4 @@ async function playAgain() {  //Allows user to play again
     }
 }
 
-start();
-
+(async () => await start())();
