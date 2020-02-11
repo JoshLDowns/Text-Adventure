@@ -1,5 +1,11 @@
 let width = process.stdout.columns - 5;
 
+async function wait(ms) {
+    return new Promise(resolve => {
+      setTimeout(resolve, ms);
+    });
+}
+
 function wrap(string, w) {
     if (string.length <= w) {
         return string;
@@ -20,5 +26,16 @@ function wrap(string, w) {
     return string;
 }
 
+async function slowLog (string) {
+    let stringArray = string.split('\n');
+    for (let subString of stringArray) {
+        let subArray = subString.split('');
+        for (let letter of subArray) {
+            process.stdout.write(letter);
+            await wait(25);
+        }
+    }
+}
+
 let text = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sit amet iaculis est. Nunc vel tempor augue, eget consectetur neque. Cras erat velit, ullamcorper et feugiat vitae, tempor at mi. Quisque ullamcorper tempor vestibulum.';
-console.log(wrap(text, width));
+slowLog(wrap(text, width));

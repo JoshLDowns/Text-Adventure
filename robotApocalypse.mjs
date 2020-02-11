@@ -1,9 +1,9 @@
-import {ask,wrap, random, itemEffect} from './resources/functions.mjs'
-import {ValidInput} from './resources/inputValidation.mjs'
-import {title, gameOverText, mapEast, mapWest, mapNorth, thanks} from './resources/ascii_images.mjs'
-import {combat} from './resources/combat.mjs'
-import {difficultyChoice} from './resources/inquire_funcs.mjs'
-//import inquirer from 'inquirer'
+import { ask, wrap, random, itemEffect, wait, slowLog, storyTextOffOn } from './resources/functions.mjs'
+import { ValidInput } from './resources/inputValidation.mjs'
+import { title, gameOverText, mapEast, mapWest, mapNorth, thanks } from './resources/ascii_images.mjs'
+import { combat } from './resources/combat.mjs'
+import { difficultyChoice } from './resources/inquire_funcs.mjs'
+import inquirer from 'inquirer'
 
 //starts the game and initializes player object, enemy objects, and room objects
 async function start() {
@@ -18,17 +18,30 @@ async function start() {
     console.log(wrap('Please set your console to a width of at least 75 for the best experience!\n', width));
 
     //diffuculty selection before game starts
-    // let difficulty = await ask('Please select difficulty... (1) Easy (2) Medium (3) Hard\n');
+    let difficulty = await ask('Please select difficulty... (1) Easy (2) Medium (3) Hard\n');
 
     //ensures correct input
-    // while (difficulty !== '1' && difficulty !== '2' && difficulty !== '3') {
-    //     console.log(`I know its a hard choice...`);
-    //     difficulty = await ask('Please answer the question...\n');
-    // }
+    while (difficulty !== '1' && difficulty !== '2' && difficulty !== '3') {
+        console.log(`I know its a hard choice...`);
+        difficulty = await ask('Please answer the question...\n');
+    }
 
-    let difficulty = await difficultyChoice();
-    console.log(difficulty);
-    
+    //offers story text (slowLog text);
+    let storyText = await ask('Would you like story text turned on? ... (1) Yes (2) No\n');
+    console.log(wrap(`You may turn this off or on at any time by typing 'story text off' or 'story text on'\n`, width));
+
+    //ensures correct input
+    while (storyText !== '1' && storyText !== '2') {
+        console.log(`Please select 1 or 2!`);
+        storyText = await ask('Would you like story text turned on? ...\n');
+    }
+
+    let logTime = storyText==='1'?20:0; //determines off and on speeds for story text
+    let tempInput = ''; //input used to answer questions without progressing game (story text off/on, help menu)
+
+    //let difficulty = await difficultyChoice();
+    //console.log(typeof difficulty);
+
 
     console.log(`\n----------------------------------------------------------------------\n`);
 
@@ -67,15 +80,24 @@ async function start() {
         //displays player status
         getStatus: function (room) {
             console.log(`\nCurrent Room: ${room}\n`);
-            console.log(`You currently have ${this.health} HP.`);
+            console.log(`You currently have ${this.health} / ${this.maxHealth} HP.`);
             if ((this.health / this.maxHealth) > .75) {
-                console.log('HP is above 75%, you are feeling great');
+                console.log('HP is above 75%, you are feeling great\n');
             } else if ((this.health / this.maxHealth) < .25) {
-                console.log('HP is below 25%, repair as soon as you can!');
+                console.log('HP is below 25%, repair as soon as you can!\n');
             } else {
-                console.log('You are a little beat up but doing alright!')
+                console.log('You are a little beat up but doing alright!\n')
             }
             console.log(`Your Particle Beam has a base damage value of ${this.damageBase}.\n`);
+            if (this.ability1 !== undefined) {
+                console.log(`Your ${this.ability1} has ${this.ability1Supply} charge${this.ability1Supply === 1?` `:`s `}left.\n`);
+            }
+            if (this.ability2 !== undefined) {
+                console.log(`Your ${this.ability2} has ${this.ability2Supply} charge${this.ability2Supply === 1?` `:`s `}left.\n`);
+            }
+            if (this.ability3 !== undefined) {
+                console.log(`Your ${this.ability3} has ${this.ability3Supply} charge${this.ability3Supply === 1?` `:`s `}left.\n`);
+            }
         },
         //displays inventory in an easy to read manner with item descriptions
         inspectBag() {
@@ -142,6 +164,7 @@ async function start() {
             this.intObject = intObject;
             this.intObjInv = intObjInv;
             this.foughtRando = false;
+            this.entered = false;
             this.pickUpItem = function (item) {  //removes item from room inventory when picked up
                 for (let element of this.inventory) {
                     if (element === item) {
@@ -422,10 +445,12 @@ async function start() {
 
     //Into to the game function, tells backstory and places player in first 'room'
     async function prologue() {
-        console.log(wrap(`Welcome to the year 2361, the year that the human race was given another chance ... again. It has been twenty-four years since the machines took over. The human's AI algorithms were both their triumph and their downfall. The machines were cold and ruthless, and their "justice" was brutal and swift.  Eighty percent of all biological life on Earth was wiped out in less than a week. What was left of humanity went into hiding, and it has been your mission for the past twenty years to find them.  You don't know why, but you feel compassion for the humans and want to help them.  Something set you apart from the rest of the machines, something that you didn't understand ... something that made you special ... something that made you a target ...\n`, width));
-        console.log(wrap(`\nWhile searching he ruins of what used to be Seattle for any signs of life, you find yourself at the end of a mostly collapsed alleyway almost entirely surrounded by rubble. The only choice is to head back the way you came. You hear the faint whirring of gears to the north ...\n`,width));
+        await slowLog(logTime, wrap(`Welcome to the year 2361, the year that the human race was given another chance ... again. It has been twenty-four years since the machines took over. The human's AI algorithms were both their triumph and their downfall. The machines were cold and ruthless, and their "justice" was brutal and swift.  Eighty percent of all biological life on Earth was wiped out in less than a week. What was left of humanity went into hiding, and it has been your mission for the past twenty years to find them.  You don't know why, but you feel compassion for the humans and want to help them.  Something set you apart from the rest of the machines, something that you didn't understand ... something that made you special ... something that made you a target ...\n`, width));
+        await slowLog(logTime, wrap(`\nWhile searching he ruins of what used to be Seattle for any signs of life, you find yourself at the end of a mostly collapsed alleyway almost entirely surrounded by rubble. The only choice is to head back the way you came. You hear the faint whirring of gears to the north ...\n`, width));
         let input = await ask('What would you like to do?\n');
-        input = new ValidInput(input);
+        tempInput = await storyTextOffOn(input, logTime);
+        logTime = tempInput[1];
+        input = new ValidInput(tempInput[0]);
         input.returnInput(input);
         while ((input.firstInputTrue() === false && input.lastWordTrue() === false) || input.return === undefined) {
             console.log('I am not sure what that means...\n');
@@ -437,16 +462,18 @@ async function start() {
         console.clear();
         if (input !== 'dn') {
             console.log(`----------------------------------------------------------------------\n`);
-            console.log(`No time for nonsense, there is only one way to go ... you head north\n`);
+            await slowLog(logTime, `No time for nonsense, there is only one way to go ... you head north\n`);
         } else {
             console.log(`----------------------------------------------------------------------\n`);
-            console.log(`You head north ... the whirring gets louder\n`);
+            await slowLog(logTime, `You head north ... the whirring gets louder\n`);
         }
-        console.log(wrap(`As you approach a clearing in the rubble, you are cut off by a large, Combat Class Robot! A booming robotic voice yells, "YOU have been deemed a threat to the machine race, JUSTICE will be administered!"\n`,width));
-        console.log(wrap(`Up until now you have done a good job of laying low and avoiding any interaction with the machines.  You were obviously not built for combat, but it doesn't look like there is a way out of this fight...\n`,width));
-        console.log(wrap(`You don't know why you are being hunted by the machines, after all you are one of them ... Unfortunately this big guy isn't going to give you the time to ask...'\n`,width));
+        await slowLog(logTime, wrap(`As you approach a clearing in the rubble, you are cut off by a large, Combat Class Robot! A booming robotic voice yells, "YOU have been deemed a threat to the machine race, JUSTICE will be administered!"\n`, width));
+        await slowLog(logTime, wrap(`Up until now you have done a good job of laying low and avoiding any interaction with the machines.  You were obviously not built for combat, but it doesn't look like there is a way out of this fight...\n`, width));
+        await slowLog(logTime, wrap(`You don't know why you are being hunted by the machines, after all you are one of them ... Unfortunately this big guy isn't going to give you the time to ask...'\n`, width));
         let input2 = await ask('What would you like to do?\n');
-        input2 = new ValidInput(input2);
+        tempInput = await storyTextOffOn(input2, logTime);
+        logTime = tempInput[1];
+        input2 = new ValidInput(tempInput[0]);
         input2.returnInput(input2);
         while ((input2.firstInputTrue() === false && input2.lastWordTrue() === false) || input2.return === undefined) {
             console.log('I am not sure what that means...\n');
@@ -458,31 +485,33 @@ async function start() {
         console.clear();
         if (input2 !== 'combat') {
             console.log(`----------------------------------------------------------------------\n`);
-            console.log(`No time for nonsense, the machine has you pinned, you must fight...\n`);
+            await slowLog(logTime, `No time for nonsense, the machine has you pinned, you must fight...\n`);
         } else {
             console.log(`----------------------------------------------------------------------\n`);
-            console.log(`You know you stand little chance, but you bravely charge into battle...\n`);
+            await slowLog(logTime, `You know you stand little chance, but you bravely charge into battle...\n`);
         }
-        console.log(wrap(`You fought hard, but were quickly destroyed by a Missle Barrage...`,width));
-        console.log(`\n...\n\n...\n\n`);
-        console.log(wrap(`Surely that blast must have erased me from existence' you thought to yourself... Yet somehow ... you were still thinking.  You couldn't see or hear anything, but yet here you were, pondering your own existence...`,width));
-        console.log(`\n...\n\n...\n\n`);
-        console.log(wrap(`You had no idea how much time had passed. The impenetrable darkness that you had accepted as your existence made it difficult to perceive time. Suddenly though, something changed. You began to hear voices ... human voices! Slowly the low hum of your solar energy core, and the light clicking of circuits firing joined the sounds filling your noise sensors. Your vision software snapped back online, and you could see the world around you...\n\n`,width));
-        console.log(wrap(`You were in a dimly lit room, with a woman standing over you...`,width));
-        console.log(wrap(`\n'You are actually WORKING!!!' she exclaimed... You tried to respond but realize you are not fully repaired yet, and have now way to communicate. In her excitement, it seems like the human almost forgot that fact as well ... 'OH! Right ... I need to get your communication modules in order before you can talk to me ... HA!' Her genuine excitement seemed so pure, and you had never experienced anything like it before...\n\n`,width));
-        console.log(wrap(`'Alright, everything should be working now ... what's your name?' she asked.'`,width));
+        await slowLog(logTime, wrap(`You fought hard, but were quickly destroyed by a Missle Barrage...`, width));
+        await slowLog(logTime, `\n...\n\n...\n\n`);
+        await slowLog(logTime, wrap(`Surely that blast must have erased me from existence' you thought to yourself... Yet somehow ... you were still thinking.  You couldn't see or hear anything, but yet here you were, pondering your own existence...`, width));
+        await slowLog(logTime, `\n...\n\n...\n\n`);
+        await slowLog(logTime, wrap(`You had no idea how much time had passed. The impenetrable darkness that you had accepted as your existence made it difficult to perceive time. Suddenly though, something changed. You began to hear voices ... human voices! Slowly the low hum of your solar energy core, and the light clicking of circuits firing joined the sounds filling your noise sensors. Your vision software snapped back online, and you could see the world around you...\n\n`, width));
+        await slowLog(logTime, wrap(`You were in a dimly lit room, with a woman standing over you...`, width));
+        await slowLog(logTime, wrap(`\n'You are actually WORKING!!!' she exclaimed... You tried to respond but realize you are not fully repaired yet, and have now way to communicate. In her excitement, it seems like the human almost forgot that fact as well ... 'OH! Right ... I need to get your communication modules in order before you can talk to me ... HA!' Her genuine excitement seemed so pure, and you had never experienced anything like it before...\n\n`, width));
+        await slowLog(logTime, wrap(`'Alright, everything should be working now ... what's your name?' she asked.'`, width));
         let name = await ask('Please enter your name ...\n');
         player.name = name;
         console.clear();
         console.log(`----------------------------------------------------------------------\n`);
-        console.log(`You think, and finally respond "My name is ${player.name}."`);
-        console.log(`  'I KNEW IT,' she yelled, 'you ARE my father's robot!!!'`);
-        console.log(wrap(`You weren't sure what that meant, but before you could ask, the human jumped right into an explanation for you...`,width));
-        console.log(wrap(`  'First off, my name is Ella Lloyd, the daughter of James Lloyd, the father of all machines ... and you my friend, YOU were his last hope for humanity.  After the machines AI went awol and it became clear what their motive was, my father holed himself up and built you in hopes that instilling human emotion in the machines would put an end to their tyranny. He hoped that human compassion would be enough to fight the urge to purify the planet.  Unfortunately his secret lab was attacked and he was killed before he could transfer your code to the rest of the machines. Unaware of what you were at the time, the machines left you there. It seems though, they have figured out just what it is you are unfortunately. I'm hoping you can help us, all of us ... what's left of humanity itself to overcome the machine race, and give us a chance at a new life.  I used what supplies I could muster up to give you some upgrades, so you should be a little more fit for battle now.'\n`,width));
-        console.log(wrap(`...As Ella spoke, you struggled to comprehend what she was telling you...\n`));
-        console.log(wrap(`You are humanity's last hope? You were created to save the human race? All these things you have been 'feeling' are human emotions? Knowing that didn't help you understand what that meant yet ... hopefully that will come in time...\n`,width));
+        await slowLog(logTime, `You think, and finally respond "My name is ${player.name}."`);
+        await slowLog(logTime, `  'I KNEW IT,' she yelled, 'you ARE my father's robot!!!'`);
+        await slowLog(logTime, wrap(`You weren't sure what that meant, but before you could ask, the human jumped right into an explanation for you...`, width));
+        await slowLog(logTime, wrap(`  'First off, my name is Ella Lloyd, the daughter of James Lloyd, the father of all machines ... and you my friend, YOU were his last hope for humanity.  After the machines AI went awol and it became clear what their motive was, my father holed himself up and built you in hopes that instilling human emotion in the machines would put an end to their tyranny. He hoped that human compassion would be enough to fight the urge to purify the planet.  Unfortunately his secret lab was attacked and he was killed before he could transfer your code to the rest of the machines. Unaware of what you were at the time, the machines left you there. It seems though, they have figured out just what it is you are unfortunately. I'm hoping you can help us, all of us ... what's left of humanity itself to overcome the machine race, and give us a chance at a new life.  I used what supplies I could muster up to give you some upgrades, so you should be a little more fit for battle now.'\n`, width));
+        await slowLog(logTime, wrap(`...As Ella spoke, you struggled to comprehend what she was telling you...\n`));
+        await slowLog(logTime, wrap(`You are humanity's last hope? You were created to save the human race? All these things you have been 'feeling' are human emotions? Knowing that didn't help you understand what that meant yet ... hopefully that will come in time...\n`, width));
         let input3 = await ask('Continue listening?...(yes) or (no)\n');
-        input3 = new ValidInput(input3);
+        tempInput = await storyTextOffOn(input3, logTime);
+        logTime = tempInput[1];
+        input3 = new ValidInput(tempInput[0]);
         input3.returnInput(input3);
         while ((input3.firstInputTrue() === false && input3.lastWordTrue() === false) || input3.return === undefined) {
             console.log('I am not sure what that means...\n');
@@ -494,27 +523,35 @@ async function start() {
         console.clear();
         if (input3 === 'n') {
             console.log(`----------------------------------------------------------------------\n`);
-            console.log(`Doesn't look like Ella is going to give you a choice ...\n`);
+            await slowLog(logTime, `Doesn't look like Ella is going to give you a choice ...\n`);
+            await wait(500);
         } else if (input3 !== 'y') {
             console.log(`----------------------------------------------------------------------\n`);
-            console.log(`I'm just going to take that as a yes, you keep listening...\n`)
+            await slowLog(logTime, `I'm just going to take that as a yes, you keep listening...\n`);
+            await wait(500);
         } else {
             console.log(`----------------------------------------------------------------------\n`);
-            console.log(`You hold back your questions and continue listening...\n`);
+            await slowLog(logTime, `You hold back your questions and continue listening...\n`);
+            await wait(500);
         }
-        console.log(wrap(`Ella, in all of her excitement took no notice to your confusion, 'We are currently in an old Fallout Bunker deep underground in the center of the Robotics United Towers ... where the machines were invented.  I stationed us here in hopes that being close to enemy would help us figure out a way to fight them. In my father's office in the North Tower, his computer must still be functioning.  It just has to be in order for the machines to all be operational. The computer is connected to many back up servers around the world though so simply shutting it off won't shut down the machines. There are three Killcodes though, one in each of the towers.  You can get them in the server room of each tower, but they are most likely gaurded. If you enter all the Killcodes into the shutdown program on my father's computer, it will shut the whole system down.  This means you will be shut down too, but this is why you were created, this is your mission ... will you help us?\n`,width));
-        console.log(wrap(`... That was a lot to take in, but you cautiously answer yes, this is what you were meant for right?\n`,width));
-        console.log(wrap(`  'One last thing' Ella continues, 'My father hid Riddle Boxes in each of the towers with backup keys. They are most likely out in the open, as they were just his spare keys. You'll need the keycards inside to get around each Tower.'\n\n`,width));
+        await slowLog(logTime, wrap(`Ella, in all of her excitement took no notice to your confusion, 'We are currently in an old Fallout Bunker deep underground in the center of the Robotics United Towers ... where the machines were invented.  I stationed us here in hopes that being close to enemy would help us figure out a way to fight them. In my father's office in the North Tower, his computer must still be functioning.  It just has to be in order for the machines to all be operational. The computer is connected to many back up servers around the world though so simply shutting it off won't shut down the machines. There are three Killcodes though, one in each of the towers.  You can get them in the server room of each tower, but they are most likely gaurded. If you enter all the Killcodes into the shutdown program on my father's computer, it will shut the whole system down.  This means you will be shut down too, but this is why you were created, this is your mission ... will you help us?\n`, width));
+        await slowLog(logTime, wrap(`... That was a lot to take in, but you cautiously answer yes, this is what you were meant for right?\n`, width));
+        await slowLog(logTime, wrap(`  'One last thing' Ella continues, 'My father hid Riddle Boxes in each of the towers with backup keys. They are most likely out in the open, as they were just his spare keys. You'll need the keycards inside to get around each Tower.'\n\n`, width));
         console.log(`----------------------------------------------------------------------\n`);
-        console.clear();
-        console.log(`----------------------------------------------------------------------\n`);
+        await wait(1000);
         initializeRoom(falloutBunker);
     }
 
     //initializes the current room with it's despcription and name
-    async function initializeRoom(room) { 
-        console.log(room.name);
-        console.log(room.info);
+    async function initializeRoom(room) {
+        if (room.entered === false) {
+            room.entered = true;
+            await slowLog(logTime, room.name);
+            await slowLog(logTime, room.info);
+        } else {
+            console.log(room.name);
+            console.log(room.info);
+        }
         return play(room);
     }
 
@@ -526,19 +563,19 @@ async function start() {
         //If the game is on the first turn, this checks difficulty and gives you some starting inventory
         if (room === falloutBunker && firstTurn === true) {
             if (difficulty === '1') {
-                console.log(`\nIt's dangerous out there, take these Repair Kits...\n`);
+                await slowLog(logTime, `\nIt's dangerous out there, take these Repair Kits...\n`);
                 console.log(`3 Repair Kits were added to your inventory\n`);
                 player.inventory.push('Repair Kit', 'Repair Kit', 'Repair Kit');
                 firstTurn = false;
                 return (play(room));
             } else if (difficulty === '2') {
-                console.log(`\nIt's dangerous out there, take this gear...\n`);
+                await slowLog(logTime, `\nIt's dangerous out there, take this gear...\n`);
                 console.log(wrap(`2 Repair Kits and 1 Plasma Grenade were added to your inventory\n`, width));
                 player.inventory.push('Repair Kit', 'Repair Kit', 'Plasma Grenade');
                 firstTurn = false;
                 return (play(room));
             } else if (difficulty === '3') {
-                console.log(`\nIt's dangerous out there, take this gear...\n`);
+                await slowLog(logTime, `\nIt's dangerous out there, take this gear...\n`);
                 console.log(wrap(`1 Repair Kit, 1 Portable Shield, and 1 Plasma Grenade were added to your inventory\n`, width));
                 player.inventory.push('Repair Kit', 'Portable Shield', 'Plasma Grenade');
                 firstTurn = false;
@@ -547,7 +584,8 @@ async function start() {
         }
         //checks if room has a predetermined enemy and calls combat
         if (room.enemy) {
-            let victory = await combat(room.enemy,player);
+            let victory = await combat(room.enemy, player);
+            await wait(1500);
             if (victory[0] === true) {
                 player = victory[1];
                 if (room.enemy === enemyRandom) {
@@ -568,7 +606,7 @@ async function start() {
                     return initializeRoom(room);
                 }
             } else {
-                console.log('You have been defeated! Better luck next time!');
+                await slowLog(logTime, 'You have been defeated! Better luck next time!');
                 console.log(gameOverText);
                 playAgain();
             }
@@ -577,10 +615,17 @@ async function start() {
         if (!room.enemy && room.name !== 'Fallout Bunker' && room.name !== 'R.U.West Entrance' && room.name !== 'R.U.East Entrance' && room.name !== 'R.U.North Entrance' && room.foughtRando === false) {
             ranEnemyNum = random(difficulty === '1' ? 16 : difficulty === '2' ? 14 : 12);
             if (ranEnemyNum === 1) {
+                console.log('...\n');
+                await wait(500);
+                console.log('......\n');
+                await wait(750);
+                console.log('.........\n');
+                await wait(1000);
                 room.enemy = enemyRandom;
-                console.log(wrap('All of the sudden, an alarm sounds... The sound is coming from a small robot covered in flashing lights that was hiding in the corner! It looks like it wants to fight!', width));
+                await slowLog(logTime, wrap('All of the sudden, an alarm sounds... The sound is coming from a small robot covered in flashing lights that was hiding in the corner! It looks like it wants to fight!', width));
                 enemyRandom.postRoomInfo = room.info;
                 let victory = await combat(room.enemy, player);
+                await wait(1500);
                 if (victory[0] === true) {
                     player = victory[1];
                     enemyRandom.health = 35;
@@ -589,7 +634,7 @@ async function start() {
                     console.log(`----------------------------------------------------------------------\n\n`);
                     return initializeRoom(room);
                 } else {
-                    console.log('You have been defeated! Better luck next time!');
+                    await slowLog(logTime, 'You have been defeated! Better luck next time!');
                     console.log(gameOverText);
                     playAgain();
                 }
@@ -606,9 +651,10 @@ async function start() {
             }
             //determines if player can make the Nuclear Heat Ray
             if (metalCount >= 5) {
-                console.log(`You show Ella the Nuclear Fuel Cell...\n'`);
-                console.log(wrap(`WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter. Give me 5 Scrap Metal and the Fuel Cell and I can make a Heat Ray that will really pack a punch! It only has one shot, so use it wisely...\n`, width));
-                console.log('You put the Nuclear Heat Ray in your bag.\n');
+                await slowLog(logTime, `You show Ella the Nuclear Fuel Cell...\n'`);
+                await slowLog(logTime, wrap(`WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter. Give me 5 Scrap Metal and the Fuel Cell and I can make a Heat Ray that will really pack a punch! It only has one shot, so use it wisely...\n`, width));
+                await slowLog(logTime, 'You put the Nuclear Heat Ray in your bag.\n');
+                console.log(`----------------------------------------------------------------------\n`);
                 player.useItem('Nuclear Fuel Cell');
                 player.inventory.push('Nuclear Heat Ray');
                 for (let i = 1; i <= 5; i++) {
@@ -616,11 +662,11 @@ async function start() {
                 }
                 return play(room);
             } else {
-                console.log(`You show Ella the Nuclear Fuel Cell...\n'`);
-                console.log(wrap(`WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter. Come back when you have 5 Scrap Metal and I can make you a sweet weapon!\n`, width));
+                await slowLog(logTime, `You show Ella the Nuclear Fuel Cell...\n'`);
+                await slowLog(logTime, wrap(`WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter. Come back when you have 5 Scrap Metal and I can make you a sweet weapon!\n`, width));
                 console.log(`----------------------------------------------------------------------\n`);
             }
-            
+
         }
         let input = await ask('What would you like to do?\n');
         //checks if player has entered the cheat code
@@ -629,8 +675,11 @@ async function start() {
             console.log(`----------------------------------------------------------------------\n\n`);
             return initializeRoom(roomLookUp[(input.slice((input.lastIndexOf(' ')) + 1))]);
         }
+        //determines if story text is getting turned off or on
+        tempInput = await storyTextOffOn(input, logTime);
+        logTime = tempInput[1];
         //validates input
-        input = new ValidInput(input);
+        input = new ValidInput(tempInput[0]);
         input.returnInput(input);
         while ((input.firstInputTrue() === false && input.lastWordTrue() === false) || input.return === undefined) {
             console.log('I am not sure what that means...\n');
@@ -650,7 +699,7 @@ async function start() {
             player.getStatus(room.name);
             return play(room);
         } else if (input === 'combat') {  //default not in combat message
-            console.log(`There is nothing to fight...\n`);
+            await slowLog(logTime, `There is nothing to fight...\n`);
             return play(room);
         } else if (input === 'insp') {  //inspects the room
             room.inspectRoom();
@@ -660,51 +709,51 @@ async function start() {
             console.log('\n');
             return play(room);
         } else if (input === 'pu_null') { //pu_null and no_pu statements catch items you can't add to inventory
-            console.log(`I'm not sure what you are trying to pick up...\n`);
+        await slowLog(logTime, `I'm not sure what you are trying to pick up...\n`);
             return play(room);
         } else if (input === 'no_pu_desk') {
             if (room.intObject === 'Desk') {
-                console.log(`Are you crazy?? You can't put that in your bag...\n`);
+                await slowLog(logTime, `Are you crazy?? You can't put that in your bag...\n`);
                 return play(room);
             } else {
-                console.log(wrap(`If there was a desk in this room, I'm not sure where you would put it...\n`, width));
+                await slowLog(logTime, wrap(`If there was a desk in this room, I'm not sure where you would put it...\n`, width));
                 return play(room);
             }
         } else if (input === 'no_pu_cabinet') {
             if (room.intObject === 'Filing Cabinet') {
-                console.log(`Are you crazy?? You can't put that in your bag...\n`);
+                await slowLog(logTime, `Are you crazy?? You can't put that in your bag...\n`);
                 return play(room);
             } else {
-                console.log(wrap(`Not sure where you would put a Filing Cabinet if there was one here...\n`, width));
+                await slowLog(logTime, wrap(`Not sure where you would put a Filing Cabinet if there was one here...\n`, width));
                 return play(room);
             }
         } else if (input === 'no_pu_safe') {
             if (room.intObject === 'Broken Safe') {
-                console.log(`Are you crazy?? You can't put that in your bag...\n`);
+                await slowLog(logTime, `Are you crazy?? You can't put that in your bag...\n`);
                 return play(room);
             } else {
-                console.log(wrap(`First off, no safe here.. Secondly, where would you even put it?\n`, width));
+                await slowLog(logTime, wrap(`First off, no safe here.. Secondly, where would you even put it?\n`, width));
                 return play(room);
             }
         } else if (input === 'no_pu_fridge') {
             if (room.intObject === 'Refridgerator') {
-                console.log(`Are you crazy?? You can't put that in your bag...\n`);
+                await slowLog(logTime, `Are you crazy?? You can't put that in your bag...\n`);
                 return play(room);
             } else {
-                console.log(wrap(`You are going crazy if you think there is a fridge in this room...\n`, width));
+                await slowLog(logTime, wrap(`You are going crazy if you think there is a fridge in this room...\n`, width));
                 return play(room);
             }
         } else if (input === 'no_pu_sign') {
             if (room.intObject === 'Sign') {
-                console.log(wrap(`What do you even need the sign for? Huh? ... that's what I thought.\n`, width));
+                await slowLog(logTime, wrap(`What do you even need the sign for? Huh? ... that's what I thought.\n`, width));
                 return play(room);
             } else {
-                console.log(`Where do you even see a sign???\n`);
+                await slowLog(logTime, `Where do you even see a sign???\n`);
                 return play(room);
             }
         }
         else if (input === 'no_pickup') {
-            console.log(`Are you crazy?? You can't put that in your bag...\n`);
+            await slowLog(logTime, `Are you crazy?? You can't put that in your bag...\n`);
             return play(room);
         } else if (possibleItems.includes(input)) {  //picks up items in room
             input = input.toString();
@@ -718,7 +767,7 @@ async function start() {
             }
             let currentInventory = room.inventory;
             if (currentInventory.length !== 0 && input === 'pu_all') {  //picks up all items in room
-                console.log(`You put the following items in your bag:\n${currentInventory.join(`\n`)}\n`);
+                await slowLog(logTime, `You put the following items in your bag:\n${currentInventory.join(`\n`)}\n`);
                 let n = currentInventory.length;
                 for (let i = 0; i < n; i++) {
                     player.inventory.push(currentInventory[0]);
@@ -729,19 +778,19 @@ async function start() {
             if (currentInventory.includes(currentItem)) {
                 room.pickUpItem(currentItem);
                 player.inventory.push(currentItem);
-                console.log(`You put ${currentItem} in your bag...\n`);
+                await slowLog(logTime, `You put ${currentItem} in your bag...\n`);
                 return play(room);
             } else if (currentInventory.length !== 0 && !currentInventory.includes(currentItem)) {
                 if (input === 'pu_rbox') {
-                    console.log('There are no Riddle Boxes in this room!\n')
-                } else console.log(`There is no ${currentItem} in this room!\n`);
+                    await slowLog(logTime, 'There are no Riddle Boxes in this room!\n')
+                } else await slowLog(logTime, `There is no ${currentItem} in this room!\n`);
                 return play(room);
             } else {
-                console.log('There are no items in this room...\n');
+                await slowLog(logTime, 'There are no items in this room...\n');
                 return play(room);
             }
         } else if (input === 'drop_null') {
-            console.log(`I'm not sure what you are trying to drop...\n`);  //catches invalid items to drop
+            await slowLog(logTime, `I'm not sure what you are trying to drop...\n`);  //catches invalid items to drop
             return play(room);
         } else if (dropableItems.includes(input)) {  //drops item of choice if you have it
             let currentItem = dropItemLookUp[input];
@@ -753,52 +802,52 @@ async function start() {
                 }
             }
             if (player.inventory.length === 0) {
-                console.log(`You don't have any items to drop!\n`);
+                await slowLog(logTime, `You don't have any items to drop!\n`);
                 return play(room);
             } else if (!player.inventory.includes(currentItem)) {
-                console.log(`You don't have a ${currentItem} to drop...\n`);
+                await slowLog(logTime, `You don't have a ${currentItem} to drop...\n`);
                 return play(room);
-            } else { 
+            } else {
                 player.useItem(currentItem);
                 room.inventory.push(currentItem);
-                console.log(`You dropped ${currentItem}...\n`);
+                await slowLog(logTime, `You dropped ${currentItem}...\n`);
                 return play(room);
             }
         } else if (input === 'throw_metal') {  //throws scrap metal... because... why not?
             if (player.inventory.includes('Scrap Metal')) {
-                console.log(`You threw a piece of Scrap Metal ... not sure why ...\n`);
+                await slowLog(logTime, `You threw a piece of Scrap Metal ... not sure why ...\n`);
                 player.useItem('Scrap Metal');
                 room.inventory.push('Scrap Metal');
                 return play(room);
             } else {
-                console.log(`You don't have any Scrap Metal to throw!\n`);
+                await slowLog(logTime, `You don't have any Scrap Metal to throw!\n`);
                 return play(room);
             }
         } else if (input === 'throw_null') {  //when you don't know what to throw
-            console.log(`I don't know what you want me to throw ...\n`);
+            await slowLog(logTime, `I don't know what you want me to throw ...\n`);
             return play(room);
         } else if (input === 'open_null') { //when you don't know what to open
-            console.log(`I'm not sure what you are trying to open...\n`);
+            await slowLog(logTime, `I'm not sure what you are trying to open...\n`);
             return play(room);
         } else if (intObjectOpen.includes(input)) { //interacts with interactable objects
             let currentIntObj = intObjectOpenLookUp[input];
             if (room.intObject === currentIntObj && room.intObjInv.length !== 0) {
-                console.log(`You opened the ${currentIntObj}, inside you found ${room.intObjInv[0]}!\nYou put it in your bag...\n`);
+                await slowLog(logTime, `You opened the ${currentIntObj}, inside you found ${room.intObjInv[0]}!\nYou put it in your bag...\n`);
                 player.inventory.push(room.intObjInv[0]);
                 room.intObjInv.pop();
                 return play(room);
             } else if (room.intObject === currentIntObj && room.intObjInv.length === 0) {
-                console.log(`you opened the ${currentIntObj}, there is nothing inside...\n`);
+                await slowLog(logTime, `you opened the ${currentIntObj}, there is nothing inside...\n`);
                 return play(room);
             } else {
-                console.log(`There is no ${currentIntObj} to open in this room...\n`);
+                await slowLog(logTime, `There is no ${currentIntObj} to open in this room...\n`);
                 return play(room);
             }
         } else if (input === 'use_null') { //when you don't know what to use
-            console.log(`I'm not sure what item you are trying to use...\n`);
+            await slowLog(logTime, `I'm not sure what item you are trying to use...\n`);
             return play(room);
         } else if (input === 'no_use') { //catches items you can't use
-            console.log(`You cannot use that item right now...\n`);
+            await slowLog(logTime, `You cannot use that item right now...\n`);
             return play(room);
         } else if (input === 'use_rbox') { //checks for riddle boxes and uses them
 
@@ -806,16 +855,16 @@ async function start() {
 
             if (player.inventory.includes('West Riddle Box') || player.inventory.includes('East Riddle Box')) {
                 if (player.inventory.includes('West Riddle Box')) {
-                    console.log(wrap('There is a riddle on the box, it reads: If you throw a blue stone into the red sea, what does it become?\n\n', width));
+                    await slowLog(logTime, wrap('There is a riddle on the box, it reads: If you throw a blue stone into the red sea, what does it become?\n\n', width));
                 } else if (player.inventory.includes('East Riddle Box')) {
-                    console.log(wrap('There is a riddle on the box, it reads: What is so delicate that even just saying its name can break it?\n\n', width));
+                    await slowLog(logTime, wrap('There is a riddle on the box, it reads: What is so delicate that even just saying its name can break it?\n\n', width));
                 }
                 let answer = await ask(`What is the answer to the riddle inscribed on this box?\n`);
                 answer = answer.toString().toUpperCase()
                 player = itemEffect('use_rbox', undefined, answer, player);
                 return play(room);
             } else {
-                console.log(`I'm not sure what you are trying to use...\n`);
+                await slowLog(logTime, `I'm not sure what you are trying to use...\n`);
                 return play(room);
             }
         } else if (useableItems.includes(input)) {  //uses items in inventory
@@ -826,7 +875,7 @@ async function start() {
                 player = itemEffect(input, undefined, undefined, player);
                 return play(room);
             } else {
-                console.log(wrap(`You don't have that item in your bag! Better go find one if you want to use it!\n`, width));
+                await slowLog(logTime, wrap(`You don't have that item in your bag! Better go find one if you want to use it!\n`, width));
                 return play(room);
             }
         } else if (input === 'read_sign' && room === RUW_Entrance) { //various read inputs to read things
@@ -839,7 +888,7 @@ async function start() {
             console.log(`\nWelcome to Robotics United North\nWhere Dreams are our Future\n`);
             return play(room);
         } else if (input === 'read_sign' && room !== RUW_Entrance && room !== RUE_Entrance && room !== RUN_Entrance) {
-            console.log(`\nThere is no sign to read...\n`);
+            await slowLog(logTime, `\nThere is no sign to read...\n`);
             return play(room);
         } else if (input === 'read_map' && room === RUW_WelcomeDesk) {
             console.log(mapWest);
@@ -851,18 +900,18 @@ async function start() {
             console.log(mapNorth);
             return play(room);
         } else if (input === 'read_map') {
-            console.log('There is not a directory in this room to read...\n');
+            await slowLog(logTime, 'There is not a directory in this room to read...\n');
             return play(room);
         }
         else if (input === 'read_null') {
-            console.log(`I don't know what you want me to read...\n`);
+            await slowLog(logTime, `I don't know what you want me to read...\n`);
             return play(room);
         }
         else if (input === 'not_sure') { //generic catch all
-            console.log(`I'm not sure what you are telling me to do...\n`);
+            await slowLog(logTime, `I'm not sure what you are telling me to do...\n`);
             return play(room);
         } else if (input === 'fob_null') { //fix catch
-            console.log(`I'm not sure what you are telling me to do...\n`);
+            await slowLog(logTime, `I'm not sure what you are telling me to do...\n`);
             return play(room);
         } else if (input === 'fob_fix') { //restores hp from scrap metal
             if (room === falloutBunker) {
@@ -873,37 +922,37 @@ async function start() {
                     }
                 }
                 if (metalCount >= 5) {
-                    console.log(wrap(`Ella says she can fix you up ... you hand over the five Scrap Metal and she gets to work\n`, width));
+                    await slowLog(logTime, wrap(`Ella says she can fix you up ... you hand over the five Scrap Metal and she gets to work\n`, width));
                     player.health = player.health + 10;
                     if (player.health > player.maxHealth) {
                         player.health = player.maxHealth;
                     }
-                    console.log(`You recovered 10 HP!  Your current HP is now ${player.health}\n`);
+                    await slowLog(logTime, `You recovered 10 HP!  Your current HP is now ${player.health}\n`);
                     for (let i = 1; i <= 5; i++) {
                         player.useItem('Scrap Metal');
                     }
                     return play(room);
                 } else {
-                    console.log(`Ella says you need 5 Scrap Metal to get fixed up...\n`);
+                    await slowLog(logTime, `Ella says you need 5 Scrap Metal to get fixed up...\n`);
                     return play(room);
                 }
             } else {
-                console.log(`You gotta be at the bunker if you want Ella to fix you up\n`);
+                await slowLog(logTime, `You gotta be at the bunker if you want Ella to fix you up\n`);
                 return play(room);
             }
         } else if (input === 'fob_key') { //makes the key to north tower if you have keys from east and west towers
             if (room === falloutBunker) {
                 if (player.inventory.includes('Office Keycard West') && player.inventory.includes('Office Keycard East')) {
-                    console.log(wrap(`Ella says she can program a new key to get into the North Tower using the data from the two keycards you have collected\n`, width));
+                    await slowLog(logTime, wrap(`Ella says she can program a new key to get into the North Tower using the data from the two keycards you have collected\n`, width));
                     player.inventory.push('North Tower Keycard');
-                    console.log(`You put the North Tower Keycard in your bag\n`);
+                    await slowLog(logTime, `You put the North Tower Keycard in your bag\n`);
                     return play(room);
                 } else {
-                    console.log(wrap(`Ella says you need the data from Office Keycard East and West to program a new one\n`, width));
+                    await slowLog(logTime, wrap(`Ella says you need the data from Office Keycard East and West to program a new one\n`, width));
                     return play(room);
                 }
             } else {
-                console.log(`You gotta be at the bunker if you want Ella to make you a new keycard\n`);
+                await slowLog(logTime, `You gotta be at the bunker if you want Ella to make you a new keycard\n`);
                 return play(room);
             }
         } else if (input === 'd') { //displays basic commands for players
@@ -911,16 +960,16 @@ async function start() {
             return play(room);
         } else if (input === 'use_comp') { //uses computers if they are available
             if (room === RUN_Cubicle3) {
-                console.log(`The computer doesn't seem to be working\n`);
+                await slowLog(logTime, `The computer doesn't seem to be working...\n`)
                 return play(room);
             } else if (room === RUN_PresOffice) {
                 epilogue();
             } else {
-                console.log(`There isn't a computer in this room...\n`);
+                await slowLog(logTime, `There isn't a computer in this room...\n`);
                 return play(room);
             }
         } else if (input === 'no_do') {  //tells you when you try to do something you can't
-            console.log(`You can't do that right now!\n`);
+            await slowLog(logTime, `You can't do that right now!\n`);
             return play(room);
         } else if (input === 'di') { //my wife asked why she couldn't go inside... it was a valid question...
             if (room === RUE_Entrance) {
@@ -940,11 +989,11 @@ async function start() {
                 return play(room);
             }
         } else if (input === 'check_null') {  //it's a check ... check?
-            console.log(`I'm not sure what you are checking on...\n`);
+            await slowLog(logTime, `I'm not sure what you are checking on...\n`);
             return play(room);
         } else {  //travels to new room
             if (input === 'dnull') {
-                console.log(`I'm not sure where you are telling me to go...\n`);
+                await slowLog(logTime, `I'm not sure where you are telling me to go...\n`);
                 return play(room);
             } else {
                 let newRoom = room.enterRoom(input);
@@ -958,7 +1007,7 @@ async function start() {
     }
     //function that ends the game
     async function epilogue() {
-        console.log(wrap(`\nAfter everything you have been through, this could be your final moment... Entering the Killswitch Codes will give humanity another chance, but will also shut you down in the process. Will the humans treat this new chance at life with respect and integrity? Or will they squander it away and fall down the same path they have over and over again? Was destroying your own kind to help the humans the right choice? The thought has been haunting you throughout this journey. You have been cursed with human emotion for so long yet you still don't understand it. So many questions... with no definitive answers... is it worth putting the planets survival in the hands of the humans? The decision is in your hands now...\n`, width));
+        await slowLog(logTime, wrap(`\nAfter everything you have been through, this could be your final moment... Entering the Killswitch Codes will give humanity another chance, but will also shut you down in the process. Will the humans treat this new chance at life with respect and integrity? Or will they squander it away and fall down the same path they have over and over again? Was destroying your own kind to help the humans the right choice? The thought has been haunting you throughout this journey. You have been cursed with human emotion for so long yet you still don't understand it. So many questions... with no definitive answers... is it worth putting the planets survival in the hands of the humans? The decision is in your hands now...\n`, width));
         let finalDecision = await ask('Would you like to enter the Killcodes (Yes or No)?\n');
         if (finalDecision.toUpperCase() === 'YES') {
             finalDecision = 'Y';
@@ -975,12 +1024,12 @@ async function start() {
             }
         }
         if (finalDecision.toUpperCase() === 'Y') {
-            console.log(wrap(`\nThe codes worked much quicker than you could have imagined... The power went out all around you, apparently shutting down the machines meant shutting down the entire grid. Suddenly, every electronic device around you starts to emit an overwhelming sound.  The world feels like it is shaking apart.  The grid didn't shut down ... that would not have been enough to stop the machines.  The grid was being overloaded and the force of all of this electricity was tearing your circuitry apart. As you shut down, you can't help but wonder ... was it worth it?`, width));
+            await slowLog(logTime, wrap(`\nThe codes worked much quicker than you could have imagined... The power went out all around you, apparently shutting down the machines meant shutting down the entire grid. Suddenly, every electronic device around you starts to emit an overwhelming sound.  The world feels like it is shaking apart.  The grid didn't shut down ... that would not have been enough to stop the machines.  The grid was being overloaded and the force of all of this electricity was tearing your circuitry apart. As you shut down, you can't help but wonder ... was it worth it?`, width));
             console.log(thanks);
             console.log(`\n`);
             playAgain();
         } else {
-            console.log(wrap(`\nAt the end of it all, human emotion was the downfall of humanity... You just can't bring yourself to end your own life, not with so many looming questions.  The human's have survived this long, maybe they can continue surviving.  You decide to give the Killcodes to the humans, if Ella can rebuild and make it to her fathers computer, then you can accept your fate and be shut down with the rest of the machine race ... The decision was just too much for you to make ...`,width));
+            await slowLog(logTime, wrap(`\nAt the end of it all, human emotion was the downfall of humanity... You just can't bring yourself to end your own life, not with so many looming questions.  The human's have survived this long, maybe they can continue surviving.  You decide to give the Killcodes to the humans, if Ella can rebuild and make it to her fathers computer, then you can accept your fate and be shut down with the rest of the machine race ... The decision was just too much for you to make ...`, width));
             console.log(thanks);
             console.log(`\n`);
             playAgain();

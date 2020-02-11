@@ -1,5 +1,5 @@
 import { ValidInput } from './inputValidation.mjs'
-import { ask, wrap, random, itemEffect } from './functions.mjs'
+import { ask, wrap, random, itemEffect, wait } from './functions.mjs'
 
 //defines width for wrap function
 let width = process.stdout.columns - 8;
@@ -43,6 +43,12 @@ export async function combat(comp, user) {
         //user Turn
         user.status2 = undefined; //emergency reset to status in case it gets skipped (happened once, can't figure out why still...)
         if (user.status === 'status_stun') {
+            console.log('...\n');
+            await wait(500);
+            console.log('......\n');
+            await wait(750);
+            console.log('.........\n');
+            await wait(1000);
             statusCheck(comp, user);
         } else {
             if (user.status === 'status_dot') {
@@ -138,6 +144,7 @@ export async function combat(comp, user) {
                 }
             }
         }
+        await wait(1000);
         //Computer Enemy turn
         compAbility = random(4);
         if (compAbility !== 4) {
