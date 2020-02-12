@@ -1,5 +1,6 @@
 import { ValidInput } from './inputValidation.mjs'
 import { ask, wrap, random, itemEffect, wait } from './functions.mjs'
+import { gameOverText } from './ascii_images.mjs'
 
 //defines width for wrap function
 let width = process.stdout.columns - 8;
