@@ -1,8 +1,8 @@
 {
-  "name": "textAdventure",
+  "name": "robotapocalypse",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "robotApocalypse.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,14 +10,16 @@
     "type": "git",
     "url": "git+https://github.com/JoshLDowns/Text-Adventure.git"
   },
+  "type": "module",
   "keywords": [],
-  "author": "",
+  "author": "Josh Downs",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/JoshLDowns/Text-Adventure/issues"
   },
   "homepage": "https://github.com/JoshLDowns/Text-Adventure#readme",
   "dependencies": {
-    "inquirer": "^7.0.4"
+    "@inquirer/input": "0.0.7-alpha.0",
+    "@inquirer/select": "0.0.7-alpha.0"
   }
 }
