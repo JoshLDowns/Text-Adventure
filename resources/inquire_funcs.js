@@ -44,11 +44,12 @@ export async function craft(user) {
         useableInventory.push({ name: 'Nuclear Fuel Cell: 5 Scrap Metal', value: 'Nuclear Fuel Cell' });
     }
     if (user.inventory.includes('Office Keycard West') && user.inventory.includes('Office Keycard East') && !user.inventory.includes('North Tower Keycard')) {
-        useableInventory.push({ name: 'North Tower Keycard', value: 'North Tower Keycard' })
+        useableInventory.push({ name: 'North Tower Keycard', value: 'North Tower Keycard' });
     }
     if (metalCount >= 3) {
-        useableInventory.push({ name: 'Repair', value: 'Repair' })
+        useableInventory.push({ name: 'Repair', value: 'Repair' });
     }
+    useableInventory.push({name: 'Exit', value: 'exit'});
 
     if (useableInventory.length !== 0) {
         let item = await menuSelect('You can craft the following items:', useableInventory);
@@ -66,7 +67,7 @@ export async function craft(user) {
         } else if (item === 'Combat Repair Module') {
             user.ability2 = item;
             user.ability2Supply = 4;
-            user.ability2Base = 10;
+            user.ability2Base = 20;
             user.ability2Modifier = 20;
             user.useItem('Combat Repair Module');
             for (let i = 1; i <= 6; i++) {
@@ -106,6 +107,8 @@ export async function craft(user) {
             for (let i = 1; i <= 3; i++) {
                 user.useItem('Scrap Metal');
             }
+            return user;
+        } else if (item === 'exit') {
             return user;
         }
 
@@ -171,7 +174,10 @@ export async function combatChoice (user) {
             possibleItems.push({name: `Portable Shield..............${shieldCount}`, value: 'use_shield'});
         }
         if (user.inventory.includes('Nuclear Heat Ray')) {
-            possibleItems.push({name: 'Nuclear Heat Ray.............1', value: 'use_heatray'})
+            possibleItems.push({name: 'Nuclear Heat Ray.............1', value: 'use_heatray'});
+        }
+        if (user.inventory.includes('EMP')) {
+            possibleItems.push({name: 'EMP..........................1', value: 'use_emp'});
         }
         possibleItems.push({name: 'Back to Combat', value: 'back'})
 

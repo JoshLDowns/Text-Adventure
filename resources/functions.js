@@ -1,4 +1,4 @@
-import { ask } from './inquire_funcs.js'
+import { ask, menuSelect } from './inquire_funcs.js'
 import chalk from 'chalk'
 
 let width = process.stdout.columns - 8;
@@ -11,7 +11,9 @@ let useableItemLookUp = {
     use_shield: 'Portable Shield',
     use_bomb: 'Smoke Bomb',
     use_heatray: 'Nuclear Heat Ray',
-    use_rbox: ['West Riddle Box', 'East Riddle Box']
+    use_rbox: ['West Riddle Box', 'East Riddle Box'],
+    use_emp: 'EMP',
+    use_chest: 'Large Chest'
 }
 
 //text wrapping function, accepts string and width(w) and wraps text accordingly
@@ -41,7 +43,7 @@ export function random(max) {
 }
 
 //determines effect of items being used by player (user)
-export function itemEffect(item, comp, answer, user) {
+export function itemEffect(item, comp, answer, user, room) {
     if (item === 'use_repairkit') {
         user.useItem(useableItemLookUp[item]);
         user.health = user.health + 30;
@@ -67,6 +69,10 @@ export function itemEffect(item, comp, answer, user) {
         if (comp !== undefined) {
             comp.health = comp.health - 20;
             console.log(`You threw a Plasma Grenade! It dealt 20 damage to ${comp.name}!\n`);
+            return user;
+        } else if (room.name = 'Hallway 1S - W') {
+            console.log(wrap(`You throw a Plasma Grenade at the door! The blast leaves a sizeable hole in the wall that fills the room with sunlight...`, width));
+            user.bonusRoom1 = true;
             return user;
         } else {
             console.log(wrap(`You throw a Plasma Grenade! The blast was impressive, but would have been more useful in a fight...\n`, width));
@@ -122,6 +128,21 @@ export function itemEffect(item, comp, answer, user) {
             console.log(wrap(`You fired the Nuclear Heat Ray! That hole in the wall would have been more impressive if it was through a robot instead...\n`, width));
             return user;
         }
+    } else if (item === 'use_emp') {
+        user.useItem(useableItemLookUp[item]);
+        if (comp !== undefined) {
+            comp.health = comp.health - 200;
+            console.log(wrap(`You set off the EMP! It completely shut down ${comp.name}!\n`, width));
+            return user;
+        } else {
+            console.log(wrap(`You set off the EMP! All the electronics in the room shut off... Might have been useful in a fight...\n`, width));
+            return user;
+        }
+    } else if (item === 'use_chest') {
+        user.useItem(useableItemLookUp[item]);
+        user.inventory.push('Particle Battery', 'EMP', 'Thick Carbon Coating');
+        console.log(`You open the chest, the following items were inside!\nParticle Battery\nThick Carbon Coating\nEMP\n`);
+        return user;
     } else {
         console.log(wrap(`You can't use that item!!!`, width));
         return user;
@@ -161,8 +182,9 @@ export async function storyTextOffOn (text, time) {
     }
 
     if (text.toLowerCase() === 'story text on') {
+        let textValue = await menuSelect('How fast would you like story text to run?', [{name: 'Slower', value: '1'}, {name: 'Faster', value: '2'}, {name: 'Fastest', value: '3'}]);
         console.log('Story text is now on!\n');
-        time = 20;
+        time = textValue==='1'?20:textValue==='2'?15:textValue==='3'?10:0;
         text = await ask('What would you like to do?\n');
     }
     return [text, time];
@@ -173,7 +195,7 @@ export function roomBar (user, room) {
     let playerBar = chalk.blue(`(${user.health}(`) + chalk.greenBright('█').repeat(playerBarCount) + chalk.greenBright('-').repeat(20 - playerBarCount) + chalk.blue(`)${user.maxHealth})`);
     let exits = `${room.north ? `North   ` : ''}${room.east ? `East   ` : ''}${room.south ? `South   ` : ''}${room.west ? `West` : ''}`;
     console.log(`╔════════════════════════════════════════════════════════════════════╗`);
-    console.log(`║ ${room.name}` + ` `.repeat(35-room.name.length) + `HP: ${playerBar}║`);
+    console.log(`║ ${room.name}` + ` `.repeat(34-room.name.length) + `${user.maxHealth>=100?'':' '}` + `HP: ${playerBar}║`);
     console.log(`║ Exits: `+ exits + ` `.repeat(60-exits.length)+`║`);
     console.log(`╚════════════════════════════════════════════════════════════════════╝\n\n`);
 }

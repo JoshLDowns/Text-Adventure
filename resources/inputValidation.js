@@ -67,6 +67,8 @@ class ValidInput {
                     this.return = 'open_fridge';
                 } else if (obj.lastWord === 'SAFE') {
                     this.return = 'open_safe';
+                } else if (obj.lastWord === 'CHEST') {
+                    this.return = 'use_chest';
                 } else if (obj.lastWord === 'ROOM') {
                     this.return = 'insp';
                 } else if (obj.firstWord === 'LOOK' && obj.lastWord === 'AROUND') {
@@ -80,13 +82,6 @@ class ValidInput {
                 this.return = 'insp';
             }
         } else if (this.falloutBunkerEvent.includes(obj.firstWord) || this.falloutBunkerEvent.includes(obj.lastWord)) {
-            //if (obj.firstWord === 'REPAIR' || obj.lastWord === 'REPAIR' || obj.firstWord === 'FIX' || obj.lastWord === 'FIX') {
-            //    this.return = 'fob_fix';
-            //} else if (obj.firstWord === 'KEY' || obj.lastWord === 'KEY' || obj.firstWord === 'KEYCARD' || obj.lastWord === 'KEYCARD') {
-            //    this.return = 'fob_key';
-            //} else {
-            //    this.return = 'fob_null';
-            //}
             this.return = 'fob_craft';
         } else if (obj.firstWord === 'OPEN' || obj.lastWord === 'OPEN') {
             if (obj.lastWord === 'DESK') {
@@ -99,6 +94,8 @@ class ValidInput {
                 this.return = 'open_safe'
             } else if (obj.lastWord === 'BOX') {
                 this.return = 'use_rbox';
+            } else if (obj.lastWord === 'CHEST') {
+                this.return = 'use_chest';
             } else {
                 this.return = 'open_null';
             }
@@ -158,6 +155,10 @@ class ValidInput {
                 this.return = 'drop_module';
             } else if (obj.lastWord === 'CANNON') {
                 this.return = 'drop_cannon';
+            } else if (obj.lastWord === 'CHEST') {
+                this.return = 'drop_chest';
+            }  else if (obj.lastWord === 'EMP') {
+                this.return = 'drop_emp';
             } else {
                 this.return = 'drop_null';
             }
@@ -196,6 +197,10 @@ class ValidInput {
                 this.return = 'use_comp';
             } else if (obj.lastWord === 'RAY') {
                 this.return = 'use_heatray';
+            } else if (obj.lastWord === 'EMP') {
+                this.return = 'use_emp';
+            }  else if (obj.lastWord === 'CHEST') {
+                this.return = 'use_chest';
             } else {
                 this.return = 'use_null';
             }
@@ -214,6 +219,8 @@ class ValidInput {
                 this.return = 'use_rbox';
             } else if (obj.lastWord === 'SIGN') {
                 this.return = 'read_sign';
+            } else if (obj.lastWord === 'CHEST') {
+                this.return = 'use_chest';
             } else {
                 this.return = 'check_null';
             }
@@ -225,6 +232,8 @@ class ValidInput {
                     this.return = 'use_bomb';
                 } else if (obj.lastWord === 'METAL') {
                     this.return = 'throw_metal';
+                } else if (obj.lastWord === 'EMP') {
+                    this.return = 'use_emp';
                 } else {
                     this.return = 'throw_null';
                 }
@@ -264,6 +273,10 @@ class ValidInput {
                 this.return = 'pu_cannon';
             } else if (obj.firstWord === 'ALL' || obj.lastWord === 'ALL') {
                 this.return = 'pu_all';
+            } else if (obj.firstWord === 'CHEST' || obj.lastWord === 'CHEST') {
+                this.return = 'pu_chest';
+            } else if (obj.firstWord === 'EMP' || obj.lastWord === 'EMP') {
+                this.return = 'pu_emp';
             } else {
                 this.return = 'pu_null';
             }

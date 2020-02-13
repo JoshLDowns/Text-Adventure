@@ -85,7 +85,7 @@ export async function combat(comp, user) {
                         return victoryText();
                     }
                 } else {
-                    console.log(`You fired your ${user.attack}!  It dealt ${damageUser} damage!\n`);
+                    console.log(wrap(`You fired your ${user.attack}!  It dealt ${damageUser} damage!\n`, width));
                     comp.health = comp.health - damageUser;
                     if (comp.health <= 0) {
                         return victoryText();
@@ -106,7 +106,7 @@ export async function combat(comp, user) {
                         return victoryText();
                     }
                 } else {
-                    console.log(`You fired your Missle Launcher!  It dealt ${damageUser} damage!\n`);
+                    console.log(wrap(`You fired your Missle Launcher!  It dealt ${damageUser} damage!\n`, width));
                     comp.health = comp.health - damageUser;
                     if (comp.health <= 0) {
                         user.ability1Supply = user.ability1Supply - 1;
@@ -125,7 +125,7 @@ export async function combat(comp, user) {
                         user.health = user.maxHealth;
                     }
                 } else {
-                    console.log(`You used your Combat Repair!  It restored ${healAmount} HP!\n`);
+                    console.log(wrap(`You used your Combat Repair!  It restored ${healAmount} HP!\n`, width));
                     user.health = user.health + healAmount;
                     if (user.health > user.maxHealth) {
                         user.health = user.maxHealth;
@@ -147,7 +147,7 @@ export async function combat(comp, user) {
                         return victoryText();
                     }
                 } else {
-                    console.log(`You fired your Fission Cannon!  It dealt ${damageUser} damage!\n`);
+                    console.log(wrap(`You fired your Fission Cannon!  It dealt ${damageUser} damage!\n`, width));
                     comp.health = comp.health - damageUser;
                     if (comp.health <= 0) {
                         user.ability3Supply = user.ability3Supply - 1;
@@ -175,6 +175,11 @@ export async function combat(comp, user) {
                 if (comp.health <= 0) {
                     return victoryText();
                 }
+            } else if (input === 'use_emp') {
+                user = itemEffect(input, comp, undefined, user);
+                if (comp.health <= 0) {
+                    return victoryText();
+                }
             }
         }
         await wait(1000);
@@ -191,7 +196,7 @@ export async function combat(comp, user) {
                 console.log(`${comp.name} fired a ${comp.attack} ... it missed!\n`);
             } else if (criticalHit === 5) {
                 damageComp = damageComp + (Math.ceil(comp.damageBase * .75));
-                console.log(`${comp.name} fired a ${comp.attack} ... it was a critical hit!\nIt dealt ${damageComp} damage!\n`);
+                console.log(`${comp.name} fired a ${comp.attack} ...\nIt was a critical hit!\nIt dealt ${damageComp} damage!\n`);
                 if (shieldHP > 0) {
                     shieldHP = shieldHP - damageComp;
                     if (shieldHP <= 0) {
@@ -264,7 +269,7 @@ export async function combat(comp, user) {
         if (comp.abilityType === 'status_stun') {
             let stunChance = random(5);
             if (stunChance !== 1) {
-                console.log(`${comp.name} used ${comp.ability}! It dealt 10 damage!\nYou are stunned from the attack!\n`);
+                console.log(`${comp.name} used ${comp.ability}!\nIt dealt 10 damage!\nYou are stunned from the attack!\n`);
                 player.health = player.health - 10;
                 if (player.health <= 0) {
                     return false;
