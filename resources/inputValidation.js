@@ -80,13 +80,14 @@ class ValidInput {
                 this.return = 'insp';
             }
         } else if (this.falloutBunkerEvent.includes(obj.firstWord) || this.falloutBunkerEvent.includes(obj.lastWord)) {
-            if (obj.firstWord === 'REPAIR' || obj.lastWord === 'REPAIR' || obj.firstWord === 'FIX' || obj.lastWord === 'FIX') {
-                this.return = 'fob_fix';
-            } else if (obj.firstWord === 'KEY' || obj.lastWord === 'KEY' || obj.firstWord === 'KEYCARD' || obj.lastWord === 'KEYCARD') {
-                this.return = 'fob_key';
-            } else {
-                this.return = 'fob_null';
-            }
+            //if (obj.firstWord === 'REPAIR' || obj.lastWord === 'REPAIR' || obj.firstWord === 'FIX' || obj.lastWord === 'FIX') {
+            //    this.return = 'fob_fix';
+            //} else if (obj.firstWord === 'KEY' || obj.lastWord === 'KEY' || obj.firstWord === 'KEYCARD' || obj.lastWord === 'KEYCARD') {
+            //    this.return = 'fob_key';
+            //} else {
+            //    this.return = 'fob_null';
+            //}
+            this.return = 'fob_craft';
         } else if (obj.firstWord === 'OPEN' || obj.lastWord === 'OPEN') {
             if (obj.lastWord === 'DESK') {
                 this.return = 'open_desk';

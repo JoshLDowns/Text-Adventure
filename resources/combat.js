@@ -216,7 +216,7 @@ export async function combat(comp, user) {
                 statusCount = random(4);
             }
         }
-        await wait(1000);
+        await wait(2000);
         console.clear();
     }
 }

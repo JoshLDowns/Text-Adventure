@@ -2,7 +2,7 @@ import { wrap, random, itemEffect, wait, slowLog, storyTextOffOn } from './resou
 import { ValidInput } from './resources/inputValidation.js'
 import { title, gameOverText, mapEast, mapWest, mapNorth, thanks } from './resources/ascii_images.js'
 import { combat } from './resources/combat.js'
-import { ask, menuSelect } from './resources/inquire_funcs.js'
+import { ask, menuSelect, craft } from './resources/inquire_funcs.js'
 
 //starts the game and initializes player object, enemy objects, and room objects
 async function start() {
@@ -42,7 +42,7 @@ async function start() {
         name: undefined,
         maxHealth: (difficulty === '1' ? 60 : difficulty === '2' ? 50 : 40), //nested ternarys to quickly determine health based on difficulty
         health: (difficulty === '1' ? 60 : difficulty === '2' ? 50 : 40),
-        inventory: [],
+        inventory: ['Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Nuclear Fuel Cell', 'Missle Launcher', 'Combat Repair Module', 'Office Keycard West', 'Office Keycard East'],
         attack: 'Particle Beam',
         damageBase: 5,
         damageModifier: 6,
@@ -51,12 +51,15 @@ async function start() {
         hasKilled: false,
         ability1: undefined,
         ability1Supply: undefined,
+        ability1Damage: undefined,
         ability1Modifier: undefined,
         ability2: undefined,
         ability2Supply: undefined,
+        ability2Base: undefined,
         ability2Modifier: undefined,
         ability3: undefined,
         ability3Supply: undefined,
+        ability3Damage: undefined,
         ability3Modifier: undefined,
         useItem: function (item) { //removes item from inventory on use
             for (let element of this.inventory) {
@@ -574,6 +577,8 @@ async function start() {
         }
         //checks if room has a predetermined enemy and calls combat
         if (room.enemy) {
+            await wait(2500);
+            console.clear();
             let victory = await combat(room.enemy, player);
             await wait(1500);
             if (victory[0] === true) {
@@ -614,11 +619,13 @@ async function start() {
                 room.enemy = enemyRandom;
                 await slowLog(logTime, wrap('All of the sudden, an alarm sounds... The sound is coming from a small robot covered in flashing lights that was hiding in the corner! It looks like it wants to fight!', width));
                 enemyRandom.postRoomInfo = room.info;
+                await wait(2500);
+                console.clear();
                 let victory = await combat(room.enemy, player);
                 await wait(1500);
                 if (victory[0] === true) {
                     player = victory[1];
-                    enemyRandom.health = 35;
+                    enemyRandom.health = 25;
                     room.enemy = undefined;
                     room.foughtRando = true;
                     console.log(`----------------------------------------------------------------------\n\n`);
@@ -631,33 +638,33 @@ async function start() {
             }
         }
         //determines if player has the Nuclear Fuel Cell, and changes room functionality if they do.
-        if (room === falloutBunker && player.inventory.includes('Nuclear Fuel Cell')) {
-            metalCount = 0;
-            //determines total scrap metal in players inventory
-            for (let i = 0; i < player.inventory.length; i++) {
-                if (player.inventory[i] === 'Scrap Metal') {
-                    metalCount = metalCount + 1;
-                }
-            }
-            //determines if player can make the Nuclear Heat Ray
-            if (metalCount >= 5) {
-                await slowLog(logTime, `You show Ella the Nuclear Fuel Cell...\n'`);
-                await slowLog(logTime, wrap(`WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter. Give me 5 Scrap Metal and the Fuel Cell and I can make a Heat Ray that will really pack a punch! It only has one shot, so use it wisely...\n`, width));
-                await slowLog(logTime, 'You put the Nuclear Heat Ray in your bag.\n');
-                console.log(`----------------------------------------------------------------------\n`);
-                player.useItem('Nuclear Fuel Cell');
-                player.inventory.push('Nuclear Heat Ray');
-                for (let i = 1; i <= 5; i++) {
-                    player.useItem('Scrap Metal');
-                }
-                return play(room);
-            } else {
-                await slowLog(logTime, `You show Ella the Nuclear Fuel Cell...\n'`);
-                await slowLog(logTime, wrap(`WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter. Come back when you have 5 Scrap Metal and I can make you a sweet weapon!\n`, width));
-                console.log(`----------------------------------------------------------------------\n`);
-            }
-
-        }
+        //if (room === falloutBunker && player.inventory.includes('Nuclear Fuel Cell')) {
+        //    metalCount = 0;
+        //    //determines total scrap metal in players inventory
+        //    for (let i = 0; i < player.inventory.length; i++) {
+        //        if (player.inventory[i] === 'Scrap Metal') {
+        //            metalCount = metalCount + 1;
+        //        }
+        //    }
+        //    //determines if player can make the Nuclear Heat Ray
+        //    if (metalCount >= 5) {
+        //        await slowLog(logTime, `You show Ella the Nuclear Fuel Cell...\n'`);
+        //        await slowLog(logTime, wrap(`WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter. Give me 5 Scrap Metal and the Fuel Cell and I can make a Heat Ray that will really pack a punch! It only has one shot, so use it wisely...\n`, width));
+        //        await slowLog(logTime, 'You put the Nuclear Heat Ray in your bag.\n');
+        //        console.log(`----------------------------------------------------------------------\n`);
+        //        player.useItem('Nuclear Fuel Cell');
+        //        player.inventory.push('Nuclear Heat Ray');
+        //        for (let i = 1; i <= 5; i++) {
+        //            player.useItem('Scrap Metal');
+        //        }
+        //        return play(room);
+        //    } else {
+        //        await slowLog(logTime, `You show Ella the Nuclear Fuel Cell...\n'`);
+        //        await slowLog(logTime, wrap(`WOW! Where did you find this?' she exclaims, 'nevermind, it doesn't matter. Come back when you have 5 Scrap Metal and I can make you a sweet weapon!\n`, width));
+        //        console.log(`----------------------------------------------------------------------\n`);
+        //    }
+//
+        //}
         let input = await ask('What would you like to do?\n');
         //checks if player has entered the cheat code
         if ((input.slice(0, input.indexOf(' ')).toUpperCase()) === 'XYZZY' && (cheatCode.includes((input.slice((input.lastIndexOf(' ')) + 1))))) {
@@ -900,36 +907,45 @@ async function start() {
         else if (input === 'not_sure') { //generic catch all
             await slowLog(logTime, `I'm not sure what you are telling me to do...\n`);
             return play(room);
-        } else if (input === 'fob_null') { //fix catch
-            await slowLog(logTime, `I'm not sure what you are telling me to do...\n`);
-            return play(room);
-        } else if (input === 'fob_fix') { //restores hp from scrap metal
+        } else if (input === 'fob_craft') {
             if (room === falloutBunker) {
-                metalCount = 0;
-                for (let i = 0; i < player.inventory.length; i++) {
-                    if (player.inventory[i] === 'Scrap Metal') {
-                        metalCount = metalCount + 1;
-                    }
-                }
-                if (metalCount >= 5) {
-                    await slowLog(logTime, wrap(`Ella says she can fix you up ... you hand over the five Scrap Metal and she gets to work\n`, width));
-                    player.health = player.health + 10;
-                    if (player.health > player.maxHealth) {
-                        player.health = player.maxHealth;
-                    }
-                    await slowLog(logTime, `You recovered 10 HP!  Your current HP is now ${player.health}\n`);
-                    for (let i = 1; i <= 5; i++) {
-                        player.useItem('Scrap Metal');
-                    }
-                    return play(room);
-                } else {
-                    await slowLog(logTime, `Ella says you need 5 Scrap Metal to get fixed up...\n`);
-                    return play(room);
-                }
+                player = await craft(player);
+                return play(room);
             } else {
                 await slowLog(logTime, `You gotta be at the bunker if you want Ella to fix you up\n`);
                 return play(room);
             }
+        
+        //} else if (input === 'fob_null') { //fix catch
+        //    await slowLog(logTime, `I'm not sure what you are telling me to do...\n`);
+        //    return play(room);
+        //} else if (input === 'fob_fix') { //restores hp from scrap metal
+        //    if (room === falloutBunker) {
+        //        metalCount = 0;
+        //        for (let i = 0; i < player.inventory.length; i++) {
+        //            if (player.inventory[i] === 'Scrap Metal') {
+        //                metalCount = metalCount + 1;
+        //            }
+        //        }
+        //        if (metalCount >= 5) {
+        //            await slowLog(logTime, wrap(`Ella says she can fix you up ... you hand over the five Scrap Metal and she gets to work\n`, width));
+        //            player.health = player.health + 10;
+        //            if (player.health > player.maxHealth) {
+        //                player.health = player.maxHealth;
+        //            }
+        //            await slowLog(logTime, `You recovered 10 HP!  Your current HP is now ${player.health}\n`);
+        //            for (let i = 1; i <= 5; i++) {
+        //                player.useItem('Scrap Metal');
+        //            }
+        //            return play(room);
+        //        } else {
+        //            await slowLog(logTime, `Ella says you need 5 Scrap Metal to get fixed up...\n`);
+        //            return play(room);
+        //        }
+        //    } else {
+        //        await slowLog(logTime, `You gotta be at the bunker if you want Ella to fix you up\n`);
+        //        return play(room);
+        //    }
         } else if (input === 'fob_key') { //makes the key to north tower if you have keys from east and west towers
             if (room === falloutBunker) {
                 if (player.inventory.includes('Office Keycard West') && player.inventory.includes('Office Keycard East')) {
