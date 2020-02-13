@@ -7,6 +7,7 @@ export async function menuSelect(listTitle, listObj) {
         message: listTitle,
         choices: listObj,
     });
+    process.stdout.removeAllListeners();
     return answer;
 }
 
@@ -18,17 +19,7 @@ export async function ask(question) {
     if (answer === undefined) {
         answer = '';
     }
-    //   console.log(process.stdin.eventNames())
-    //   console.log(process.stdout.eventNames())
-    //   console.log(process.stdin.listenerCount('end'))
-    //   console.log(process.stdin.listenerCount('pause'))
-    //   console.log(process.stdin.listenerCount('data'))
-    //   console.log(process.stdout.listenerCount('end'))
-    //   console.log(process.stdout.listenerCount('drain'))
-    //   console.log(process.stdout.listenerCount('error'))
-    //   console.log(process.stdout.listenerCount('close'))
     process.stdout.removeAllListeners();
-    console.log(answer)
     return answer;
 }
 
@@ -52,8 +43,8 @@ export async function craft(user) {
     if (user.inventory.includes('Nuclear Fuel Cell') && metalCount >= 5) {
         useableInventory.push({ name: 'Nuclear Fuel Cell: 5 Scrap Metal', value: 'Nuclear Fuel Cell' });
     }
-    if (user.inventory.includes('Office Keycard West') && user.inventory.includes('Office Keycard East') && !user.inventory.includes('Office Keycard North')) {
-        useableInventory.push({ name: 'Office Keycard North', value: 'Office Keycard North' })
+    if (user.inventory.includes('Office Keycard West') && user.inventory.includes('Office Keycard East') && !user.inventory.includes('North Tower Keycard')) {
+        useableInventory.push({ name: 'North Tower Keycard', value: 'North Tower Keycard' })
     }
     if (metalCount >= 3) {
         useableInventory.push({ name: 'Repair', value: 'Repair' })
@@ -86,7 +77,7 @@ export async function craft(user) {
         } else if (item === 'Fission Cannon') {
             user.ability3 = item;
             user.ability3Supply = 3;
-            user.ability3Base = 20;
+            user.ability3Damage = 20;
             user.ability3Modifier = 15;
             user.useItem('Fission Cannon');
             for (let i = 1; i <= 8; i++) {
@@ -102,8 +93,8 @@ export async function craft(user) {
             }
             console.log(`You put the Nuclear Heat Ray in your bag...\nIt only has one shot, use it wisely!`);
             return user;
-        } else if (item === 'Office Keycard North') {
-            user.inventory.push('Office Keycard North');
+        } else if (item === 'North Tower Keycard') {
+            user.inventory.push('North Tower Keycard');
             console.log(`Ella was able to code a new keycard!\nYou now have access to the North Tower!\n`);
             return user;
         } else if (item === 'Repair') {
@@ -126,14 +117,14 @@ export async function craft(user) {
 
 export async function combatChoice (user) {
     //builds list of possible choices to send to menuSelect
-    let possibleChoices = [{name: `Particle Beam................∞`, value: 'Particle Beam'}];
-    if (user.ability1) {
+    let possibleChoices = [{name: `Particle Beam................∞`, value: 'combat'}];
+    if (user.ability1 && user.ability1Supply > 0) {
         possibleChoices.push({name: `Missle Launcher..............${user.ability1Supply}`, value: 'Missle Launcher'});
     }
-    if (user.ability2) {
+    if (user.ability2 && user.ability2Supply > 0) {
         possibleChoices.push({name: `Combat Repair Module.........${user.ability2Supply}`, value: 'Combat Repair Module'});
     }
-    if (user.ability3) {
+    if (user.ability3 && user.ability3Supply > 0) {
         possibleChoices.push({name: `Fission Cannon...............${user.ability3Supply}`, value: 'Fission Cannon'});
     }
     possibleChoices.push({name: 'Use Item', value: 'Use Item'});
@@ -150,16 +141,16 @@ export async function combatChoice (user) {
                     kitCount = kitCount + 1;
                 }
             }
-            possibleItems.push({name: `Repair Kit...................${kitCount}`, value: 'Repair Kit'});
+            possibleItems.push({name: `Repair Kit...................${kitCount}`, value: 'use_repairkit'});
         }
-        if (user.inventory.inventory('Plasma Grenade')) {
+        if (user.inventory.includes('Plasma Grenade')) {
             let grenadeCount = 0;
             for (let i = 0; i < user.inventory.length; i++) {
                 if (user.inventory[i] === 'Plasma Grenade') {
                     grenadeCount = grenadeCount + 1;
                 }
             }
-            possibleItems.push({name: `Plasma Grenade...............${grenadeCount}`, value: 'Plasma Grenade'});
+            possibleItems.push({name: `Plasma Grenade...............${grenadeCount}`, value: 'use_grenade'});
         }
         if (user.inventory.includes('Smoke Bomb')) {
             let bombCount = 0;
@@ -168,7 +159,7 @@ export async function combatChoice (user) {
                     bombCount = bombCount + 1;
                 }
             }
-            possibleItems.push({name: `Smoke Bomb...................${bombCount}`, value: 'Smoke Bomb'});
+            possibleItems.push({name: `Smoke Bomb...................${bombCount}`, value: 'use_bomb'});
         }
         if (user.inventory.includes('Portable Shield')) {
             let shieldCount = 0;
@@ -177,10 +168,10 @@ export async function combatChoice (user) {
                     shieldCount = shieldCount + 1;
                 }
             }
-            possibleItems.push({name: `Portable Shield..............${shieldCount}`, value: 'Portable Shield'});
+            possibleItems.push({name: `Portable Shield..............${shieldCount}`, value: 'use_shield'});
         }
         if (user.inventory.includes('Nuclear Heat Ray')) {
-            possibleItems.push({name: 'Nuclear Heat Ray.............1', value: 'Nuclear Heat Ray'})
+            possibleItems.push({name: 'Nuclear Heat Ray.............1', value: 'use_heatray'})
         }
         possibleItems.push({name: 'Back to Combat', value: 'back'})
 

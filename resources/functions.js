@@ -1,4 +1,5 @@
 import { ask } from './inquire_funcs.js'
+import chalk from 'chalk'
 
 let width = process.stdout.columns - 8;
 
@@ -12,13 +13,6 @@ let useableItemLookUp = {
     use_heatray: 'Nuclear Heat Ray',
     use_rbox: ['West Riddle Box', 'East Riddle Box']
 }
-
-//accepts input
-//export function ask(questionText) {
-//    return new Promise((resolve, reject) => {
-//        rl.question(questionText, resolve);
-//    });
-//}
 
 //text wrapping function, accepts string and width(w) and wraps text accordingly
 export function wrap(string, w) {
@@ -172,4 +166,14 @@ export async function storyTextOffOn (text, time) {
         text = await ask('What would you like to do?\n');
     }
     return [text, time];
+}
+
+export function roomBar (user, room) {
+    let playerBarCount = (Math.ceil((user.health / user.maxHealth).toPrecision(2) * 10)) * 2;
+    let playerBar = chalk.blue(`(${user.health}(`) + chalk.greenBright('█').repeat(playerBarCount) + chalk.greenBright('-').repeat(20 - playerBarCount) + chalk.blue(`)${user.maxHealth})`);
+    let exits = `${room.north ? `North   ` : ''}${room.east ? `East   ` : ''}${room.south ? `South   ` : ''}${room.west ? `West` : ''}`;
+    console.log(`╔════════════════════════════════════════════════════════════════════╗`);
+    console.log(`║ ${room.name}` + ` `.repeat(35-room.name.length) + `HP: ${playerBar}║`);
+    console.log(`║ Exits: `+ exits + ` `.repeat(60-exits.length)+`║`);
+    console.log(`╚════════════════════════════════════════════════════════════════════╝\n\n`);
 }
