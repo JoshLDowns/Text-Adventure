@@ -1100,7 +1100,7 @@ async function start() {
 async function playAgain(logTime) {  //Allows user to play again
     let hintArray = ['If you want to survive, try keeping your HP above 0...', 'Make sure to check rooms after you defeat enemies, you never know what they might have dropped!', `You can 'use', 'check', or 'read' a lot of items in rooms!`, `If you can't solf the riddles, ask a middle schooler!`, `Despite living through the apocalypse, Ella is quite positive... be more like Ella!`, `Some of these messages are hints... most aren't... but you can see them all if you keep getting blown up!`, `Items are your friend, use them wisely!`]
     let hintNumber = random(7);
-    await slowLog(logTime, wrap(hintArray[hintNumber-1]));
+    await slowLog(logTime, wrap(hintArray[hintNumber-1], 75));
     console.log('\n\n');
     let again = await menuSelect('Would you like to play again?', [{ name: 'Yes', value: 'Y' }, { name: 'No', value: 'N' }]);
     if (again.toUpperCase() === 'Y') {

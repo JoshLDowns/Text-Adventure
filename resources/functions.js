@@ -3,6 +3,7 @@ import chalk from 'chalk'
 
 let width = process.stdout.columns - 8;
 
+//useable Item lookup table
 let useableItemLookUp = {
     use_repairkit: 'Repair Kit',
     use_particlebattery: 'Particle Battery',
@@ -156,7 +157,7 @@ export function itemEffect(item, comp, answer, user, room) {
     }
 }
 
-//sets pauses in combat for readability and more fluid feeling gameplay
+//sets pauses in combat and long text blocks for readability and more fluid feeling gameplay
 export async function wait(ms) {
     return new Promise(resolve => {
         setTimeout(resolve, ms);
@@ -180,7 +181,7 @@ export async function slowLog(time = 15, string) {
     }
 }
 
-
+//called when player turns story text off or on, lets them set speed
 export async function storyTextOffOn (text, time) {
     if (text.toLowerCase() === 'story text off') {
         console.log('Story text is now off!\n');
@@ -197,6 +198,7 @@ export async function storyTextOffOn (text, time) {
     return [text, time];
 }
 
+//builds and displays status bar when rooms are initialized
 export function roomBar (user, room) {
     let playerBarCount = Math.round((user.health/user.maxHealth).toPrecision(2)*100/5);
     let playerBar = chalk.blue(`(${user.health}(`) + chalk.greenBright('█').repeat(playerBarCount) + chalk.greenBright('-').repeat(20 - playerBarCount) + chalk.blue(`)${user.maxHealth})`);

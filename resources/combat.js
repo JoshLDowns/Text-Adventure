@@ -40,16 +40,16 @@ export async function combat(comp, user) {
 
     while (user.health > 0 || comp.health > 0) {  //Loop that breaks when either user or computer hits 0 or less HP
         //user Turn
-        if (user.diode === true) {
+        if (user.diode === true) {  //checks to see if player has diode, and adjusts health if they do
             user.health = user.health+10;
             if (user.health > user.maxHealth) {
                 user.health = user.maxHealth;
             }
         }
 
-        statusBar();
+        statusBar();  //refreshes status bar with current HP of player and enemy
 
-        if (user.diode === true) {
+        if (user.diode === true) {  //text that displays if player has diode
             await console.log('...\n.....\n');
             await wait(500);
             await console.log('.......\n');
@@ -57,7 +57,8 @@ export async function combat(comp, user) {
             console.log('\nYour Regeneration Diode restored 10 HP!\n');
         }
 
-        user.status2 = undefined; //emergency reset to status in case it gets skipped (happened once, can't figure out why still...)
+        user.status2 = undefined; //clears temporary status effects from player
+
         if (user.status === 'status_stun') {
             console.log('...\n');
             await wait(500);
@@ -83,9 +84,9 @@ export async function combat(comp, user) {
                     }
                 }
             }
-
+            //player action menu from inquire_funcs.js
             let input = await combatChoice(user);
-
+            //logic block to determine how to handle player choice
             if (input === 'combat') {
                 criticalHit = random(5);
                 miss = random(5);
@@ -199,7 +200,7 @@ export async function combat(comp, user) {
         }
         await wait(1000);
         //Computer Enemy turn
-        compAbility = random(4);
+        compAbility = random(4); //determines if computer uses normal attack or special ability
         if (compAbility !== 4) {
             criticalHit = random(5);
             miss = random(5);
@@ -245,7 +246,7 @@ export async function combat(comp, user) {
                     }
                 }
             }
-        } else {
+        } else { //calles useCompAbility to determine what the special ability effect is
             let afterAbility = useCompAbility(comp, user);
             if (afterAbility === false) {
                 return [false];

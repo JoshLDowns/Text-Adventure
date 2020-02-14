@@ -1,6 +1,7 @@
 import input from '@inquirer/input';
 import select from '@inquirer/select';
 
+//builds drop down menu for input selection
 export async function menuSelect(listTitle, listObj) {
     let answer;
     answer = await select({
@@ -11,6 +12,7 @@ export async function menuSelect(listTitle, listObj) {
     return answer;
 }
 
+//ask function for accepting input
 export async function ask(question) {
     let answer;
     answer = await input({
@@ -23,6 +25,7 @@ export async function ask(question) {
     return answer;
 }
 
+//called from fallout bunker, builds a menu of craftable items based on player inventory, and executes selection
 export async function craft(user) {
     let metalCount = 0;
     for (let i = 0; i < user.inventory.length; i++) {
@@ -159,6 +162,7 @@ export async function craft(user) {
     }
 }
 
+//used in combat to decide which action to take
 export async function combatChoice (user) {
     //builds list of possible choices to send to menuSelect
     let possibleChoices = [{name: `Particle Beam................∞`, value: 'combat'}];
