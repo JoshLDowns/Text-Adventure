@@ -13,7 +13,8 @@ let useableItemLookUp = {
     use_heatray: 'Nuclear Heat Ray',
     use_rbox: ['West Riddle Box', 'East Riddle Box'],
     use_emp: 'EMP',
-    use_chest: 'Large Chest'
+    use_chest: 'Large Chest',
+    use_plating: 'Graphene Plating'
 }
 
 //text wrapping function, accepts string and width(w) and wraps text accordingly
@@ -63,6 +64,12 @@ export function itemEffect(item, comp, answer, user, room) {
         user.maxHealth = user.maxHealth + 10;
         user.health = user.health + 10;
         console.log(`You have increased your maximum HP by 10 points!\n`);
+        return user;
+    } else if (item === 'use_plating') {
+        user.useItem(useableItemLookUp[item]);
+        user.maxHealth = user.maxHealth + 30;
+        user.health = user.health + 30;
+        console.log(`You have increased your maximum HP by 30 points!\n`);
         return user;
     } else if (item === 'use_grenade') {
         user.useItem(useableItemLookUp[item]);
@@ -121,7 +128,7 @@ export function itemEffect(item, comp, answer, user, room) {
     } else if (item === 'use_heatray') {
         user.useItem(useableItemLookUp[item]);
         if (comp !== undefined) {
-            comp.health = comp.health - 40;
+            comp.health = comp.health - 75;
             console.log(wrap(`You fired the Nuclear Heat Ray! It dealt 40 damage to ${comp.name}!\n`, width));
             return user;
         } else {
@@ -191,11 +198,11 @@ export async function storyTextOffOn (text, time) {
 }
 
 export function roomBar (user, room) {
-    let playerBarCount = (Math.ceil((user.health / user.maxHealth).toPrecision(2) * 10)) * 2;
+    let playerBarCount = Math.round((user.health/user.maxHealth).toPrecision(2)*100/5);
     let playerBar = chalk.blue(`(${user.health}(`) + chalk.greenBright('█').repeat(playerBarCount) + chalk.greenBright('-').repeat(20 - playerBarCount) + chalk.blue(`)${user.maxHealth})`);
     let exits = `${room.north ? `North   ` : ''}${room.east ? `East   ` : ''}${room.south ? `South   ` : ''}${room.west ? `West` : ''}`;
     console.log(`╔════════════════════════════════════════════════════════════════════╗`);
-    console.log(`║ ${room.name}` + ` `.repeat(34-room.name.length) + `${user.maxHealth>=100?'':' '}` + `HP: ${playerBar}║`);
+    console.log(`║${room.name}` + ` `.repeat(34-room.name.length) + `${user.health>=100?'':' '}` + `${user.maxHealth>=100?'':' '}` + `HP: ${playerBar}║`);
     console.log(`║ Exits: `+ exits + ` `.repeat(60-exits.length)+`║`);
     console.log(`╚════════════════════════════════════════════════════════════════════╝\n\n`);
 }

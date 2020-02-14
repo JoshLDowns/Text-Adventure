@@ -1,6 +1,6 @@
 import { wrap, random, itemEffect, wait, slowLog, storyTextOffOn, roomBar } from './resources/functions.js'
 import { ValidInput } from './resources/inputValidation.js'
-import { title, gameOverText, mapEast, mapWest, mapNorth, thanks } from './resources/ascii_images.js'
+import { title, gameOverText, mapEast, mapWest, mapNorth, thanks, secretMap } from './resources/ascii_images.js'
 import { combat } from './resources/combat.js'
 import { ask, menuSelect, craft } from './resources/inquire_funcs.js'
 
@@ -59,6 +59,7 @@ async function start() {
         ability3Damage: undefined,
         ability3Modifier: undefined,
         bonusRoom1: false,
+        diode: false,
         useItem: function (item) { //removes item from inventory on use
             for (let element of this.inventory) {
                 if (element === item) {
@@ -134,17 +135,20 @@ async function start() {
     let enemyW = new Enemy('Robot Sentry', 50, 50, 'Plasma Ray', 'Static Discharge', 6, 9, 'status_stun', undefined, undefined, 'Killswitch Code 1', wrap('The low hum of the servers surrounds you as you stare at what was left of your foe...\n', width), wrap(`Taking down your first enemy was both empowering and soul crushing... Your new found power is exhilerating but what have you given up for it? ... The low hum of the servers and what is left of your foe surrounds you.\n`, width), ['Combat Repair Module', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal']);
     let enemyE = new Enemy('Robot Bruiser', 75, 75, 'Pneumatic Fist', 'Missle Barrage', 6, 3, 'offensive', 8, 12, 'Killswitch Code 2', wrap('The low hum of the servers surrounds you as you stare at what was left of your foe...\n', width), wrap(`Taking down your first enemy was both empowering and soul crushing... Your new found power is exhilerating but what have you given up for it? ... The low hum of the servers and what is left of your foe surrounds you.\n`, width), ['Missle Launcher', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Scrap Metal']);
     let enemyN1 = new Enemy('Mechanical Surveillance Unit', 125, 125, 'Fission Laser', 'Remote Laser', 10, 6, 'status_dot', 6, 3, 'Office Keycard North', wrap('As the dust settles, you notice that you were surrounded by automated turrets, thankfully defeating this foe seems to have shut them down... The room is earily quiet.\n', width), undefined, ['Fission Cannon', 'Scrap Metal', 'Scrap Metal']);
-    let enemyF = new Enemy('Enforcer Captain', 175, 175, 'Collider Beam', 'Combat Repair', 12, 10, 'defensive', 14, 6, 'Killswitch Code 3', wrap(`Your final foe has been defeated ... You are so close to your end goal, but you can't help but ask yourself, has destroying your own kind been worth it?\n`, width));
+    let enemyF = new Enemy('Enforcer Captain', 175, 175, 'Collider Beam', 'Combat Repair', 12, 10, 'defensive', 14, 6, 'Killswitch Code 3', wrap(`Your final foe has been defeated ... You are so close to your end goal, but you can't help but ask yourself, has destroying your own kind been worth it?\n`, width), undefined, ['Scrap Metal', 'Scrap Metal', 'Scrap Metal']);
     let enemyRandom = new Enemy('Surveillance Bot', 35, 45, 'Photon Blaster', 'Combat Repair', 5, 5, 'defensive', 5, 5, `${random(5) <= 2 ? 'Repair Kit' : random(5) <= 2 ? 'Smoke Bomb' : random(5) <= 2 ? 'Plasma Grenade' : 'Scrap Metal'}`) //random loot with nested ternary
     let enemyRandom2 = new Enemy('Drill Bot', 20, 20, 'Nail Gun', 'Drill Punch', 10, 10, 'offensive', 20, 10, `${random(5) <= 2 ? 'Repair Kit' : random(5) <= 2 ? 'Smoke Bomb' : random(5) <= 2 ? 'Plasma Grenade' : 'Scrap Metal'}`)
     let enemyBonus1 = new Enemy('Imperial Infantry Unit', 225, 225, 'Radioactive Slug', 'Rail Gun', 15, 15, 'offensive', 20, 20, 'Large Chest', wrap(`The parking lot is incredibly silent... It's a sunny day, but the beautiful weather will never overshadow the ravaged city that surrounds you`, width), undefined, ['Scrap Metal', 'Scrap Metal', 'Repair Kit', 'Repair Kit']);
-
+    let enemyB1 = new Enemy('Automated Turret', 65, 65, 'Machine Gun', 'Plasma Beam', 12, 8, 'offensive', 10, 20, `${random(5) <= 2 ? 'Repair Kit' : random(5) <= 2 ? 'Smoke Bomb' : random(5) <= 2 ? 'Plasma Grenade' : 'Scrap Metal'}`, wrap(`Without the turret, the bright room is eerily quite being so far underground. It doesn't look like you can salvage anything useful from the turret.\n`, width), undefined, ['Scrap Metal', 'Scrap Metal'])
+    let enemyB2 = new Enemy('Warehouse Guard', 75, 75, 'Solar Ray', 'Static Discharge', 12, 12, 'status_stun', undefined, undefined, 'Basement Keycard', wrap(`Now that you have a chance to explore the warehouse, you realize it is mostly full of supplies for organic life forms. There are still some useful items though...\n`, width), undefined, ['Repair Kit', 'Repair Kit', 'Scrap Metal', 'Scrap Metal', 'Portable Shield', 'Plasma Grenade', 'Thick Carbon Coating', 'Thick Carbon Coating']);
+    let enemyB3 = new Enemy('Vault Guardian', 200, 200, 'Nuclear Cannon', 'Remote Laser', 15, 15, 'status_dot', 10, 5, 'Nuclear Fuel Cell', wrap(`Your battle with the guard destroyed a good portion of the room... Fortunately, a few of James' inventions remain untouched, and a small work desk in the corner still stands...\n`, width), undefined, ['Scrap Metal', 'Scrap Metal', 'Scrap Metal', 'Regeneration Diode', 'Graphene Plating']);
+    
     //cheat code input check
-    let cheatCode = ['falloutBunker', 'RUW_Entrance', 'RUW_WelcomeDesk', 'RUW_BreakRoom', 'RUW_Hallway1N', 'RUW_ExpLabs', 'RUW_Cubicle1', 'RUW_Hallway1S', 'RUW_Office', 'RUW_FabUnit', 'RUW_ServerW', 'RUE_Entrance', 'RUE_WelcomeDesk', 'RUE_Cubicle2', 'RUE_Hallway1N', 'RUE_QA', 'RUE_Charging', 'RUE_Hallway1S', 'RUE_SupplyCloset', 'RUE_AdvWeapons', 'RUE_FabUnit', 'RUE_ServerE', 'RUN_Entrance', 'RUN_WelcomeDesk', 'RUN_Cubicle3', 'RUN_Hallway1E', 'RUN_AdminOffice', 'RUN_Cubicle4', 'RUN_Hallway1W', 'RUN_Treasury', 'RUN_aiLab', 'RUN_Hallway3N', 'RUN_MainServer', 'RUN_PresOffice'];
+    let cheatCode = ['falloutBunker', 'RUW_Entrance', 'RUW_WelcomeDesk', 'RUW_BreakRoom', 'RUW_Hallway1N', 'RUW_ExpLabs', 'RUW_Cubicle1', 'RUW_Hallway1S', 'RUW_Office', 'RUW_FabUnit', 'RUW_ServerW', 'RUE_Entrance', 'RUE_WelcomeDesk', 'RUE_Cubicle2', 'RUE_Hallway1N', 'RUE_QA', 'RUE_Charging', 'RUE_Hallway1S', 'RUE_SupplyCloset', 'RUE_AdvWeapons', 'RUE_FabUnit', 'RUE_ServerE', 'RUN_Entrance', 'RUN_WelcomeDesk', 'RUN_Cubicle3', 'RUN_Hallway1E', 'RUN_AdminOffice', 'RUN_Cubicle4', 'RUN_Hallway1W', 'RUN_Treasury', 'RUN_aiLab', 'RUN_Hallway3N', 'RUN_MainServer', 'RUN_PresOffice', 'RUW_ParkingLot', 'RUN_SecretStairwell', 'RUN_BasementLanding', 'RUN_FalloutWarehouse', 'RUN_BasementHallway', 'RUN_Vault'];
 
     //Room class to build each room
     class Room {
-        constructor(name, info, inventory, enemy, north, south, east, west, keycard, intObject, intObjInv, foughtRando) {
+        constructor(name, info, inventory, enemy, north, south, east, west, keycard, intObject, intObjInv, secret=false) {
             this.name = name;
             this.info = info;
             this.inventory = inventory;
@@ -156,8 +160,10 @@ async function start() {
             this.keycard = keycard;
             this.intObject = intObject;
             this.intObjInv = intObjInv;
+            this.secret = secret;
             this.foughtRando = false;
             this.entered = false;
+            this.interacted = false;
             this.pickUpItem = function (item) {  //removes item from room inventory when picked up
                 for (let element of this.inventory) {
                     if (element === item) {
@@ -175,16 +181,14 @@ async function start() {
                     newRoom = this.north;
                     newRoom = roomLookUp[newRoom];
                     if (newRoom.keycard === 'blocked') {
-                        console.log(`The way is blocked...\nMaybe something explosive could fix that problem??\n`);
-                        console.log(`----------------------------------------------------------------------\n`);
+                        console.log(`The way is blocked...\nMaybe something explosive could fix that problem??\n`);   
                         return false;
                     } else if (newRoom.keycard && player.inventory.includes(newRoom.keycard)) {
                         console.clear();
                         console.log('You scan your keycard, the door unlocks!\n\n');
                         return newRoom;
                     } else if (newRoom.keycard && !player.inventory.includes(newRoom.keycard)) {
-                        console.log(`You need ${newRoom.keycard} to enter this room ... \n`);
-                        console.log(`----------------------------------------------------------------------\n`);
+                        console.log(`You need ${newRoom.keycard} to enter this room ... \n`);  
                         return false;
                     } else {
                         console.clear();
@@ -194,16 +198,14 @@ async function start() {
                     newRoom = this.south;
                     newRoom = roomLookUp[newRoom];
                     if (newRoom.keycard === 'blocked') {
-                        console.log(`The way is blocked...\nMaybe something explosive could fix that problem??\n`);
-                        console.log(`----------------------------------------------------------------------\n`);
+                        console.log(`The way is blocked...\nMaybe something explosive could fix that problem??\n`);   
                         return false;
                     } else if (newRoom.keycard && player.inventory.includes(newRoom.keycard)) {
                         console.clear();
                         console.log('You scan your keycard, the door unlocks!\n\n');
                         return newRoom;
                     } else if (newRoom.keycard && !player.inventory.includes(newRoom.keycard)) {
-                        console.log(`You need ${newRoom.keycard} to enter this room ... \n`);
-                        console.log(`----------------------------------------------------------------------\n`);
+                        console.log(`You need ${newRoom.keycard} to enter this room ... \n`);   
                         return false;
                     } else {
                         console.clear();
@@ -213,16 +215,14 @@ async function start() {
                     newRoom = this.east;
                     newRoom = roomLookUp[newRoom];
                     if (newRoom.keycard === 'blocked') {
-                        console.log(`The way is blocked...\nMaybe something explosive could fix that problem??\n`);
-                        console.log(`----------------------------------------------------------------------\n`);
+                        console.log(`The way is blocked...\nMaybe something explosive could fix that problem??\n`);   
                         return false;
                     } else if (newRoom.keycard && player.inventory.includes(newRoom.keycard)) {
                         console.clear();
                         console.log('You scan your keycard, the door unlocks!\n\n');
                         return newRoom;
                     } else if (newRoom.keycard && !player.inventory.includes(newRoom.keycard)) {
-                        console.log(`You need ${newRoom.keycard} to enter this room ... \n`);
-                        console.log(`----------------------------------------------------------------------\n`);
+                        console.log(`You need ${newRoom.keycard} to enter this room ... \n`);   
                         return false;
                     } else {
                         console.clear();
@@ -232,8 +232,7 @@ async function start() {
                     newRoom = this.west;
                     newRoom = roomLookUp[newRoom];
                     if (newRoom.keycard === 'blocked') {
-                        console.log(`The way is blocked...\nMaybe something explosive could fix that problem??\n`);
-                        console.log(`----------------------------------------------------------------------\n`);
+                        console.log(`The way is blocked...\nMaybe something explosive could fix that problem??\n`);    
                         return false;
                     } else if (newRoom.keycard && player.inventory.includes(newRoom.keycard)) {
                         console.clear();
@@ -241,7 +240,6 @@ async function start() {
                         return newRoom;
                     } else if (newRoom.keycard && !player.inventory.includes(newRoom.keycard)) {
                         console.log(`You need ${newRoom.keycard} to enter this room ... \n`);
-                        console.log(`----------------------------------------------------------------------\n`);
                         return false;
                     } else {
                         console.clear();
@@ -250,7 +248,6 @@ async function start() {
                 }
             } else {
                 console.log('There is nothing in that direction ...\n')
-                console.log(`----------------------------------------------------------------------\n`);
                 return false;
             }
         }
@@ -304,16 +301,21 @@ async function start() {
     //R.U. North
     let RUN_Entrance = new Room('R.U.North Entrance', wrap(`Unlike the other two towers, the Robotics United Tower North seems to be in pretty good shape from the outside. The machines must have been worried about destroying the main server computer that resides inside Ella's Dad's office. I wonder how he would have felt about the sign on the door now...\n`, width), [], undefined, 'RUN_WelcomeDesk', 'falloutBunker', false, false, 'North Tower Keycard', 'Sign');
     let RUN_WelcomeDesk = new Room('Welcome Desk', wrap(`The outside might have looked like it had avoided the brunt of the machine onslaught, but the inside sure didn't. The room is littered with the remains of both machine and human alike. The one takeaway from this gruesome sight is that the desks at Robotics United were rock solid, as the one in this welcome area is still standing tall, just like in the other Towers... At least the directory with a nice map of the tower is still mostly legible...\n`, width), ['Scrap Metal', 'Scrap Metal', 'Scrap Metal'], undefined, 'RUN_aiLab', 'RUN_Entrance', 'RUN_Cubicle3', 'RUN_Cubicle4', false, 'Desk', ['Thick Carbon Coating']);
-    let RUN_Cubicle3 = new Room('Cubicle Block 3', wrap('Half of the room is completely leveled, as if a bulldozer drove right through the room. There must have been a big fight here. The other side of the room is in disarray, but some things are still intact...\n', width), ['Repair Kit'], undefined, 'RUN_Hallway1E', false, false, 'RUN_WelcomeDesk', false, 'Computer', []);
+    let RUN_Cubicle3 = new Room('Cubicle Block 3', wrap('Half of the room is completely leveled, as if a bulldozer drove right through the room. There must have been a big fight here. The other side of the room is in disarray, but one cubicle managed to escape unscathed. Whoever worked there was a huge Hitchhikers Guide to the Galaxy fan, there are posters from the movie all over the cubicle. It looks like the computer still works too...\n', width), ['Repair Kit'], undefined, 'RUN_Hallway1E', false, false, 'RUN_WelcomeDesk', false, 'Computer', []);
     let RUN_Hallway1E = new Room('Hallway 1E - N', wrap(`The walls in this hallway are mostly intact, and are lined with awards celebrating the accomplishments of AI before things went south... If the machines don't have emotion, why save all of this?\n`, width), ['Thick Carbon Coating'], undefined, 'RUN_AdminOffice', 'RUN_Cubicle3', false, 'RUN_aiLab', false);
     let RUN_AdminOffice = new Room('Administrative Offices', wrap('The machines must have took out the higher ups first, as this room looks like it was cleared before the panic set in. It looks as if most the room has already been ransacked for supplies, but a lone Filing Cabinet at the back of the office remains untouched...\n', width), ['Repair Kit', 'Scrap Metal'], undefined, false, 'RUN_Hallway1E', false, 'RUN_Hallway3N', false, 'Filing Cabinet', ['Smoke Bomb']);
     let RUN_Cubicle4 = new Room('Cubicle Block 4', wrap(`This cubicle block seems to have avoided the carnage, as it looks as if the staff had just left for the day. You look around the cubicles and see pictures of friends, family, loved ones...all gone. You still don't understand these feelings, but you know you don't like them...\n`, width), ['Particle Battery'], undefined, 'RUN_Hallway1W', false, 'RUN_WelcomeDesk', false, false);
-    let RUN_Hallway1W = new Room('Hallway 1W - N', wrap('On the wall in this hallway is a giant framed picture, with a plaque mounted under it. The plaque reads: James Lloyd, Father of all Machines... There is a single bullet hole in his head...\n', width), ['Thick Carbon Coating', 'Scrap Metal'], undefined, 'RUN_Treasury', 'RUN_Cubicle4', 'RUN_aiLab', false, false);
+    let RUN_Hallway1W = new Room('Hallway 1W - N', wrap('On the wall in this hallway is a giant framed picture, with a plaque mounted under it. The plaque reads: James Lloyd, Father of all Machines... There is a single bullet hole in his head...\n', width), ['Thick Carbon Coating', 'Scrap Metal'], undefined, 'RUN_Treasury', 'RUN_Cubicle4', 'RUN_aiLab', false, false, undefined, undefined, true);
     let RUN_Treasury = new Room('R.U. Treasury', wrap('If you had any use for money, you would be one happy camper as the room looked like someone popped a giant confetti launcher that was just full of $100 bills...\n', width), ['Repair Kit'], undefined, false, 'RUN_Hallway1W', 'RUN_Hallway3N', false, false, 'Broken Safe', ['Particle Battery']);
     let RUN_aiLab = new Room('Artificial Intelligence Laboratory', wrap(`As you enter the room, it is completely dark... Suddenly all the lights blast on, and you are met with a machine that looks like a giant turret with arms ...'INTRUDER DETECTED, ELIMINATION SEQUENCE INITIATED'... The door slams shut behind you, it appears there is only one way out of this...\n`, width), [], enemyN1, 'RUN_Hallway3N', 'RUN_WelcomeDesk', 'RUN_Hallway1E', 'RUN_Hallway1W', false);
     let RUN_Hallway3N = new Room('Hallway 3N - N', wrap(`There must have been a mad dash to get to James' office just north of here. The hall has so much rubble, decimated machines, and skeletal remains that it is hard to walk through...\n`, width), ['Scrap Metal', 'Scrap Metal'], undefined, 'RUN_MainServer', 'RUN_aiLab', 'RUN_AdminOffice', 'RUN_Treasury', false);
     let RUN_MainServer = new Room('Main Server Room', wrap(`This is the last room before the office, and you are met with one last foe. You immidiately recognize this Robot. It was the same one that almost ended your time here on what is left of Earth... Thanks to Ella, you have a shot at revenge!\n`, width), [], enemyF, 'RUN_PresOffice', 'RUN_Hallway3N', false, false, 'Office Keycard North');
     let RUN_PresOffice = new Room('R.U. Presidents Office', wrap(`Well, you made it...are you ready for this? You see James' computer in the middle of the office completely untouched by the war. There is one more big choice in your journey...\n`, width), [], undefined, false, false, false, false, false, 'Computer', []);
+    let RUN_SecretStairwell = new Room('Secret Stairwell', wrap(`Behind the hidden door you find a long, dark stairwell heading deep underground...\n`, width), [], undefined, false, false, 'RUN_Hallway1W', 'RUN_BasementLanding', false);
+    let RUN_BasementLanding = new Room ('Basement Landing', wrap(`As you reach the bottom of the stairs, bright white lights suddenly switch on and you notice an automated turret on the ceiling... it looks like it has it's sights on you...\n`, width), [], enemyB1, 'RUN_BasementHallway', false, 'RUN_SecretStairwell', 'RUN_FalloutWarehouse', false);
+    let RUN_FalloutWarehouse = new Room('Fallout Warehouse', wrap(`It looks like James was fully prepared for the fallout, the underground warehouse is huge and filled with enough resources to last a group of people a few years... it is also apparently well guarded...\n`, width), [], enemyB2, false, false, 'RUN_BasementLanding', false, false);
+    let RUN_BasementHallway = new Room('Basement Hallway', wrap(`As you walk down the hallway, you feel a sense of comfort. Nothing is destroyed, there are no holes in the wall ... you haven't experienced calm like this in a long time. You are quickly reminded of the times though when you see military supplies piled in the corner... James was getting ready for anything...\n`, width), ['Repair Kit', 'Repair Kit', 'Plasma Grenade', 'Plasma Grenade', 'Nuclear Heat Ray', 'Portable Shield'], false, 'RUN_Vault', 'RUN_BasementLanding', false, false, false, 'Computer', []);
+    let RUN_Vault = new Room('The Vault', wrap(`The room is filled with shelves, each littered with their own treasures. James must have used this room to store his most advanced inventions... He also guarded it well...\n`, width), [], enemyB3, false, 'RUN_BasementHallway', false, false, 'Basement Keycard', 'Desk', ['Letter'], false);
 
     //Room Lookup Table
     let roomLookUp = {
@@ -351,8 +353,16 @@ async function start() {
         'RUN_aiLab': RUN_aiLab,
         'RUN_Hallway3N': RUN_Hallway3N,
         'RUN_MainServer': RUN_MainServer,
-        'RUN_PresOffice': RUN_PresOffice
+        'RUN_PresOffice': RUN_PresOffice,
+        'RUN_SecretStairwell': RUN_SecretStairwell, 
+        'RUN_BasementLanding': RUN_BasementLanding, 
+        'RUN_FalloutWarehouse': RUN_FalloutWarehouse,
+        'RUN_BasementHallway': RUN_BasementHallway, 
+        'RUN_Vault': RUN_Vault
     }
+
+    //array of rooms in secret wing for enemy spawning condition
+    let basementRooms = [RUN_SecretStairwell, RUN_BasementHallway, RUN_BasementLanding, RUN_FalloutWarehouse, RUN_Vault];
 
     //item description lookup table
     let descLookUp = {
@@ -378,7 +388,10 @@ async function start() {
         'Combat Repair Module': 'Maybe Ella can do something with this...',
         'Fission Cannon': 'Maybe Ella can do something with this...',
         'Large Chest': 'Open it up!...',
-        'EMP': 'A targeted EMP charge, should disable most enemies'
+        'EMP': 'A targeted EMP charge, should disable most enemies',
+        'Graphene Plating': 'Increases Max HP by 30',
+        'Regeneration Diode': 'Maybe Ella can do something with this...',
+        'Letter': 'Looks like James wrote it...'
     }
 
     //interactable open objects arrays
@@ -394,7 +407,7 @@ async function start() {
     }
 
     //possible item array
-    let possibleItems = ['pu_scrapmetal', 'pu_particlebattery', 'pu_carboncoating', 'pu_repairkit', 'pu_rbox', 'pu_grenade', 'pu_shield', 'pu_bomb', 'pu_fuelcell', 'pu_heatray', 'pu_all', 'pu_launcher', 'pu_module', 'pu_cannon', 'pu_chest', 'pu_emp'];
+    let possibleItems = ['pu_scrapmetal', 'pu_particlebattery', 'pu_carboncoating', 'pu_repairkit', 'pu_rbox', 'pu_grenade', 'pu_shield', 'pu_bomb', 'pu_fuelcell', 'pu_heatray', 'pu_all', 'pu_launcher', 'pu_module', 'pu_cannon', 'pu_chest', 'pu_emp', 'pu_letter', 'pu_diode', 'pu_plating'];
 
     // pick up item lookup object
     let itemLookUp = {
@@ -412,11 +425,14 @@ async function start() {
         pu_module: 'Combat Repair Module',
         pu_cannon: 'Fission Cannon',
         pu_chest: 'Large Chest',
-        pu_emp: 'EMP'
+        pu_emp: 'EMP',
+        pu_letter: 'Letter',
+        pu_plating: 'Graphene Plating',
+        pu_diode: 'Regeneration Diode'
     }
 
     //dropable item arary
-    let dropableItems = ['drop_scrapmetal', 'drop_particlebattery', 'drop_carboncoating', 'drop_repairkit', 'drop_rbox', 'drop_grenade', 'drop_shield', 'drop_bomb', 'drop_fuelcell', 'drop_heatray', 'drop_launcher', 'drop_module', 'drop_cannon', 'drop_chest', 'drop_emp']
+    let dropableItems = ['drop_scrapmetal', 'drop_particlebattery', 'drop_carboncoating', 'drop_repairkit', 'drop_rbox', 'drop_grenade', 'drop_shield', 'drop_bomb', 'drop_fuelcell', 'drop_heatray', 'drop_launcher', 'drop_module', 'drop_cannon', 'drop_chest', 'drop_emp', 'drop_letter', 'drop_plating', 'drop_diode']
 
     //drop item lookup object
     let dropItemLookUp = {
@@ -434,11 +450,14 @@ async function start() {
         drop_module: 'Combat Repair Module',
         drop_cannon: 'Fission Cannon',
         drop_chest: 'Large Chest',
-        drop_emp: 'EMP'
+        drop_emp: 'EMP',
+        drop_letter: 'Letter',
+        drop_plating: 'Graphene Plating',
+        drop_diode: 'Regeneration Diode'
     }
 
     //useable item array
-    let useableItems = ['use_particlebattery', 'use_carboncoating', 'use_rbox', 'use_repairkit', 'use_grenade', 'use_shield', 'use_bomb', 'use_heatray', 'use_chest', 'use_emp'];
+    let useableItems = ['use_particlebattery', 'use_carboncoating', 'use_rbox', 'use_repairkit', 'use_grenade', 'use_shield', 'use_bomb', 'use_heatray', 'use_chest', 'use_emp', 'use_plating'];
 
     //useable item lookup object
     let useableItemLookUp = {
@@ -451,7 +470,8 @@ async function start() {
         use_heatray: 'Nuclear Heat Ray',
         use_rbox: ['West Riddle Box', 'East Riddle Box'],
         use_chest: 'Large Chest',
-        use_emp: 'EMP'
+        use_emp: 'EMP',
+        use_plating: 'Graphene Plating'
     }
 
     //Into to the game function, tells backstory and places player in first 'room'
@@ -558,6 +578,12 @@ async function start() {
     async function initializeRoom(room) {
         if (room.entered === false) {
             room.entered = true;
+            if (player.diode === true) {
+                player.health = player.health+10;
+                if (player.health > player.maxHealth) {
+                    player.health = player.maxHealth;
+                }
+            }
             roomBar(player, room);
             await slowLog(logTime, room.info);
         } else {
@@ -608,7 +634,6 @@ async function start() {
                     room.info = room.enemy.postRoomInfo;
                     room.inventory = room.enemy.postRoomInventory;
                     room.enemy = undefined;
-                    //console.log(`----------------------------------------------------------------------\n\n`);
                     await wait(1500);
                     console.clear();
                     return initializeRoom(room);
@@ -617,7 +642,6 @@ async function start() {
                     room.info = room.enemy.postRoomInfo2;
                     room.inventory = room.enemy.postRoomInventory
                     room.enemy = undefined;
-                    //console.log(`----------------------------------------------------------------------\n\n`);
                     await wait(1500);
                     console.clear();
                     return initializeRoom(room);
@@ -629,7 +653,7 @@ async function start() {
             }
         }
         //determines if random enemy spawns in room
-        if (!room.enemy && room.name !== 'Fallout Bunker' && room.name !== 'R.U.West Entrance' && room.name !== 'R.U.East Entrance' && room.name !== 'R.U.North Entrance' && room.foughtRando === false) {
+        if (!room.enemy && room.name !== 'Fallout Bunker' && room.name !== 'R.U.West Entrance' && room.name !== 'R.U.East Entrance' && room.name !== 'R.U.North Entrance' && room.foughtRando === false && !basementRooms.includes(room)) {
             ranEnemyNum = random(difficulty === '1' ? 16 : difficulty === '2' ? 14 : 12);
             if (ranEnemyNum === 1) {
                 console.log('...\n');
@@ -867,13 +891,15 @@ async function start() {
             await slowLog(logTime, `You cannot use that item right now...\n`);
             return play(room);
         } else if (input === 'use_rbox') { //checks for riddle boxes and uses them
-
-            //------!!!!!!! ADD CHECK FOR WHEN PLAYER HAS BOTH RIDDLE BOXES.... SHOULDN'T REALLY HAPPEN BUT WHO KNOWS WHAT PEOPLE WILL DO!!!!!
-
+            //determines which box player has, or lets them select if they have both
             if (player.inventory.includes('West Riddle Box') || player.inventory.includes('East Riddle Box')) {
-                if (player.inventory.includes('West Riddle Box')) {
+                let boxChoice;
+                if (player.inventory.includes('West Riddle Box') && player.inventory.includes('East Riddle Box')) {
+                    boxChoice = await menuSelect('Which box would you like to use?', [{ name: 'West Riddle Box', value: 'West Riddle Box' }, { name: 'East Riddle Box', value: 'East Riddle Box' }]);
+                }
+                if (boxChoice === 'West Riddle Box' || player.inventory.includes('West Riddle Box')) {
                     await slowLog(logTime, wrap('There is a riddle on the box, it reads: If you throw a blue stone into the red sea, what does it become?\n\n', width));
-                } else if (player.inventory.includes('East Riddle Box')) {
+                } else if (boxChoice === 'East Riddle Box' || player.inventory.includes('East Riddle Box')) {
                     await slowLog(logTime, wrap('There is a riddle on the box, it reads: What is so delicate that even just saying its name can break it?\n\n', width));
                 }
                 let answer = await ask(`What is the answer to the riddle inscribed on this box?\n`);
@@ -922,6 +948,17 @@ async function start() {
         } else if (input === 'read_map') {
             await slowLog(logTime, 'There is not a directory in this room to read...\n');
             return play(room);
+        } else if (input === 'read_letter') {
+            if (player.inventory.includes('Letter')) {
+                await slowLog(logTime, 'To everyone... especially my daughter...\n\n');
+                await slowLog(logTime, wrap(`I don't think that I can put together a string of words that can explain how sorry I am, and how wrong I was. I truly was trying to make the world a better place, but it seems that I have failed. Technology was our Garden of Eden, and AI was the proverbial apple. I had always dreamed of a wolrd where humans could live freely while AI took care of everything, but it seems that dream was rather farfetched. I have one last plan to try and fix things, but I fear it might be too little to late... If you are reading this, it means at least something survived the apocalypse... I'm sorry...`, width));
+                await slowLog(logTime, '...\n\n.....\n\n......\n\n');
+                await slowLog(logTime, wrap(`You are overcome with emotions you can't understand. You are starting to understand your past more and more, and begin to truly feel sorry for Ella, and the rest of the survivors...\n`));
+                return play(room);
+            } else {
+                await slowLog(logTime, `I don't know what you want me to read...\n`);
+                return play(room);
+            }
         }
         else if (input === 'read_null') {
             await slowLog(logTime, `I don't know what you want me to read...\n`);
@@ -941,9 +978,50 @@ async function start() {
         } else if (input === 'd') { //displays basic commands for players
             console.log(`If you are unsure what to do, try these commands:\n'go' followed by a direction (N, S, E, W) will attempt to go that way\n'inspect' will tell you what's in the room\n'get' or 'pick up' followed by an item will put an item in your bag\n'all' after get or pick up will pick up every available item\n'read' followed by an object will try to read that object\n'use' followed by an item will try to use that item\n'check' or 'open' to interact with objects in room\n'drop' followed by an item will drop that item\n'status' will display your current status\n'bag' or 'b' will show what's in your bag\n'attack' will attack an enemy in combat\n'craft' at the Fallout Bunker will interact with Ella\n Other commands work too, try some out!\n`);
             return play(room);
+        } else if (input === 'move_pic') {
+            if (room === RUN_Hallway1W && room.secret === true) {
+                let passcode = await ask(`The portrait is on a hinge!\n\nIt looks like there is a door behind it...\nIt is locked, but there is a numpad next to the door...\n\nEnter password:\n`);
+                if (passcode === '3141') {
+                    slowLog(logTime, wrap('The door unlocks! It looks like there is a stairway behind the door, but it is very dark...\n', width));
+                    room.secret = false;
+                    room.west = 'RUN_SecretStairwell';
+                    return play(room);
+                } else {
+                    slowLog(logTime, 'You hear a loud buzz and the portrait swings shut...\nMust have entered the wrong code\n');
+                    return play(room);
+                }
+            } else if (room === RUN_Hallway1W && room.secret === false) {
+                slowLog(logTime, 'You already checked the portrait in this room\n');
+                return play(room);
+            } else {
+                slowLog(logTime, 'There are no interesting pictures in this room...\n');
+                return play(room);
+            }
         } else if (input === 'use_comp') { //uses computers if they are available
             if (room === RUN_Cubicle3) {
-                await slowLog(logTime, `The computer doesn't seem to be working...\n`)
+                if (room.interacted === false) {
+                    await slowLog(logTime, `You sit down and fire up the old computer...\n`);
+                    let compChoice = await menuSelect('It looks like you need a password to log in', [{ name: 'Enter Password', value: 'password' }, { name: 'Turn Computer Off', value: 'exit' }]);
+                    if (compChoice === 'password') {
+                        let password = await ask('Please enter the password\n');
+                        if (password === '42') {
+                            await slowLog(logTime, wrap('The computer boots up, looks like whoever was using it before was looking at a map...\n', width));
+                            console.log(secretMap);
+                            await slowLog(logTime, wrap(`The computer freezes, but the image of the North Tower Map remains locked to the screen... It looks different from the map in the Welcome Desk, I wonder what it means?`, width));
+                            room.interacted = true;
+                            return play(room);
+                        } else {
+                            slowLog(logTime, `Incorrect Password...Computer Power Terminated\n`);
+                            slowLog(logTime, `...\n....\n\nThankfully it looks like it will turn back on\n`);
+                            return play(room);
+                        }
+                    } else return play(room);
+                } else {
+                    slowLog(logTime, 'The computer is frozen...\n');
+                    return play(room);
+                }
+            } else if (room === RUN_BasementHallway) {
+                await slowLog(logTime, `The computer doesn't seem to be working...\n`);
                 return play(room);
             } else if (room === RUN_PresOffice) {
                 epilogue();
@@ -957,15 +1035,12 @@ async function start() {
         } else if (input === 'di') { //my wife asked why she couldn't go inside... it was a valid question...
             if (room === RUE_Entrance) {
                 console.clear();
-                //console.log(`----------------------------------------------------------------------\n\n`);
                 return initializeRoom(RUE_WelcomeDesk);
             } else if (room === RUW_Entrance) {
                 console.clear();
-                //console.log(`----------------------------------------------------------------------\n\n`);
                 return initializeRoom(RUW_WelcomeDesk);
             } else if (room === RUN_Entrance) {
                 console.clear();
-                //console.log(`----------------------------------------------------------------------\n\n`);
                 return initializeRoom(RUN_WelcomeDesk);
             } else {
                 console.log(`You are already inside a building...\n`);
@@ -1023,6 +1098,10 @@ async function start() {
 }
 
 async function playAgain() {  //Allows user to play again
+    let hintArray = ['If you want to survive, try keeping your HP above 0...', 'Make sure to check rooms after you defeat enemies, you never know what they might have dropped!', `You can 'use', 'check', or 'read' a lot of items in rooms!`, `If you can't solf the riddles, ask a middle schooler!`, `Despite living through the apocalypse, Ella is quite positive... be more like Ella!`, `Some of these messages are hints... most aren't... but you can see them all if you keep getting blown up!`, `Items are your friend, use them wisely!`]
+    let hintNumber = random(7);
+    await slowLog(logTime, wrap(hintArray[hintNumber-1]));
+    console.log('\n\n');
     let again = await menuSelect('Would you like to play again?', [{ name: 'Yes', value: 'Y' }, { name: 'No', value: 'N' }]);
     if (again.toUpperCase() === 'Y') {
         await start();

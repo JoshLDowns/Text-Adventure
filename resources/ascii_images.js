@@ -111,7 +111,35 @@ export const mapNorth = `\n        Robotics United North Tower
      9: Cubicle Blk 4, 10: You are here!
      11: Cubicle Blk 3\n`;
 
-     export const thanks = `\n
+export const secretMap = `\n
+
+                                      +--------+
+      North Tower Basement:           |        |
+       Classified Entrance            |        |
+                                      |        |
+           +--------+                 +--⋮  ⋮--+
+           |        |                 |        |
+           |        |                 |        |
+           |        |                 |        |
+           +--⋮  ⋮--+        +--------+--⋮  ⋮--+--------+
+           |        |        |        |        |        |
+           |        |        |       ===      ===       |
+           |        |        |        |        |        |
+  +--------+--⋮  ⋮--+--------+--⋮  ⋮--+--⋮  ⋮--+--⋮  ⋮--+
+  |        |        |        |        |        |        |
+  |       ===      ===       |       ===      ===       |
+  |        |        |        |        |        |        |
+  +--------+--------+--------+--⋮  ⋮--+--⋮  ⋮--+--⋮  ⋮--+
+                             |        |        |        |
+   Pie is good, but four     |       ===      ===       |
+   pieces of pi is better    |        |        |        |
+                             +--------+--⋮  ⋮--+--------+ 
+                                      |        |
+                                      |        |
+                                      |        |
+                                      +--⋮  ⋮--+`
+  
+export const thanks = `\n
       ___________.__                   __               
       \\__    ___/|  |__ _____    ____ |  | __  ______   
         |    |   |  |  \\\\__  \\  /    \\|  |/ / /  ___/   

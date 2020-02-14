@@ -46,17 +46,29 @@ export async function craft(user) {
     if (user.inventory.includes('Office Keycard West') && user.inventory.includes('Office Keycard East') && !user.inventory.includes('North Tower Keycard')) {
         useableInventory.push({ name: 'North Tower Keycard', value: 'North Tower Keycard' });
     }
+    if (user.inventory.includes('Regeneration Diode')) {
+        useableInventory.push({ name: 'Regeneration Diode', value: 'Regeneration Diode'});
+    }
+    if (user.ability1 && user.inventory.includes('Smoke Bomb') && metalCount >=2) {
+        useableInventory.push({ name: 'Missle Launcher Ammo.........2', value: 'launcherAmmo' });
+    }
+    if (user.ability2 && user.inventory.includes('Repair Kit') && metalCount >=2) {
+        useableInventory.push({ name: 'Combat Repair Module Charge..2', value: 'repairCharge'});
+    }
+    if (user.ability3 && user.inventory.includes('Plasma Grenade') && metalCount >=2) {
+        useableInventory.push({ name: 'Fission Cannon Ammo..........2', value: 'fissionAmmo'});
+    }
     if (metalCount >= 3) {
         useableInventory.push({ name: 'Repair', value: 'Repair' });
     }
     useableInventory.push({name: 'Exit', value: 'exit'});
 
-    if (useableInventory.length !== 0) {
+    if (useableInventory.length !== 1) {
         let item = await menuSelect('You can craft the following items:', useableInventory);
         if (item === 'Missle Launcher') {
             user.ability1 = item;
             user.ability1Supply = 2;
-            user.ability1Damage = 15;
+            user.ability1Damage = 20;
             user.ability1Modifier = 15;
             user.useItem('Missle Launcher');
             for (let i = 1; i <= 4; i++) {
@@ -78,7 +90,7 @@ export async function craft(user) {
         } else if (item === 'Fission Cannon') {
             user.ability3 = item;
             user.ability3Supply = 3;
-            user.ability3Damage = 20;
+            user.ability3Damage = 30;
             user.ability3Modifier = 15;
             user.useItem('Fission Cannon');
             for (let i = 1; i <= 8; i++) {
@@ -107,6 +119,35 @@ export async function craft(user) {
             for (let i = 1; i <= 3; i++) {
                 user.useItem('Scrap Metal');
             }
+            return user;
+        } else if (item === 'Regeneration Diode') {
+            user.diode = true;
+            console.log(`You will now restore health over time!\n`);
+            user.useItem('Regeneration Diode');
+            return user;
+        } else if (item === 'launcherAmmo') {
+            user.useItem('Smoke Bomb');
+            user.ability1Supply += 2;
+            for (let i = 1; i <= 2; i++) {
+                user.useItem('Scrap Metal');
+            }
+            console.log('You got 2 more missles for your Missle Launcher!\n');
+            return user;
+        } else if (item === 'repairCharge') {
+            user.useItem('Repair Kit');
+            user.ability2Supply += 2;
+            for (let i = 1; i <= 2; i++) {
+                user.useItem('Scrap Metal');
+            }
+            console.log('You got 2 more charges for your Combat Repair Module!\n');
+            return user;
+        } else if (item === 'fissionAmmo') {
+            user.useItem('Plasma Grenade');
+            user.ability3Supply += 2;
+            for (let i = 1; i <= 2; i++) {
+                user.useItem('Scrap Metal');
+            }
+            console.log('You got 2 more charges for your Fission Cannon!\n');
             return user;
         } else if (item === 'exit') {
             return user;
@@ -174,7 +215,13 @@ export async function combatChoice (user) {
             possibleItems.push({name: `Portable Shield..............${shieldCount}`, value: 'use_shield'});
         }
         if (user.inventory.includes('Nuclear Heat Ray')) {
-            possibleItems.push({name: 'Nuclear Heat Ray.............1', value: 'use_heatray'});
+            let rayCount = 0;
+            for (let i = 0; i < user.inventory.length; i++) {
+                if (user.inventory[i] === 'Nuclear Heat Ray') {
+                    rayCount = rayCount + 1;
+                }
+            }
+            possibleItems.push({name: `Nuclear Heat Ray.............${rayCount}`, value: 'use_heatray'});
         }
         if (user.inventory.includes('EMP')) {
             possibleItems.push({name: 'EMP..........................1', value: 'use_emp'});

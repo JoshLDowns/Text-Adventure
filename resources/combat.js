@@ -18,7 +18,7 @@ export async function combat(comp, user) {
     user.status = undefined;
 
     function statusBar() {
-        let playerBarCount = (Math.ceil((user.health / user.maxHealth).toPrecision(2) * 10)) * 2;
+        let playerBarCount = Math.round((user.health/user.maxHealth).toPrecision(2)*100/5);
         let playerBar = chalk.blue('((') + chalk.greenBright('█').repeat(playerBarCount) + chalk.greenBright('-').repeat(20 - playerBarCount) + chalk.blue('))');
         let compBarCount = (Math.ceil((comp.health / comp.maxHealth).toPrecision(2) * 10)) * 2;
         let compBar = chalk.blue('((') + chalk.redBright('█').repeat(compBarCount) + chalk.redBright('-').repeat(20 - compBarCount) + chalk.blue('))');
@@ -40,7 +40,22 @@ export async function combat(comp, user) {
 
     while (user.health > 0 || comp.health > 0) {  //Loop that breaks when either user or computer hits 0 or less HP
         //user Turn
+        if (user.diode === true) {
+            user.health = user.health+10;
+            if (user.health > user.maxHealth) {
+                user.health = user.maxHealth;
+            }
+        }
+
         statusBar();
+
+        if (user.diode === true) {
+            await console.log('...\n.....\n');
+            await wait(500);
+            await console.log('.......\n');
+            await wait(500);
+            console.log('\nYour Regeneration Diode restored 10 HP!\n');
+        }
 
         user.status2 = undefined; //emergency reset to status in case it gets skipped (happened once, can't figure out why still...)
         if (user.status === 'status_stun') {
