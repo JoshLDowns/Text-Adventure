@@ -44,7 +44,7 @@ export async function craft(user) {
         useableInventory.push({ name: 'Fission Cannon: 8 Scrap Metal', value: 'Fission Cannon' });
     }
     if (user.inventory.includes('Nuclear Fuel Cell') && metalCount >= 5) {
-        useableInventory.push({ name: 'Nuclear Fuel Cell: 5 Scrap Metal', value: 'Nuclear Fuel Cell' });
+        useableInventory.push({ name: 'Nuclear Heat Ray.5 Scrap Metal', value: 'Nuclear Fuel Cell' });
     }
     if (user.inventory.includes('Office Keycard West') && user.inventory.includes('Office Keycard East') && !user.inventory.includes('North Tower Keycard')) {
         useableInventory.push({ name: 'North Tower Keycard', value: 'North Tower Keycard' });

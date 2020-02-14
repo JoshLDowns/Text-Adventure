@@ -130,7 +130,7 @@ export function itemEffect(item, comp, answer, user, room) {
         user.useItem(useableItemLookUp[item]);
         if (comp !== undefined) {
             comp.health = comp.health - 75;
-            console.log(wrap(`You fired the Nuclear Heat Ray! It dealt 40 damage to ${comp.name}!\n`, width));
+            console.log(wrap(`You fired the Nuclear Heat Ray! It dealt 75 damage to ${comp.name}!\n`, width));
             return user;
         } else {
             console.log(wrap(`You fired the Nuclear Heat Ray! That hole in the wall would have been more impressive if it was through a robot instead...\n`, width));
