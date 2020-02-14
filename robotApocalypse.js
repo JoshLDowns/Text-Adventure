@@ -662,8 +662,8 @@ async function start() {
                 await wait(750);
                 console.log('.........\n');
                 await wait(1000);
-                let enemyRoll = random(2);
-                if (enemyRoll === 1) {
+                let enemyRoll = random(3);
+                if (enemyRoll === 1 || enemyRoll === 2) {
                     room.enemy = enemyRandom;
                     await slowLog(logTime, wrap('All of the sudden, an alarm sounds... The sound is coming from a small robot covered in flashing lights that was hiding in the corner! It looks like it wants to fight!', width));
                     enemyRandom.postRoomInfo = room.info;
