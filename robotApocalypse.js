@@ -649,7 +649,7 @@ async function start() {
             } else {
                 await slowLog(logTime, 'You have been defeated! Better luck next time!');
                 console.log(gameOverText);
-                await playAgain();
+                await playAgain(logTime);
             }
         }
         //determines if random enemy spawns in room
@@ -682,7 +682,7 @@ async function start() {
                     } else {
                         await slowLog(logTime, 'You have been defeated! Better luck next time!');
                         console.log(gameOverText);
-                        await playAgain();
+                        await playAgain(logTime);
                     }
                 } else {
                     room.enemy = enemyRandom2;
@@ -703,7 +703,7 @@ async function start() {
                     } else {
                         await slowLog(logTime, 'You have been defeated! Better luck next time!');
                         console.log(gameOverText);
-                        await playAgain();
+                        await playAgain(logTime);
                     }
                 }
             }
@@ -1085,19 +1085,19 @@ async function start() {
             await slowLog(logTime, wrap(`\nThe codes worked much quicker than you could have imagined... The power went out all around you, apparently shutting down the machines meant shutting down the entire grid. Suddenly, every electronic device around you starts to emit an overwhelming sound.  The world feels like it is shaking apart.  The grid didn't shut down ... that would not have been enough to stop the machines.  The grid was being overloaded and the force of all of this electricity was tearing your circuitry apart. As you shut down, you can't help but wonder ... was it worth it?`, width));
             console.log(thanks);
             console.log(`\n`);
-            await playAgain();
+            await playAgain(logTime);
         } else {
             await slowLog(logTime, wrap(`\nAt the end of it all, human emotion was the downfall of humanity... You just can't bring yourself to end your own life, not with so many looming questions.  The human's have survived this long, maybe they can continue surviving.  You decide to give the Killcodes to the humans, if Ella can rebuild and make it to her fathers computer, then you can accept your fate and be shut down with the rest of the machine race ... The decision was just too much for you to make ...`, width));
             console.log(thanks);
             console.log(`\n`);
-            await playAgain();
+            await playAgain(logTime);
         }
     }
 
     prologue();
 }
 
-async function playAgain() {  //Allows user to play again
+async function playAgain(logTime) {  //Allows user to play again
     let hintArray = ['If you want to survive, try keeping your HP above 0...', 'Make sure to check rooms after you defeat enemies, you never know what they might have dropped!', `You can 'use', 'check', or 'read' a lot of items in rooms!`, `If you can't solf the riddles, ask a middle schooler!`, `Despite living through the apocalypse, Ella is quite positive... be more like Ella!`, `Some of these messages are hints... most aren't... but you can see them all if you keep getting blown up!`, `Items are your friend, use them wisely!`]
     let hintNumber = random(7);
     await slowLog(logTime, wrap(hintArray[hintNumber-1]));
