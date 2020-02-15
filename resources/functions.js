@@ -139,7 +139,7 @@ export function itemEffect(item, comp, answer, user, room) {
     } else if (item === 'use_emp') {
         user.useItem(useableItemLookUp[item]);
         if (comp !== undefined) {
-            comp.health = comp.health - 200;
+            comp.health = comp.health - 300;
             console.log(wrap(`You set off the EMP! It completely shut down ${comp.name}!\n`, width));
             return user;
         } else {

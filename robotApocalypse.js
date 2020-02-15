@@ -39,7 +39,7 @@ async function start() {
         name: undefined,
         maxHealth: (difficulty === '1' ? 70 : difficulty === '2' ? 60 : 50), //nested ternarys to quickly determine health based on difficulty
         health: (difficulty === '1' ? 70 : difficulty === '2' ? 60 : 50),
-        inventory: ['EMP', 'EMP'],
+        inventory: [],
         attack: 'Particle Beam',
         damageBase: 8,
         damageModifier: 6,
