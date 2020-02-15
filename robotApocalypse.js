@@ -391,7 +391,8 @@ async function start() {
         'EMP': 'A targeted EMP charge, should disable most enemies',
         'Graphene Plating': 'Increases Max HP by 30',
         'Regeneration Diode': 'Maybe Ella can do something with this...',
-        'Letter': 'Looks like James wrote it...'
+        'Letter': 'Looks like James wrote it...', 
+        'Basement Keycard': 'Opens doors in the Secret Basement'
     }
 
     //interactable open objects arrays
