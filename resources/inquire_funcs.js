@@ -77,6 +77,7 @@ export async function craft(user) {
             for (let i = 1; i <= 4; i++) {
                 user.useItem('Scrap Metal');
             }
+            console.log(`You give Ella the Missle Launcher and 4 Scrap Metal...\n\n`);
             console.log(`You now have the ability to use a Missle Launcher in combat!\nCongratulations! Now go blow some stuff up!\n`);
             return user;
         } else if (item === 'Combat Repair Module') {
@@ -88,6 +89,7 @@ export async function craft(user) {
             for (let i = 1; i <= 6; i++) {
                 user.useItem('Scrap Metal');
             }
+            console.log(`You give Ella the Combat Repair Module and 6 Scrap Metal...\n\n`);
             console.log(`You now have the ability to use a Combat Repair Module!\nCongratulations! Now don't get yourself killed out there!\n`);
             return user;
         } else if (item === 'Fission Cannon') {
@@ -99,6 +101,7 @@ export async function craft(user) {
             for (let i = 1; i <= 8; i++) {
                 user.useItem('Scrap Metal');
             }
+            console.log(`You give Ella the Fission Cannon and 8 Scrap Metal...\n\n`);
             console.log(`You now have the ability to use a Fission Cannon in combat!\nCongratulations! This thing packs a punch!\n`);
             return user;
         } else if (item === 'Nuclear Fuel Cell') {
@@ -107,6 +110,7 @@ export async function craft(user) {
             for (let i = 1; i <= 5; i++) {
                 user.useItem('Scrap Metal');
             }
+            console.log(`You give Ella the Nuclear Fuel Cell and 5 Scrap Metal...\n\n`);
             console.log(`You put the Nuclear Heat Ray in your bag...\nIt only has one shot, use it wisely!`);
             return user;
         } else if (item === 'North Tower Keycard') {
@@ -118,6 +122,7 @@ export async function craft(user) {
             if (user.health > user.maxHealth) {
                 user.health = user.maxHealth;
             }
+            console.log(`You give Ella 3 Scrap Metal...\n\n`);
             console.log(`You recovered 10 HP!  Your current HP is now ${user.health}\n`);
             for (let i = 1; i <= 3; i++) {
                 user.useItem('Scrap Metal');
@@ -125,6 +130,7 @@ export async function craft(user) {
             return user;
         } else if (item === 'Regeneration Diode') {
             user.diode = true;
+            console.log(`You give Ella the Regeneration Diode...\n\n`);
             console.log(`You will now restore health over time!\n`);
             user.useItem('Regeneration Diode');
             return user;
@@ -134,6 +140,7 @@ export async function craft(user) {
             for (let i = 1; i <= 2; i++) {
                 user.useItem('Scrap Metal');
             }
+            console.log(`You give Ella a Smoke Bomb and 2 Scrap Metal...\n\n`);
             console.log('You got 2 more missles for your Missle Launcher!\n');
             return user;
         } else if (item === 'repairCharge') {
@@ -142,6 +149,7 @@ export async function craft(user) {
             for (let i = 1; i <= 2; i++) {
                 user.useItem('Scrap Metal');
             }
+            console.log(`You give Ella a Repair Kit and 2 Scrap Metal...\n\n`);
             console.log('You got 2 more charges for your Combat Repair Module!\n');
             return user;
         } else if (item === 'fissionAmmo') {
@@ -150,6 +158,7 @@ export async function craft(user) {
             for (let i = 1; i <= 2; i++) {
                 user.useItem('Scrap Metal');
             }
+            console.log(`You give Ella a Plasma Grenade and 2 Scrap Metal...\n\n`);
             console.log('You got 2 more charges for your Fission Cannon!\n');
             return user;
         } else if (item === 'exit') {

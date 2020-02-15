@@ -5,10 +5,10 @@ class ValidInput {
         this.return = undefined;
         this.affirmative = ['YES', 'YEAH', 'YUP', 'YUPPER', 'MHM', 'MMHMM', 'AFFIRMATIVE',];
         this.negatory = ['NO', 'NOPE', 'NADA', 'NEGATORY'];
-        this.direction = ['GO', 'TRAVEL', 'LEAVE', 'EXIT', 'N', 'NORTH', 'S', 'SOUTH', 'E', 'EAST', 'W', 'WEST', 'INSIDE', 'IN'];
+        this.direction = ['GO', 'TRAVEL', 'LEAVE', 'EXIT', 'N', 'NORTH', 'S', 'SOUTH', 'E', 'EAST', 'W', 'WEST', 'INSIDE', 'IN', 'DOWNSTAIRS', 'DOWN'];
         this.inventory = ['B', 'INVENTORY', 'BAG', 'BACKPACK'];
         this.status = ['STATUS', 'INFO', 'HP', 'HEALTH'];
-        this.inspect = ['INSPECT', 'EXAMINE', 'ROOM', 'LOOK', 'AROUND', 'EXPLORE'];
+        this.inspect = ['INSPECT', 'EXAMINE', 'ROOM', 'LOOK', 'AROUND', 'EXPLORE', 'SEARCH', 'FIND'];
         this.instructions = ['D', 'DIRECTIONS', 'INSTRUCTIONS', 'INST', 'HOW', 'PLAY', 'HELP'];
         this.pickUpItem = ['PICK UP', 'PICK', 'GRAB', 'GET', 'TAKE', 'AQUIRE'];
         this.useItem = ['USE'];
@@ -80,7 +80,7 @@ class ValidInput {
                 }
             } else if (obj.firstWord === 'CHECK' && obj.lastWord === 'ROOM') {
                 this.return = 'insp';
-            } else if (!(this.inspect.includes(obj.firstWord)) && this.inspect.includes(obj.lastWord) && obj.firstWord !== 'INSPEC' && obj.firstWord !== 'EXAMIN' && obj.firstWord !== 'EXPLOR') {
+            } else if (!(this.inspect.includes(obj.firstWord)) && this.inspect.includes(obj.lastWord) && obj.firstWord !== 'INSPEC' && obj.firstWord !== 'EXAMIN' && obj.firstWord !== 'EXPLOR' && obj.firstWord !== 'SEARC' && obj.firstWord !== 'FIN') {
                 this.return = 'not_sure';
             } else {
                 this.return = 'insp';
@@ -185,7 +185,9 @@ class ValidInput {
                 this.return = 'dw';
             } else if (obj.firstWord === 'INSIDE' || obj.lastWord === 'INSIDE' || obj.firstWord === 'IN' || obj.lastWord === 'IN') {
                 this.return = 'di';
-            } else {
+            } else if (obj.firstWord === 'DOWNSTAIRS' || obj.lastWord === 'DOWNSTAIRS' || obj.firstWord === 'DOWN' || obj.lastWord === 'DOWN') {
+                this.return = 'dd';
+            }  else {
                 this.return = 'dnull';
             }
         } else if (obj.firstWord === 'USE' || obj.lastWord === 'USE') {

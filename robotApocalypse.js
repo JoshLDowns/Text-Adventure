@@ -37,9 +37,9 @@ async function start() {
     //player object
     let player = {
         name: undefined,
-        maxHealth: (difficulty === '1' ? 60 : difficulty === '2' ? 50 : 40), //nested ternarys to quickly determine health based on difficulty
-        health: (difficulty === '1' ? 60 : difficulty === '2' ? 50 : 40),
-        inventory: [],
+        maxHealth: (difficulty === '1' ? 70 : difficulty === '2' ? 60 : 50), //nested ternarys to quickly determine health based on difficulty
+        health: (difficulty === '1' ? 70 : difficulty === '2' ? 60 : 50),
+        inventory: ['EMP', 'EMP'],
         attack: 'Particle Beam',
         damageBase: 8,
         damageModifier: 6,
@@ -114,8 +114,8 @@ async function start() {
     class Enemy {
         constructor(name, health, maxHealth, attack, ability, damageBase, damageModifier, abilityType, abilityBase, abilityModifier, reward, postRoomInfo, postRoomInfo2, postRoomInventory) {
             this.name = name;
-            this.health = health;
-            this.maxHealth = maxHealth;
+            this.health = difficulty==='1'?health:difficulty==='2'?health+5:health+10;
+            this.maxHealth = difficulty==='1'?maxHealth:difficulty==='2'?maxHealth+5:maxHealth+10;
             this.attack = attack;
             this.ability = ability;
             this.damageBase = damageBase;
@@ -578,17 +578,17 @@ async function start() {
     async function initializeRoom(room) {
         if (room.entered === false) {
             room.entered = true;
-            if (player.diode === true) {
-                player.health = player.health+10;
-                if (player.health > player.maxHealth) {
-                    player.health = player.maxHealth;
-                }
-            }
             roomBar(player, room);
             await slowLog(logTime, room.info);
         } else {
             roomBar(player, room);
             console.log(room.info);
+        }
+        if (player.diode === true) {
+            player.health = player.health+10;
+            if (player.health > player.maxHealth) {
+                player.health = player.maxHealth;
+            }
         }
         return play(room);
     }
@@ -613,8 +613,8 @@ async function start() {
                 return (play(room));
             } else if (difficulty === '3') {
                 await slowLog(logTime, `\nIt's dangerous out there, take this gear...\n`);
-                console.log(wrap(`1 Repair Kit, 1 Portable Shield, and 1 Plasma Grenade were added to your inventory\n`, width));
-                player.inventory.push('Repair Kit', 'Portable Shield', 'Plasma Grenade');
+                console.log(wrap(`3 Repair Kits, 1 Portable Shield, and 1 Plasma Grenade were added to your inventory\n`, width));
+                player.inventory.push('Repair Kit', 'Repair Kit', 'Repair Kit', 'Portable Shield', 'Plasma Grenade');
                 firstTurn = false;
                 return (play(room));
             }
@@ -649,7 +649,7 @@ async function start() {
             } else {
                 await slowLog(logTime, 'You have been defeated! Better luck next time!');
                 console.log(gameOverText);
-                await playAgain(logTime);
+                await playAgain(logTime, true);
             }
         }
         //determines if random enemy spawns in room
@@ -682,7 +682,7 @@ async function start() {
                     } else {
                         await slowLog(logTime, 'You have been defeated! Better luck next time!');
                         console.log(gameOverText);
-                        await playAgain(logTime);
+                        await playAgain(logTime, true);
                     }
                 } else {
                     room.enemy = enemyRandom2;
@@ -703,7 +703,7 @@ async function start() {
                     } else {
                         await slowLog(logTime, 'You have been defeated! Better luck next time!');
                         console.log(gameOverText);
-                        await playAgain(logTime);
+                        await playAgain(logTime, true);
                     }
                 }
             }
@@ -873,7 +873,7 @@ async function start() {
         } else if (intObjectOpen.includes(input)) { //interacts with interactable objects
             let currentIntObj = intObjectOpenLookUp[input];
             if (room.intObject === currentIntObj && room.intObjInv.length !== 0) {
-                await slowLog(logTime, `You opened the ${currentIntObj}, inside you found ${room.intObjInv[0]}!\nYou put it in your bag...\n`);
+                await slowLog(logTime, `You opened the ${currentIntObj}, inside you found a ${room.intObjInv[0]}!\nYou put it in your bag...\n`);
                 player.inventory.push(room.intObjInv[0]);
                 room.intObjInv.pop();
                 return play(room);
@@ -951,9 +951,9 @@ async function start() {
         } else if (input === 'read_letter') {
             if (player.inventory.includes('Letter')) {
                 await slowLog(logTime, 'To everyone... especially my daughter...\n\n');
-                await slowLog(logTime, wrap(`I don't think that I can put together a string of words that can explain how sorry I am, and how wrong I was. I truly was trying to make the world a better place, but it seems that I have failed. Technology was our Garden of Eden, and AI was the proverbial apple. I had always dreamed of a wolrd where humans could live freely while AI took care of everything, but it seems that dream was rather farfetched. I have one last plan to try and fix things, but I fear it might be too little to late... If you are reading this, it means at least something survived the apocalypse... I'm sorry...`, width));
+                await slowLog(logTime, wrap(`I don't think that I can put together a string of words that can explain how sorry I am, and how wrong I was. I truly was trying to make the world a better place, but it seems that I have failed. Technology was our Garden of Eden, and AI was the proverbial apple. I had always dreamed of a world where humans could live freely while AI took care of everything, but it seems that dream was rather farfetched. I have one last plan to try and fix things, but I fear it might be too little to late... If you are reading this, it means at least something survived the apocalypse... I'm sorry...`, width));
                 await slowLog(logTime, '...\n\n.....\n\n......\n\n');
-                await slowLog(logTime, wrap(`You are overcome with emotions you can't understand. You are starting to understand your past more and more, and begin to truly feel sorry for Ella, and the rest of the survivors...\n`));
+                await slowLog(logTime, wrap(`You are overcome with emotions you can't understand. You are starting to understand your past more and more, and begin to truly feel sorry for Ella, and the rest of the survivors...\n`, width));
                 return play(room);
             } else {
                 await slowLog(logTime, `I don't know what you want me to read...\n`);
@@ -1042,8 +1042,19 @@ async function start() {
             } else if (room === RUN_Entrance) {
                 console.clear();
                 return initializeRoom(RUN_WelcomeDesk);
+            } else if (room === RUN_Hallway1W && room.secret === false) {
+                console.clear();
+                return initializeRoom(RUN_SecretStairwell);
             } else {
                 console.log(`You are already inside a building...\n`);
+                return play(room);
+            }
+        } else if (input === 'dd') {
+            if (room === RUN_Hallway1W && room.secret === false) {
+                console.clear();
+                return initializeRoom(RUN_SecretStairwell);
+            } else {
+                console.log(`You can't go that way...\n`);
                 return play(room);
             }
         } else if (input === 'check_null') {  //it's a check ... check?
@@ -1085,23 +1096,25 @@ async function start() {
             await slowLog(logTime, wrap(`\nThe codes worked much quicker than you could have imagined... The power went out all around you, apparently shutting down the machines meant shutting down the entire grid. Suddenly, every electronic device around you starts to emit an overwhelming sound.  The world feels like it is shaking apart.  The grid didn't shut down ... that would not have been enough to stop the machines.  The grid was being overloaded and the force of all of this electricity was tearing your circuitry apart. As you shut down, you can't help but wonder ... was it worth it?`, width));
             console.log(thanks);
             console.log(`\n`);
-            await playAgain(logTime);
+            await playAgain(logTime, false);
         } else {
             await slowLog(logTime, wrap(`\nAt the end of it all, human emotion was the downfall of humanity... You just can't bring yourself to end your own life, not with so many looming questions.  The human's have survived this long, maybe they can continue surviving.  You decide to give the Killcodes to the humans, if Ella can rebuild and make it to her fathers computer, then you can accept your fate and be shut down with the rest of the machine race ... The decision was just too much for you to make ...`, width));
             console.log(thanks);
             console.log(`\n`);
-            await playAgain(logTime);
+            await playAgain(logTime, false);
         }
     }
 
     prologue();
 }
 
-async function playAgain(logTime) {  //Allows user to play again
+async function playAgain(logTime, death) {  //Allows user to play again
     let hintArray = ['If you want to survive, try keeping your HP above 0...', 'Make sure to check rooms after you defeat enemies, you never know what they might have dropped!', `You can 'use', 'check', or 'read' a lot of items in rooms!`, `If you can't solf the riddles, ask a middle schooler!`, `Despite living through the apocalypse, Ella is quite positive... be more like Ella!`, `Some of these messages are hints... most aren't... but you can see them all if you keep getting blown up!`, `Items are your friend, use them wisely!`]
     let hintNumber = random(7);
-    await slowLog(logTime, wrap(hintArray[hintNumber-1], 75));
-    console.log('\n\n');
+    if (death) {
+        await slowLog(logTime, wrap(hintArray[hintNumber-1], 75));
+        console.log('\n\n');
+    }
     let again = await menuSelect('Would you like to play again?', [{ name: 'Yes', value: 'Y' }, { name: 'No', value: 'N' }]);
     if (again.toUpperCase() === 'Y') {
         await start();
