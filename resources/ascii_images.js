@@ -49,7 +49,7 @@ export const mapEast = `\n                Robotics United East Tower
                |          |          |          |
                +----------+----------+----------+ 
     1: Cubicle Blk. 2, 2: Hallway N, 3: Q.A.
-    4: You are Here!, 5: Fab. Unit, 6: Server Room
+    4: Welcome Desk, 5: Fab. Unit, 6: Server Room
     7: Charging Station, 8: Hallway S, 4: Adv. Wpns.\n`;
 
 export const mapWest = `\n     Robotics United West Tower
@@ -70,7 +70,7 @@ export const mapWest = `\n     Robotics United West Tower
     |          |          |          |
     +----------+----------+----------+ 
     1: Exp. Arms Lab, 2: Hallway N 3: Breakroom
-    4: Server Room, 5: Fab. Unit, 6: You are Here!
+    4: Server Room, 5: Fab. Unit, 6: Welcome Desk
     7: Office, 8: Hallway S, 9: Cubicle Blk. 1\n`;
 
 export const mapNorth = `\n        Robotics United North Tower
@@ -108,7 +108,7 @@ export const mapNorth = `\n        Robotics United North Tower
      1: President' Office, 2: Server Room
      3: Treasury, 4: Hallway N, 5: Admin
      6: Hallway W, 7: AI Lab, 8: Hallway E
-     9: Cubicle Blk 4, 10: You are here!
+     9: Cubicle Blk 4, 10: Welcome Desk
      11: Cubicle Blk 3\n`;
 
 export const secretMap = `\n

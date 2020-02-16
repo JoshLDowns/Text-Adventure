@@ -15,7 +15,7 @@ class ValidInput {
         this.combat = ['ATTACK', 'FIGHT', 'THROW', 'SHOOT', 'FIRE'];
         this.items = ['KIT', 'METAL', 'BATTERY', 'COATING', 'BOX', 'GRENADE', 'SHIELD', 'BOMB', 'CELL', 'NUCLEAR', 'RAY', 'ALL', 'LAUNCHER', 'MODULE', 'CANNON', 'LETTER', 'PLATING', 'DIODE'];
         this.otherActions = ['DROP', 'THROW', 'FART', 'LAUGH', 'LOL', 'HUG', 'READ', 'OPEN', 'RUN', 'CHECK'];
-        this.intObjects = ['SIGN', 'DESK', 'COMPUTER', 'CABINET', 'FRIDGE', 'REFRIDGERATOR', 'SAFE', 'MAP', 'DIRECTORY', 'PAINTING', 'PICTURE', 'PORTRAIT'];
+        this.intObjects = ['SIGN', 'DESK', 'COMPUTER', 'CABINET', 'FRIDGE', 'REFRIDGERATOR', 'SAFE', 'MAP', 'M', 'DIRECTORY', 'PAINTING', 'PICTURE', 'PORTRAIT'];
         this.falloutBunkerEvent = ['REPAIR', 'FIX', 'KEYCARD', 'KEY', 'CRAFT'];
         this.validInputs = [this.affirmative, this.negatory, this.direction, this.inventory, this.status, this.inspect, this.instructions, this.useItem, this.pickUpItem, this.combat, this.items, this.otherActions, this.intObjects, this.falloutBunkerEvent];
     }
@@ -190,6 +190,8 @@ class ValidInput {
             }  else {
                 this.return = 'dnull';
             }
+        } else if (obj.firstWord === 'MAP' || obj.lastWord === 'MAP' || obj.firstWord === 'M' || obj.lastWord === 'M') {
+            this.return = 'read_map';
         } else if (obj.firstWord === 'USE' || obj.lastWord === 'USE') {
             if (obj.lastWord === 'BATTERY') {
                 this.return = 'use_particlebattery';
@@ -219,6 +221,8 @@ class ValidInput {
                 this.return = 'use_plating';
             } else if (obj.lastWord === 'LETTER') {
                 this.return = 'read_letter';
+            } else if (obj.lastWord === 'MAP') {
+                this.return = 'read_map';
             } else {
                 this.return = 'use_null';
             }
