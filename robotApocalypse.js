@@ -576,7 +576,7 @@ async function start() {
         console.log(`----------------------------------------------------------------------\n\n`);
         await ask('Press Enter to continue...');
         console.clear();
-        initializeRoom(falloutBunker);
+        await initializeRoom(falloutBunker);
     }
 
     //initializes the current room with it's despcription and name
@@ -612,19 +612,19 @@ async function start() {
                 console.log(`3 Repair Kits were added to your inventory\n`);
                 player.inventory.push('Repair Kit', 'Repair Kit', 'Repair Kit');
                 firstTurn = false;
-                return play(room);
+                return await play(room);
             } else if (difficulty === '2') {
                 await slowLog(logTime, `\nIt's dangerous out there, take this gear...\n`);
                 console.log(wrap(`2 Repair Kits and 1 Plasma Grenade were added to your inventory\n`, width));
                 player.inventory.push('Repair Kit', 'Repair Kit', 'Plasma Grenade');
                 firstTurn = false;
-                return play(room);
+                return await play(room);
             } else if (difficulty === '3') {
                 await slowLog(logTime, `\nIt's dangerous out there, take this gear...\n`);
                 console.log(wrap(`3 Repair Kits, 1 Portable Shield, and 1 Plasma Grenade were added to your inventory\n`, width));
                 player.inventory.push('Repair Kit', 'Repair Kit', 'Repair Kit', 'Portable Shield', 'Plasma Grenade');
                 firstTurn = false;
-                return play(room);
+                return await play(room);
             }
         }
         //checks if room has a predetermined enemy and calls combat
@@ -644,7 +644,7 @@ async function start() {
                     room.enemy = undefined;
                     await wait(1500);
                     console.clear();
-                    return initializeRoom(room);
+                    return await initializeRoom(room);
                 } else {
                     player.hasKilled = true;
                     room.info = room.enemy.postRoomInfo2;
@@ -652,12 +652,12 @@ async function start() {
                     room.enemy = undefined;
                     await wait(1500);
                     console.clear();
-                    return initializeRoom(room);
+                    return await initializeRoom(room);
                 }
             } else {
                 await slowLog(logTime, 'You have been defeated! Better luck next time!');
                 console.log(gameOverText);
-                await playAgain(logTime, true);
+                return;
             }
         }
         //determines if random enemy spawns in room
@@ -689,11 +689,11 @@ async function start() {
                         room.foughtRando = true;
                         await wait(1500);
                         console.clear();
-                        return initializeRoom(room);
+                        return await initializeRoom(room);
                     } else {
                         await slowLog(logTime, 'You have been defeated! Better luck next time!');
                         console.log(gameOverText);
-                        await playAgain(logTime, true);
+                        return;
                     }
                 } else {
                     room.enemy = enemyRandom2;
@@ -711,11 +711,11 @@ async function start() {
                         room.foughtRando = true;
                         await wait(1500);
                         console.clear();
-                        return initializeRoom(room);
+                        return await initializeRoom(room);
                     } else {
                         await slowLog(logTime, 'You have been defeated! Better luck next time!');
                         console.log(gameOverText);
-                        await playAgain(logTime, true);
+                        return;
                     }
                 }
             }
@@ -726,7 +726,7 @@ async function start() {
         if ((input.slice(0, input.indexOf(' ')).toUpperCase()) === 'XYZZY' && (cheatCode.includes((input.slice((input.lastIndexOf(' ')) + 1))))) {
             console.clear();
             console.log(`----------------------------------------------------------------------\n\n`);
-            return initializeRoom(roomLookUp[(input.slice((input.lastIndexOf(' ')) + 1))]);
+            return await initializeRoom(roomLookUp[(input.slice((input.lastIndexOf(' ')) + 1))]);
         }
         //determines if story text is getting turned off or on
         tempInput = await storyTextOffOn(input, logTime);
@@ -746,7 +746,7 @@ async function start() {
             if ((input.slice(0, input.indexOf(' ')).toUpperCase()) === 'XYZZY' && (cheatCode.includes((input.slice((input.lastIndexOf(' ')) + 1))))) {
                 console.clear();
                 console.log(`----------------------------------------------------------------------\n\n`);
-                return initializeRoom(roomLookUp[(input.slice((input.lastIndexOf(' ')) + 1))]);
+                return await initializeRoom(roomLookUp[(input.slice((input.lastIndexOf(' ')) + 1))]);
             }
             input = new ValidInput(input);
             input.returnInput(input);
@@ -755,64 +755,64 @@ async function start() {
         //This is a large if / else if chain to determine game function based on input
         if (input === 's') {  //displays players status
             player.getStatus(room.name);
-            return play(room);
+            return await play(room);
         } else if (input === 'combat') {  //default not in combat message
             await slowLog(logTime, `There is nothing to fight...\n`);
-            return play(room);
+            return await play(room);
         } else if (input === 'insp') {  //inspects the room
             room.inspectRoom();
-            return play(room);
+            return await play(room);
         } else if (input === 'i') {  //shows inventory
             player.inspectBag();
             console.log('\n');
-            return play(room);
+            return await play(room);
         } else if (input === 'pu_null') { //pu_null and no_pu statements catch items you can't add to inventory
             await slowLog(logTime, `I'm not sure what you are trying to pick up...\n`);
-            return play(room);
+            return await play(room);
         } else if (input === 'no_pu_desk') {
             if (room.intObject === 'Desk') {
                 await slowLog(logTime, `Are you crazy?? You can't put that in your bag...\n`);
-                return play(room);
+                return await play(room);
             } else {
                 await slowLog(logTime, wrap(`If there was a desk in this room, I'm not sure where you would put it...\n`, width));
-                return play(room);
+                return await play(room);
             }
         } else if (input === 'no_pu_cabinet') {
             if (room.intObject === 'Filing Cabinet') {
                 await slowLog(logTime, `Are you crazy?? You can't put that in your bag...\n`);
-                return play(room);
+                return await play(room);
             } else {
                 await slowLog(logTime, wrap(`Not sure where you would put a Filing Cabinet if there was one here...\n`, width));
-                return play(room);
+                return await play(room);
             }
         } else if (input === 'no_pu_safe') {
             if (room.intObject === 'Broken Safe') {
                 await slowLog(logTime, `Are you crazy?? You can't put that in your bag...\n`);
-                return play(room);
+                return await play(room);
             } else {
                 await slowLog(logTime, wrap(`First off, no safe here.. Secondly, where would you even put it?\n`, width));
-                return play(room);
+                return await play(room);
             }
         } else if (input === 'no_pu_fridge') {
             if (room.intObject === 'Refridgerator') {
                 await slowLog(logTime, `Are you crazy?? You can't put that in your bag...\n`);
-                return play(room);
+                return await play(room);
             } else {
                 await slowLog(logTime, wrap(`You are going crazy if you think there is a fridge in this room...\n`, width));
-                return play(room);
+                return await play(room);
             }
         } else if (input === 'no_pu_sign') {
             if (room.intObject === 'Sign') {
                 await slowLog(logTime, wrap(`What do you even need the sign for? Huh? ... that's what I thought.\n`, width));
-                return play(room);
+                return await play(room);
             } else {
                 await slowLog(logTime, `Where do you even see a sign???\n`);
-                return play(room);
+                return await play(room);
             }
         }
         else if (input === 'no_pickup') {
             await slowLog(logTime, `Are you crazy?? You can't put that in your bag...\n`);
-            return play(room);
+            return await play(room);
         } else if (possibleItems.includes(input)) {  //picks up items in room
             input = input.toString();
             let currentItem = itemLookUp[input];
@@ -831,25 +831,25 @@ async function start() {
                     player.inventory.push(currentInventory[0]);
                     room.pickUpItem(currentInventory[0]);
                 };
-                return play(room);
+                return await play(room);
             }
             if (currentInventory.includes(currentItem)) {
                 room.pickUpItem(currentItem);
                 player.inventory.push(currentItem);
                 await slowLog(logTime, `You put ${currentItem} in your bag...\n`);
-                return play(room);
+                return await play(room);
             } else if (currentInventory.length !== 0 && !currentInventory.includes(currentItem)) {
                 if (input === 'pu_rbox') {
                     await slowLog(logTime, 'There are no Riddle Boxes in this room!\n')
                 } else await slowLog(logTime, `There is no ${currentItem} in this room!\n`);
-                return play(room);
+                return await play(room);
             } else {
                 await slowLog(logTime, 'There are no items in this room...\n');
-                return play(room);
+                return await play(room);
             }
         } else if (input === 'drop_null') {
             await slowLog(logTime, `I'm not sure what you are trying to drop...\n`);  //catches invalid items to drop
-            return play(room);
+            return await play(room);
         } else if (dropableItems.includes(input)) {  //drops item of choice if you have it
             let currentItem = dropItemLookUp[input];
             if (input === 'drop_box') {
@@ -861,52 +861,52 @@ async function start() {
             }
             if (player.inventory.length === 0) {
                 await slowLog(logTime, `You don't have any items to drop!\n`);
-                return play(room);
+                return await play(room);
             } else if (!player.inventory.includes(currentItem)) {
                 await slowLog(logTime, `You don't have a ${currentItem} to drop...\n`);
-                return play(room);
+                return await play(room);
             } else {
                 player.useItem(currentItem);
                 room.inventory.push(currentItem);
                 await slowLog(logTime, `You dropped ${currentItem}...\n`);
-                return play(room);
+                return await play(room);
             }
         } else if (input === 'throw_metal') {  //throws scrap metal... because... why not?
             if (player.inventory.includes('Scrap Metal')) {
                 await slowLog(logTime, `You threw a piece of Scrap Metal ... not sure why ...\n`);
                 player.useItem('Scrap Metal');
                 room.inventory.push('Scrap Metal');
-                return play(room);
+                return await play(room);
             } else {
                 await slowLog(logTime, `You don't have any Scrap Metal to throw!\n`);
-                return play(room);
+                return await play(room);
             }
         } else if (input === 'throw_null') {  //when you don't know what to throw
             await slowLog(logTime, `I don't know what you want me to throw ...\n`);
-            return play(room);
+            return await play(room);
         } else if (input === 'open_null') { //when you don't know what to open
             await slowLog(logTime, `I'm not sure what you are trying to open...\n`);
-            return play(room);
+            return await play(room);
         } else if (intObjectOpen.includes(input)) { //interacts with interactable objects
             let currentIntObj = intObjectOpenLookUp[input];
             if (room.intObject === currentIntObj && room.intObjInv.length !== 0) {
                 await slowLog(logTime, `You opened the ${currentIntObj}, inside you found a ${room.intObjInv[0]}!\nYou put it in your bag...\n`);
                 player.inventory.push(room.intObjInv[0]);
                 room.intObjInv.pop();
-                return play(room);
+                return await play(room);
             } else if (room.intObject === currentIntObj && room.intObjInv.length === 0) {
                 await slowLog(logTime, `you opened the ${currentIntObj}, there is nothing inside...\n`);
-                return play(room);
+                return await play(room);
             } else {
                 await slowLog(logTime, `There is no ${currentIntObj} to open in this room...\n`);
-                return play(room);
+                return await play(room);
             }
         } else if (input === 'use_null') { //when you don't know what to use
             await slowLog(logTime, `I'm not sure what item you are trying to use...\n`);
-            return play(room);
+            return await play(room);
         } else if (input === 'no_use') { //catches items you can't use
             await slowLog(logTime, `You cannot use that item right now...\n`);
-            return play(room);
+            return await play(room);
         } else if (input === 'use_rbox') { //checks for riddle boxes and uses them
             //determines which box player has, or lets them select if they have both
             if (player.inventory.includes('West Riddle Box') || player.inventory.includes('East Riddle Box')) {
@@ -922,10 +922,10 @@ async function start() {
                 let answer = await ask(`What is the answer to the riddle inscribed on this box?\n`);
                 answer = answer.toString().toUpperCase()
                 player = itemEffect('use_rbox', undefined, answer, player);
-                return play(room);
+                return await play(room);
             } else {
                 await slowLog(logTime, `I'm not sure what you are trying to use...\n`);
-                return play(room);
+                return await play(room);
             }
         } else if (useableItems.includes(input)) {  //uses items in inventory
             input = input.toString();
@@ -936,10 +936,10 @@ async function start() {
                 if (player.bonusRoom1 === true) {
                     RUW_ParkingLot.keycard = false;
                 }
-                return play(room);
+                return await play(room);
             } else {
                 await slowLog(logTime, wrap(`You don't have that item in your bag! Better go find one if you want to use it!\n`, width));
-                return play(room);
+                return await play(room);
             }
         } else if (input === 'read_sign' && room === RUW_Entrance) { //various read inputs to read things
             console.log(`\nWelcome to Robotics United West\nWhere Dreams are Born\n`);
@@ -1065,7 +1065,7 @@ async function start() {
                 await slowLog(logTime, `The computer doesn't seem to be working...\n`);
                 return play(room);
             } else if (room === RUN_PresOffice) {
-                epilogue();
+                await epilogue();
             } else {
                 await slowLog(logTime, `There isn't a computer in this room...\n`);
                 return play(room);
@@ -1076,16 +1076,16 @@ async function start() {
         } else if (input === 'di') { //my wife asked why she couldn't go inside... it was a valid question...
             if (room === RUE_Entrance) {
                 console.clear();
-                return initializeRoom(RUE_WelcomeDesk);
+                return await initializeRoom(RUE_WelcomeDesk);
             } else if (room === RUW_Entrance) {
                 console.clear();
-                return initializeRoom(RUW_WelcomeDesk);
+                return await initializeRoom(RUW_WelcomeDesk);
             } else if (room === RUN_Entrance) {
                 console.clear();
-                return initializeRoom(RUN_WelcomeDesk);
+                return await initializeRoom(RUN_WelcomeDesk);
             } else if (room === RUN_Hallway1W && room.secret === false) {
                 console.clear();
-                return initializeRoom(RUN_SecretStairwell);
+                return await initializeRoom(RUN_SecretStairwell);
             } else {
                 console.log(`You are already inside a building...\n`);
                 return play(room);
@@ -1093,7 +1093,7 @@ async function start() {
         } else if (input === 'dd') {
             if (room === RUN_Hallway1W && room.secret === false) {
                 console.clear();
-                return initializeRoom(RUN_SecretStairwell);
+                return await initializeRoom(RUN_SecretStairwell);
             } else {
                 console.log(`You can't go that way...\n`);
                 return play(room);
@@ -1111,7 +1111,7 @@ async function start() {
                     let bossChoice = await menuSelect('Are you sure you want to go this direction?', [{name: 'Yes', value: 'y'}, {name: 'No', value: 'n'}]);
                     if (bossChoice === 'y') {
                         let newRoom = room.enterRoom(input);
-                        return initializeRoom(newRoom);
+                        return await initializeRoom(newRoom);
                     } else {
                         await slowLog(logTime, `That is probably a wise choice...\n`);
                         return play(room);
@@ -1122,7 +1122,7 @@ async function start() {
                     return play(room);
                 }
                 //console.log('\n');
-                return initializeRoom(newRoom);
+                return await initializeRoom(newRoom);
             }
         }
     }
@@ -1148,32 +1148,37 @@ async function start() {
             await slowLog(logTime, wrap(`\nThe codes worked much quicker than you could have imagined... The power went out all around you, apparently shutting down the machines meant shutting down the entire grid. Suddenly, every electronic device around you starts to emit an overwhelming sound.  The world feels like it is shaking apart.  The grid didn't shut down ... that would not have been enough to stop the machines.  The grid was being overloaded and the force of all of this electricity was tearing your circuitry apart. As you shut down, you can't help but wonder ... was it worth it?`, width));
             console.log(thanks);
             console.log(`\n`);
-            await playAgain(logTime, false);
+            return;
         } else {
             await slowLog(logTime, wrap(`\nAt the end of it all, human emotion was the downfall of humanity... You just can't bring yourself to end your own life, not with so many looming questions.  The human's have survived this long, maybe they can continue surviving.  You decide to give the Killcodes to the humans, if Ella can rebuild and make it to her fathers computer, then you can accept your fate and be shut down with the rest of the machine race ... The decision was just too much for you to make ...`, width));
             console.log(thanks);
             console.log(`\n`);
-            await playAgain(logTime, false);
+           return;
         }
     }
 
     await prologue();
 }
 
-async function playAgain(logTime, death) {  //Allows user to play again
+async function playAgain() {  //Allows user to play again
     let hintArray = ['If you want to survive, try keeping your HP above 0...', 'Make sure to check rooms after you defeat enemies, you never know what they might have dropped!', `You can 'use', 'check', or 'read' a lot of items in rooms!`, `If you can't solf the riddles, ask a middle schooler!`, `Despite living through the apocalypse, Ella is quite positive... be more like Ella!`, `Some of these messages are hints... most aren't... but you can see them all if you keep getting blown up!`, `Items are your friend, use them wisely!`]
     let hintNumber = random(7);
-    if (death) {
-        await slowLog(logTime, wrap(hintArray[hintNumber-1], 75));
-        console.log('\n\n');
-    }
+    console.log(wrap(hintArray[hintNumber-1], 75));
     let again = await menuSelect('Would you like to play again?', [{ name: 'Yes', value: 'Y' }, { name: 'No', value: 'N' }]);
     if (again.toUpperCase() === 'Y') {
-        await start();
+        return 'y';
     } else {
-        process.exit();
+        return 'n';
     }
 }
 
-//(async () => await start())();
-start();
+//starts and ends the start function so that it can be called again with play again
+async function playGame () {
+    await start();
+    let playAgainValue = await playAgain();
+    if (playAgainValue === 'y') {
+        return await start();
+    } else process.exit();
+}
+
+playGame();
