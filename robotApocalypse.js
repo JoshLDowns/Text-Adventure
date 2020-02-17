@@ -635,9 +635,6 @@ async function start() {
             await wait(1500);
             if (victory[0] === true) {
                 player = victory[1];
-                if (room.enemy === enemyRandom) {
-                    enemyRandom.health = 35;
-                }
                 if (player.hasKilled === true) {
                     room.info = room.enemy.postRoomInfo;
                     room.inventory = room.enemy.postRoomInventory;
@@ -684,7 +681,7 @@ async function start() {
                     await wait(1500);
                     if (victory[0] === true) {
                         player = victory[1];
-                        enemyRandom.health = 35;
+                        enemyRandom.health = difficulty==='1'?35:difficulty='2'?40:45;
                         room.enemy = undefined;
                         room.foughtRando = true;
                         await wait(1500);
@@ -706,7 +703,7 @@ async function start() {
                     await wait(1500);
                     if (victory[0] === true) {
                         player = victory[1];
-                        enemyRandom2.health = 20;
+                        enemyRandom2.health = enemyRandom2.maxHealth;
                         room.enemy = undefined;
                         room.foughtRando = true;
                         await wait(1500);
