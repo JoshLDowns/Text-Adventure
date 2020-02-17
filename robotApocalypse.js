@@ -7,7 +7,7 @@ import { ask, menuSelect, craft } from './resources/inquire_funcs.js'
 //starts the game and initializes player object, enemy objects, and room objects
 async function start() {
 
-    //global variable declaration (width is declared after width warning so wrap function works better)
+    //game variable declaration (width is declared after width warning so wrap function works better)
     let width = process.stdout.columns - 8;
     let firstTurn = true;
 
@@ -595,7 +595,7 @@ async function start() {
                 player.health = player.maxHealth;
             }
         }
-        return play(room);
+        return await play(room);
     }
 
     //Main game function, reads user input and makes decisions based on input, room, and player attributes
@@ -603,6 +603,7 @@ async function start() {
         let ranEnemyNum;
         let lootNum;
         let loot;
+        let invalidCount = 0;
         console.log(`----------------------------------------------------------------------\n`);
         //If the game is on the first turn, this checks difficulty and gives you some starting inventory
         if (room === falloutBunker && firstTurn === true) {
@@ -611,19 +612,19 @@ async function start() {
                 console.log(`3 Repair Kits were added to your inventory\n`);
                 player.inventory.push('Repair Kit', 'Repair Kit', 'Repair Kit');
                 firstTurn = false;
-                return (play(room));
+                return play(room);
             } else if (difficulty === '2') {
                 await slowLog(logTime, `\nIt's dangerous out there, take this gear...\n`);
                 console.log(wrap(`2 Repair Kits and 1 Plasma Grenade were added to your inventory\n`, width));
                 player.inventory.push('Repair Kit', 'Repair Kit', 'Plasma Grenade');
                 firstTurn = false;
-                return (play(room));
+                return play(room);
             } else if (difficulty === '3') {
                 await slowLog(logTime, `\nIt's dangerous out there, take this gear...\n`);
                 console.log(wrap(`3 Repair Kits, 1 Portable Shield, and 1 Plasma Grenade were added to your inventory\n`, width));
                 player.inventory.push('Repair Kit', 'Repair Kit', 'Repair Kit', 'Portable Shield', 'Plasma Grenade');
                 firstTurn = false;
-                return (play(room));
+                return play(room);
             }
         }
         //checks if room has a predetermined enemy and calls combat
@@ -736,6 +737,11 @@ async function start() {
         while ((input.firstInputTrue() === false && input.lastWordTrue() === false) || input.return === undefined) {
             console.log('I am not sure what that means...\n');
             console.log(`----------------------------------------------------------------------\n`);
+            invalidCount += 1;
+            if (invalidCount === 3) {
+                console.log(`Try typing 'help' for a list of commands that work!\n`)
+                invalidCount = 0;
+            }
             input = await ask('What would you like to do?\n');
             if ((input.slice(0, input.indexOf(' ')).toUpperCase()) === 'XYZZY' && (cheatCode.includes((input.slice((input.lastIndexOf(' ')) + 1))))) {
                 console.clear();
@@ -967,6 +973,7 @@ async function start() {
                 await slowLog(logTime, wrap(`You can read it at any time if you are in this building by typing map...\n`, width));
                 return play(room);
             } else if (player.mapWest === true && room.map === 'w') {
+                await slowLog(logTime, `You are currently in ${room.name}\n`);
                 console.log(mapWest);
                 return play(room);
             } else if (player.mapEast === true && room.map === 'e') {
@@ -1150,7 +1157,7 @@ async function start() {
         }
     }
 
-    prologue();
+    await prologue();
 }
 
 async function playAgain(logTime, death) {  //Allows user to play again
@@ -1162,11 +1169,11 @@ async function playAgain(logTime, death) {  //Allows user to play again
     }
     let again = await menuSelect('Would you like to play again?', [{ name: 'Yes', value: 'Y' }, { name: 'No', value: 'N' }]);
     if (again.toUpperCase() === 'Y') {
-        process.stdout.removeAllListeners();
         await start();
     } else {
         process.exit();
     }
 }
 
-(async () => await start())();
+//(async () => await start())();
+start();
