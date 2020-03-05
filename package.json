@@ -1,6 +1,6 @@
 {
   "name": "text-adventure-robot-apocalypse",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "robotApocalypse.js",
   "scripts": {
