@@ -4,7 +4,11 @@ A text based adventure game reminiscent of Zork and Colossal Cave Adventure.
 Thanks for installing Robot Apocalypse!  This is always a work in progress, but the game is up and running so feel free to give it a play!
 
 # Basic Commands
-npm start - gets the game running
+
+node node_modules\text-adventure-robot-apocalypse\robotApocalypse.js - gets the game running
+
+I'm working on figuring out how to make that more intuitive!
+
 
 While in game:
 
