@@ -50,7 +50,7 @@ export const mapEast = `\n                Robotics United East Tower
                +----------+----------+----------+ 
     1: Cubicle Blk. 2, 2: Hallway N, 3: Q.A.
     4: Welcome Desk, 5: Fab. Unit, 6: Server Room
-    7: Charging Station, 8: Hallway S, 4: Adv. Wpns.\n`;
+    7: Charging Station, 8: Hallway S, 9: Adv. Wpns.\n`;
 
 export const mapWest = `\n     Robotics United West Tower
     +----------+----------+----------+
