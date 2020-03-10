@@ -7,7 +7,7 @@ Thanks for installing Robot Apocalypse!  This is always a work in progress, but 
 
 npm install - g text-adventure-robot-apocalypse to install
 
-robot-apocalypse - gets the game running
+robot-apocalypse or robot-apocalypse.cmd - gets the game running
 
 
 While in game:

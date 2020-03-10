@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { wrap, random, itemEffect, wait, slowLog, storyTextOffOn, roomBar } from '../resources/functions.js'
 import { ValidInput } from '../resources/inputValidation.js'
 import { title, gameOverText, mapEast, mapWest, mapNorth, thanks, secretMap } from '../resources/ascii_images.js'
