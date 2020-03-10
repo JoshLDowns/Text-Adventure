@@ -2,10 +2,13 @@
   "name": "text-adventure-robot-apocalypse",
   "version": "1.0.1",
   "description": "",
-  "main": "robotApocalypse.js",
+  "main": "./bin/robotApocalypse.js",
+  "bin": {
+    "robot-apocalypse": "./bin/robotApocalypse.js"
+},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node robotApocalypse.js"
+    "start": "node bin/robotApocalypse.js"
   },
   "repository": {
     "type": "git",

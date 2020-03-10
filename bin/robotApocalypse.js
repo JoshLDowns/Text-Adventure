@@ -1,8 +1,8 @@
-import { wrap, random, itemEffect, wait, slowLog, storyTextOffOn, roomBar } from './resources/functions.js'
-import { ValidInput } from './resources/inputValidation.js'
-import { title, gameOverText, mapEast, mapWest, mapNorth, thanks, secretMap } from './resources/ascii_images.js'
-import { combat } from './resources/combat.js'
-import { ask, menuSelect, craft } from './resources/inquire_funcs.js'
+import { wrap, random, itemEffect, wait, slowLog, storyTextOffOn, roomBar } from '../resources/functions.js'
+import { ValidInput } from '../resources/inputValidation.js'
+import { title, gameOverText, mapEast, mapWest, mapNorth, thanks, secretMap } from '../resources/ascii_images.js'
+import { combat } from '../resources/combat.js'
+import { ask, menuSelect, craft } from '../resources/inquire_funcs.js'
 
 //starts the game and initializes player object, enemy objects, and room objects
 async function start() {

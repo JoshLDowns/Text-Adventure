@@ -5,9 +5,9 @@ Thanks for installing Robot Apocalypse!  This is always a work in progress, but 
 
 # Basic Commands
 
-node node_modules\text-adventure-robot-apocalypse\robotApocalypse.js - gets the game running
+npm install - g text-adventure-robot-apocalypse to install
 
-I'm working on figuring out how to make that more intuitive!
+robot-apocalypse - gets the game running
 
 
 While in game:
