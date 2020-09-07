@@ -17,29 +17,15 @@ class ValidInput {
         this.otherActions = ['DROP', 'THROW', 'FART', 'LAUGH', 'LOL', 'HUG', 'READ', 'OPEN', 'RUN', 'CHECK'];
         this.intObjects = ['SIGN', 'DESK', 'COMPUTER', 'CABINET', 'FRIDGE', 'REFRIDGERATOR', 'SAFE', 'MAP', 'M', 'DIRECTORY', 'PAINTING', 'PICTURE', 'PORTRAIT'];
         this.falloutBunkerEvent = ['REPAIR', 'FIX', 'KEYCARD', 'KEY', 'CRAFT'];
-        this.validInputs = [this.affirmative, this.negatory, this.direction, this.inventory, this.status, this.inspect, this.instructions, this.useItem, this.pickUpItem, this.combat, this.items, this.otherActions, this.intObjects, this.falloutBunkerEvent];
+        this.validInputs = [...this.affirmative, ...this.negatory, ...this.direction, ...this.inventory, ...this.status, ...this.inspect, ...this.instructions, ...this.useItem, ...this.pickUpItem, ...this.combat, ...this.items, ...this.otherActions, ...this.intObjects, ...this.falloutBunkerEvent];
     }
     //checks first word of input
     firstInputTrue() {
-        for (let arr of this.validInputs) {
-            for (let item of arr) {
-                if (this.firstWord === item.toString()) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return this.validInputs.includes(this.firstWord);
     }
     //checks last word of input
     lastWordTrue() {
-        for (let arr of this.validInputs) {
-            for (let item of arr) {
-                if (this.lastWord === item.toString()) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return this.validInputs.includes(this.lastWord);
     }
     //determines the return output of each valid entry
     returnInput(obj) {

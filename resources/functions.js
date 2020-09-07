@@ -61,7 +61,7 @@ export function itemEffect(item, comp, answer, user, room) {
         console.log(wrap(`You have upgraded your Particle Beam!  It now hits harder than ever!\n`, width));
         return user;
     } else if (item === 'use_carboncoating') {
-        user.useItem(useableItemLookUp[item]);
+        user.useItem(useableItemLookUpcd[item]);
         user.maxHealth = user.maxHealth + 10;
         user.health = user.health + 10;
         console.log(`You have increased your maximum HP by 10 points!\n`);
@@ -78,7 +78,7 @@ export function itemEffect(item, comp, answer, user, room) {
             comp.health = comp.health - 20;
             console.log(`You threw a Plasma Grenade! It dealt 20 damage to ${comp.name}!\n`);
             return user;
-        } else if (room.name = 'Hallway 1S - W') {
+        } else if (room.name === 'Hallway 1S - W') {
             console.log(wrap(`You throw a Plasma Grenade at the door! The blast leaves a sizeable hole in the wall that fills the room with sunlight...`, width));
             user.bonusRoom1 = true;
             return user;
