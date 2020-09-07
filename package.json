@@ -1,11 +1,11 @@
 {
   "name": "text-adventure-robot-apocalypse",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "",
   "main": "./bin/robotApocalypse.js",
   "bin": {
     "robot-apocalypse": "./bin/robotApocalypse.js"
-},
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node bin/robotApocalypse.js"
