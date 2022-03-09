@@ -61,7 +61,7 @@ export function itemEffect(item, comp, answer, user, room) {
         console.log(wrap(`You have upgraded your Particle Beam!  It now hits harder than ever!\n`, width));
         return user;
     } else if (item === 'use_carboncoating') {
-        user.useItem(useableItemLookUpcd[item]);
+        user.useItem(useableItemLookUp[item]);
         user.maxHealth = user.maxHealth + 10;
         user.health = user.health + 10;
         console.log(`You have increased your maximum HP by 10 points!\n`);
